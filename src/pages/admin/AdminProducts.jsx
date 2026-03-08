@@ -1,0 +1,244 @@
+import { useState, useEffect } from 'react'
+import { Plus, Edit2, Trash2, Search, X, Image as Img } from 'lucide-react'
+import { AdminLayout } from './Dashboard'
+import { useToast } from '../../context/ToastContext'
+import api from '../../utils/api'
+
+const EMPTY = { name: '', description: '', price: '', originalPrice: '', category: 'keychains', image: '', images: [], badge: '', inStock: true, featured: false }
+const CATS = [{ label: 'Keychains', value: 'keychains' }, { label: 'Soft Toys', value: 'soft-toys' }, { label: 'Flowers', value: 'flowers' }]
+
+export default function AdminProducts() {
+  const [products, setProducts] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
+  const [catFilter, setCatFilter] = useState('all')
+  const [modal, setModal] = useState(false)
+  const [editing, setEditing] = useState(null)
+  const [form, setForm] = useState(EMPTY)
+  const [saving, setSaving] = useState(false)
+  const [deleteId, setDeleteId] = useState(null)
+  const { addToast } = useToast()
+
+  const fetch = () => {
+    setLoading(true)
+    const p = new URLSearchParams()
+    if (catFilter !== 'all') p.set('category', catFilter)
+    if (search) p.set('search', search)
+    api.get(`/products?${p}`).then(r => setProducts(r.data)).finally(() => setLoading(false))
+  }
+
+  useEffect(() => { fetch() }, [catFilter, search])
+
+  const openAdd = () => { setEditing(null); setForm(EMPTY); setModal(true) }
+  const openEdit = (p) => { setEditing(p._id); setForm({ name: p.name, description: p.description, price: p.price, originalPrice: p.originalPrice || '', category: p.category, image: p.image, images: p.images || [], badge: p.badge || '', inStock: p.inStock, featured: p.featured }); setModal(true) }
+
+  const handleSave = async (e) => {
+    e.preventDefault()
+    setSaving(true)
+    try {
+      if (!form.image) { addToast('Please upload at least one photo', 'error'); setSaving(false); return }
+      const data = { ...form, price: Number(form.price), originalPrice: form.originalPrice ? Number(form.originalPrice) : undefined }
+      if (editing) await api.put(`/products/${editing}`, data)
+      else await api.post('/products', data)
+      addToast(editing ? 'Product updated!' : 'Product created!', 'success')
+      setModal(false); fetch()
+    } catch { addToast('Failed to save product', 'error') }
+    finally { setSaving(false) }
+  }
+
+  const handleDelete = async () => {
+    try {
+      await api.delete(`/products/${deleteId}`)
+      addToast('Product deleted', 'info')
+      setDeleteId(null); fetch()
+    } catch { addToast('Failed to delete', 'error') }
+  }
+
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
+
+  const handleImageUpload = (e) => {
+    Array.from(e.target.files).forEach(file => {
+      const reader = new FileReader()
+      reader.onload = ev => {
+        setForm(f => {
+          if (!f.image) return { ...f, image: ev.target.result }
+          return { ...f, images: [...(f.images || []), ev.target.result] }
+        })
+      }
+      reader.readAsDataURL(file)
+    })
+    e.target.value = ''
+  }
+
+  const removeImage = (idx) => {
+    setForm(f => {
+      const all = [f.image, ...(f.images || [])].filter(Boolean)
+      all.splice(idx, 1)
+      return { ...f, image: all[0] || '', images: all.slice(1) }
+    })
+  }
+
+  return (
+    <AdminLayout title="Products">
+      {/* Controls */}
+      <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap', alignItems: 'center' }}>
+        <div style={{ position: 'relative', flex: '1 1 200px' }}>
+          <Search size={15} color="#C4A696" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search products..." className="form-input" style={{ paddingLeft: '36px' }} />
+        </div>
+        <select value={catFilter} onChange={e => setCatFilter(e.target.value)} className="form-input" style={{ width: 'auto' }}>
+          <option value="all">All Categories</option>
+          {CATS.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+        </select>
+        <button onClick={openAdd} className="btn-primary" style={{ whiteSpace: 'nowrap' }}><Plus size={16} /> Add Product</button>
+      </div>
+
+      {/* Table */}
+      <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid rgba(248,200,220,0.2)', overflow: 'hidden' }}>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr style={{ background: '#FFF6EC', borderBottom: '1px solid rgba(238,214,196,0.5)' }}>
+                {['Product', 'Category', 'Price', 'Stock', 'Featured', 'Actions'].map(h => (
+                  <th key={h} style={{ padding: '12px 16px', textAlign: 'left', fontSize: '0.75rem', fontWeight: 700, color: '#9E7B6C', textTransform: 'uppercase', letterSpacing: '0.06em', whiteSpace: 'nowrap' }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                [...Array(5)].map((_, i) => (
+                  <tr key={i}><td colSpan={6} style={{ padding: '12px 16px' }}><div className="skeleton" style={{ height: '40px', borderRadius: '8px' }} /></td></tr>
+                ))
+              ) : products.length === 0 ? (
+                <tr><td colSpan={6} style={{ textAlign: 'center', padding: '40px', color: '#9E7B6C' }}>No products found</td></tr>
+              ) : products.map(p => (
+                <tr key={p._id} style={{ borderBottom: '1px solid rgba(238,214,196,0.3)', transition: 'background 0.15s' }}
+                  onMouseEnter={e => e.currentTarget.style.background = '#FFFBF8'}
+                  onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                >
+                  <td style={{ padding: '12px 16px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <img src={p.image} alt={p.name} style={{ width: '44px', height: '44px', borderRadius: '10px', objectFit: 'cover', background: '#FFF6EC' }} />
+                      <div>
+                        <div style={{ fontWeight: 600, color: '#7A5C4E', fontSize: '0.875rem' }}>{p.name}</div>
+                        {p.badge && <span style={{ fontSize: '0.65rem', background: '#FDE8F0', color: '#E8A0B8', padding: '2px 6px', borderRadius: '50px', fontWeight: 700 }}>{p.badge}</span>}
+                      </div>
+                    </div>
+                  </td>
+                  <td style={{ padding: '12px 16px' }}><span style={{ fontSize: '0.8rem', background: 'rgba(248,200,220,0.2)', color: '#9E7B6C', padding: '4px 10px', borderRadius: '50px', textTransform: 'capitalize', whiteSpace: 'nowrap' }}>{p.category.replace('-', ' ')}</span></td>
+                  <td style={{ padding: '12px 16px', fontWeight: 700, color: '#7A5C4E', fontSize: '0.9rem' }}>₹{p.price.toLocaleString('en-IN')}</td>
+                  <td style={{ padding: '12px 16px' }}>
+                    <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', background: p.inStock ? '#16a34a' : '#dc2626', marginRight: '6px' }} />
+                    <span style={{ fontSize: '0.8rem', color: '#7A5C4E' }}>{p.inStock ? 'In Stock' : 'Out'}</span>
+                  </td>
+                  <td style={{ padding: '12px 16px', fontSize: '0.8rem', color: p.featured ? '#E8A0B8' : '#C4A696', fontWeight: 600 }}>{p.featured ? '★ Yes' : 'No'}</td>
+                  <td style={{ padding: '12px 16px' }}>
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                      <button onClick={() => openEdit(p)} style={{ width: '34px', height: '34px', border: '1.5px solid #EED6C4', borderRadius: '8px', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9E7B6C' }}><Edit2 size={14} /></button>
+                      <button onClick={() => setDeleteId(p._id)} style={{ width: '34px', height: '34px', border: '1.5px solid #fca5a5', borderRadius: '8px', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#dc2626' }}><Trash2 size={14} /></button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Add/Edit Modal */}
+      {modal && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 2000, background: 'rgba(122,92,78,0.4)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}
+          onClick={e => e.target === e.currentTarget && setModal(false)}
+        >
+          <div style={{ background: '#fff', borderRadius: '20px', padding: '28px', width: '100%', maxWidth: '560px', maxHeight: '90vh', overflowY: 'auto' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+              <h2 style={{ fontWeight: 800, color: '#7A5C4E' }}>{editing ? 'Edit Product' : 'Add Product'}</h2>
+              <button onClick={() => setModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9E7B6C' }}><X size={20} /></button>
+            </div>
+            <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <F label="Name" v={form.name} onChange={v => set('name', v)} required />
+              <div>
+                <label className="form-label">Description</label>
+                <textarea value={form.description} onChange={e => set('description', e.target.value)} rows={3} className="form-input" style={{ resize: 'vertical' }} required />
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <F label="Price (₹)" type="number" v={form.price} onChange={v => set('price', v)} required />
+                <F label="Original Price (₹)" type="number" v={form.originalPrice} onChange={v => set('originalPrice', v)} />
+              </div>
+              <div>
+                <label className="form-label">Category</label>
+                <select value={form.category} onChange={e => set('category', e.target.value)} className="form-input" style={{ appearance: 'auto' }}>
+                  {CATS.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+                </select>
+              </div>
+              {/* Multi-image upload */}
+              <div>
+                <label className="form-label">Product Photos</label>
+                <label
+                  style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', padding: '14px 16px', border: '1.5px dashed #EED6C4', borderRadius: '12px', background: '#FFFBF8', transition: 'border-color 0.2s' }}
+                  onMouseEnter={e => e.currentTarget.style.borderColor = '#E8A0B8'}
+                  onMouseLeave={e => e.currentTarget.style.borderColor = '#EED6C4'}
+                >
+                  <Img size={18} color="#E8A0B8" />
+                  <div>
+                    <div style={{ fontSize: '0.875rem', color: '#7A5C4E', fontWeight: 600 }}>Upload Photos from Device</div>
+                    <div style={{ fontSize: '0.72rem', color: '#9E7B6C' }}>Select multiple images • First uploaded = main photo</div>
+                  </div>
+                  <input type="file" accept="image/*" multiple onChange={handleImageUpload} style={{ display: 'none' }} />
+                </label>
+                {[form.image, ...(form.images || [])].filter(Boolean).length > 0 && (
+                  <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '12px' }}>
+                    {[form.image, ...(form.images || [])].filter(Boolean).map((img, i) => (
+                      <div key={i} style={{ position: 'relative', paddingBottom: i === 0 ? '10px' : '0' }}>
+                        <img src={img} alt="" style={{ width: '76px', height: '76px', objectFit: 'cover', borderRadius: '10px', border: i === 0 ? '2.5px solid #E8A0B8' : '2px solid #EED6C4', display: 'block' }} onError={e => e.target.style.opacity = '0.3'} />
+                        {i === 0 && <span style={{ position: 'absolute', bottom: '-2px', left: '50%', transform: 'translateX(-50%)', background: '#E8A0B8', color: '#fff', fontSize: '0.5rem', fontWeight: 800, padding: '2px 8px', borderRadius: '50px', whiteSpace: 'nowrap' }}>MAIN</span>}
+                        <button type="button" onClick={() => removeImage(i)} style={{ position: 'absolute', top: '-7px', right: '-7px', width: '20px', height: '20px', background: '#dc2626', border: 'none', borderRadius: '50%', cursor: 'pointer', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 900, lineHeight: 1 }}>×</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <F label="Badge (optional)" v={form.badge} onChange={v => set('badge', v)} />
+              <div style={{ display: 'flex', gap: '20px' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.875rem', color: '#7A5C4E', fontWeight: 600 }}>
+                  <input type="checkbox" checked={form.inStock} onChange={e => set('inStock', e.target.checked)} /> In Stock
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.875rem', color: '#7A5C4E', fontWeight: 600 }}>
+                  <input type="checkbox" checked={form.featured} onChange={e => set('featured', e.target.checked)} /> Featured
+                </label>
+              </div>
+              <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '8px' }}>
+                <button type="button" onClick={() => setModal(false)} className="btn-secondary">Cancel</button>
+                <button type="submit" disabled={saving} className="btn-primary">{saving ? 'Saving...' : editing ? 'Update' : 'Create'}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Delete confirm */}
+      {deleteId && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 2000, background: 'rgba(122,92,78,0.4)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+          <div style={{ background: '#fff', borderRadius: '20px', padding: '32px', maxWidth: '360px', width: '100%', textAlign: 'center' }}>
+            <Trash2 size={40} color="#dc2626" style={{ margin: '0 auto 16px', display: 'block' }} />
+            <h3 style={{ fontWeight: 800, color: '#7A5C4E', marginBottom: '8px' }}>Delete Product?</h3>
+            <p style={{ color: '#9E7B6C', marginBottom: '24px', fontSize: '0.875rem' }}>This action cannot be undone.</p>
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+              <button onClick={() => setDeleteId(null)} className="btn-secondary">Cancel</button>
+              <button onClick={handleDelete} style={{ background: '#dc2626', color: '#fff', padding: '12px 24px', borderRadius: '50px', fontWeight: 600, fontSize: '0.875rem', border: 'none', cursor: 'pointer' }}>Delete</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </AdminLayout>
+  )
+}
+
+function F({ label, v, onChange, type = 'text', required }) {
+  return (
+    <div>
+      <label className="form-label">{label}</label>
+      <input type={type} value={v} onChange={e => onChange(e.target.value)} className="form-input" required={required} />
+    </div>
+  )
+}
