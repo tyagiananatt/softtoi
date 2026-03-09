@@ -1,8 +1,8 @@
 // Vercel serverless entry point
 require('dotenv').config();
 const serverless = require('serverless-http');
-const connectDB = require('./db');
-const app = require('./app');
+const connectDB = require('../lib/db');
+const app = require('../lib/app');
 
 let handler;
 
