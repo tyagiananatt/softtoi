@@ -8,7 +8,8 @@
     "dev:api": "nodemon lib/server.js",
     "build": "vite build",
     "preview": "vite preview",
-    "seed": "node lib/seed.js"
+    "seed": "node lib/seed.js",
+    "seed:atlas": "node api/_lib/seed.js"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.0.14",

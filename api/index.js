@@ -1,8 +1,5 @@
 // Vercel serverless entry point
-require('dotenv').config();
 const serverless = require('serverless-http');
-const connectDB = require('../lib/db');
-const app = require('../lib/app');
 
 let handler;
 
@@ -18,13 +15,11 @@ module.exports = async (req, res) => {
     });
   }
 
+  const connectDB = require('./_lib/db');
+  const app = require('./_lib/app');
+
   try {
-    await Promise.race([
-      connectDB(),
-      new Promise((_, reject) =>
-        setTimeout(() => reject(new Error('DB connection timeout')), 8000)
-      ),
-    ]);
+    await connectDB();
   } catch (err) {
     console.error('DB Error:', err.message);
     return res.status(503).json({ message: 'Database connection failed: ' + err.message });

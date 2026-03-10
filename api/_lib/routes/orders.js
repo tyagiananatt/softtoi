@@ -1,0 +1,72 @@
+const express = require('express');
+const router = express.Router();
+const Order = require('../models/Order');
+const authMiddleware = require('../middleware/auth');
+
+const generateOrderId = () => `ST-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
+
+// GET orders (admin: all; user: by email query)
+router.get('/', async (req, res) => {
+  try {
+    const { email, status, search } = req.query;
+    let query = {};
+    if (email) query['shipping.email'] = email;
+    if (status && status !== 'all') query.status = status;
+    if (search) {
+      query.$or = [
+        { orderId: { $regex: search, $options: 'i' } },
+        { 'shipping.firstName': { $regex: search, $options: 'i' } },
+        { 'shipping.lastName': { $regex: search, $options: 'i' } },
+        { 'shipping.email': { $regex: search, $options: 'i' } },
+      ];
+    }
+    const orders = await Order.find(query).sort({ createdAt: -1 }).populate('items.product', 'name image price');
+    res.json(orders);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// GET single order
+router.get('/:id', async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id).populate('items.product');
+    if (!order) return res.status(404).json({ message: 'Order not found' });
+    res.json(order);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// POST create order
+router.post('/', async (req, res) => {
+  try {
+    const { items, shipping, subtotal, shippingCost, total, paymentMethod } = req.body;
+    const order = new Order({
+      orderId: generateOrderId(),
+      items,
+      shipping,
+      subtotal,
+      shippingCost,
+      total,
+      paymentMethod: paymentMethod || 'COD',
+    });
+    const saved = await order.save();
+    res.status(201).json(saved);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+// PUT update order status (admin)
+router.put('/:id', authMiddleware, async (req, res) => {
+  try {
+    const updated = await Order.findByIdAndUpdate(req.params.id, { status: req.body.status }, { new: true });
+    if (!updated) return res.status(404).json({ message: 'Order not found' });
+    res.json(updated);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
+module.exports = router;
