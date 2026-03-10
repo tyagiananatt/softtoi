@@ -29,13 +29,24 @@ module.exports = async (req, res) => {
 
     handler = serverless(app);
 
-    // Connect to DB
+    // Connect to DB — use direct hosts to avoid SRV DNS timeout on Vercel
     if (!dbConnected) {
       try {
-        await mongoose.connect(process.env.MONGODB_URI, {
+        // Convert mongodb+srv:// to direct connection if SRV
+        let uri = process.env.MONGODB_URI;
+        if (uri && uri.startsWith('mongodb+srv://')) {
+          const afterSrv = uri.replace('mongodb+srv://', '');
+          const atIdx = afterSrv.indexOf('@');
+          const creds = afterSrv.substring(0, atIdx);
+          const rest = afterSrv.substring(atIdx + 1);
+          const slashIdx = rest.indexOf('/');
+          const dbAndParams = rest.substring(slashIdx);
+          uri = `mongodb://${creds}@ac-i8wgyby-shard-00-00.yv52lvm.mongodb.net:27017,ac-i8wgyby-shard-00-01.yv52lvm.mongodb.net:27017,ac-i8wgyby-shard-00-02.yv52lvm.mongodb.net:27017${dbAndParams}&ssl=true&authSource=admin&replicaSet=atlas-k0gitt-shard-0`;
+        }
+        await mongoose.connect(uri, {
           bufferCommands: false,
-          serverSelectionTimeoutMS: 5000,
-          connectTimeoutMS: 5000,
+          serverSelectionTimeoutMS: 10000,
+          connectTimeoutMS: 10000,
         });
         dbConnected = true;
       } catch (err) {
