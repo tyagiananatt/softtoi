@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "concurrently \"npm run dev:api\" \"npm run dev:client\"",
     "dev:client": "vite",
-    "dev:api": "nodemon api/server.js",
+    "dev:api": "nodemon lib/server.js",
     "build": "vite build",
     "preview": "vite preview",
     "seed": "node lib/seed.js"
