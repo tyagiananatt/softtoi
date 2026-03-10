@@ -2,9 +2,17 @@ import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
 
+// Curated aesthetic banner images per category slug
+const SLUG_IMAGES = {
+  keychains:   'https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?auto=format&fit=crop&w=600&h=750&q=90',
+  'soft-toys': 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=600&h=750&q=90',
+  flowers:     'https://images.unsplash.com/photo-1490750967868-88df5691cc43?auto=format&fit=crop&w=600&h=750&q=90',
+}
+
 export default function CategoryCard({ category, index = 0 }) {
   const slugMap = { keychains: 'keychains', 'soft-toys': 'soft-toys', flowers: 'flowers' }
   const href = `/products?category=${slugMap[category.slug] || category.slug}`
+  const bannerImage = SLUG_IMAGES[category.slug] || category.image
 
   return (
     <motion.div
@@ -17,7 +25,7 @@ export default function CategoryCard({ category, index = 0 }) {
       <Link to={href} style={{ textDecoration: 'none', display: 'block', height: '100%' }}>
         <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden' }}>
           <img
-            src={category.image}
+            src={bannerImage}
             alt={category.name}
             loading="lazy"
             style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }}
