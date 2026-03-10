@@ -2,11 +2,11 @@ import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
 
-// Curated aesthetic banner images per category slug
+// Local category banner images from public/category_card/
 const SLUG_IMAGES = {
-  keychains:   'https://images.unsplash.com/photo-1576871337632-b9aef4c17ab9?auto=format&fit=crop&w=600&h=750&q=90',
-  'soft-toys': 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=600&h=750&q=90',
-  flowers:     'https://images.unsplash.com/photo-1490750967868-88df5691cc43?auto=format&fit=crop&w=600&h=750&q=90',
+  keychains:   '/category_card/keychain.png',
+  'soft-toys': '/category_card/softtoy.png',
+  flowers:     '/category_card/flowers.png',
 }
 
 export default function CategoryCard({ category, index = 0 }) {
