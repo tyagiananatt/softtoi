@@ -12,7 +12,15 @@ api.interceptors.request.use((config) => {
 })
 
 api.interceptors.response.use(
-  (res) => res,
+  (res) => {
+    // If Vercel routing is misconfigured it returns HTML with status 200.
+    // Catch that here so callers always get a real error instead of silent data loss.
+    const ct = res.headers['content-type'] || ''
+    if (ct.includes('text/html')) {
+      return Promise.reject(new Error('API returned HTML instead of JSON — check Vercel routing config'))
+    }
+    return res
+  },
   (err) => {
     if (err.response?.status === 401) {
       localStorage.removeItem('softtoi_admin_token')
