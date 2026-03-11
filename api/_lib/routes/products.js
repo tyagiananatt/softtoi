@@ -20,7 +20,7 @@ router.get('/', async (req, res) => {
 
     // Exclude the large base64 `images` array from list responses to reduce memory usage.
     // The full images array is returned only on the single-product endpoint below.
-    const products = await Product.find(query).sort(sortOption).select('-images').lean();
+    const products = await Product.find(query).sort(sortOption).select('-images').allowDiskUse(true).lean();
     res.json(products);
   } catch (err) {
     res.status(500).json({ message: err.message });

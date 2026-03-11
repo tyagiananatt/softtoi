@@ -20,6 +20,9 @@ async function connectDB() {
   }
   try {
     cached.conn = await cached.promise;
+    // Ensure indexes defined in models are created in the database
+    const Product = require('./models/Product');
+    await Product.syncIndexes();
   } catch (e) {
     cached.promise = null;
     throw e;
