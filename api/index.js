@@ -112,11 +112,20 @@ async function connectDB() {
 }
 
 module.exports = async (req, res) => {
+  // Health check bypasses DB so we can always verify the function is alive
+  if (req.url === '/api/health' || req.url === '/api/health/') {
+    return res.json({ status: 'ok', time: new Date().toISOString() });
+  }
+
   try {
     await connectDB();
   } catch (err) {
     console.error('DB connection failed:', err.message);
-    return res.status(503).json({ message: 'Database connection failed. Please try again later.' });
+    // Return the real error in non-production so it's debuggable
+    return res.status(503).json({
+      message: 'Database connection failed',
+      detail: err.message,
+    });
   }
   return buildHandler()(req, res);
 };
