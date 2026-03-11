@@ -42,10 +42,22 @@ async function resolveSrvUri(uri) {
     const srvHost = afterAt.slice(0, slashIdx);             // cluster.mongodb.net
     const dbAndParams = afterAt.slice(slashIdx);            // /dbname?opts
 
-    const [srvRecords, txtRecords] = await Promise.all([
-      dns.resolveSrv(`_mongodb._tcp.${srvHost}`),
-      dns.resolveTxt(srvHost).catch(() => []),
-    ]);
+    // Race DNS lookups against a 3-second timeout so cold starts don't hang
+    const timeout = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('DNS timeout')), 3000)
+    );
+    const [srvRecords, txtRecords] = await Promise.race([
+      Promise.all([
+        dns.resolveSrv(`_mongodb._tcp.${srvHost}`),
+        dns.resolveTxt(srvHost).catch(() => []),
+      ]),
+      timeout,
+    ]).catch(() => null) || [null, []];
+
+    if (!srvRecords || srvRecords.length === 0) {
+      console.warn('SRV resolution returned no records, falling back to original URI');
+      return uri;
+    }
 
     const hosts = srvRecords.map((r) => `${r.name}:${r.port}`).join(',');
     const txtOpts = (txtRecords[0] || []).join('');        // e.g. authSource=admin&replicaSet=...
@@ -56,7 +68,9 @@ async function resolveSrvUri(uri) {
       ? `${sep}${txtOpts}&tls=true&authSource=admin`
       : `${sep}tls=true&authSource=admin`;
 
-    return `mongodb://${creds}@${hosts}${dbAndParams}${extraParams}`;
+    const directUri = `mongodb://${creds}@${hosts}${dbAndParams}${extraParams}`;
+    console.log(`SRV resolved to ${srvRecords.length} host(s)`);
+    return directUri;
   } catch (e) {
     // If DNS resolution fails for any reason, fall back to the original SRV URI
     console.warn('SRV resolution failed, using original URI:', e.message);

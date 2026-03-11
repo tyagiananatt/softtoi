@@ -10,6 +10,7 @@ const CATS = [{ label: 'Keychains', value: 'keychains' }, { label: 'Soft Toys', 
 export default function AdminProducts() {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
+  const [apiError, setApiError] = useState(null)
   const [search, setSearch] = useState('')
   const [catFilter, setCatFilter] = useState('all')
   const [modal, setModal] = useState(false)
@@ -21,10 +22,14 @@ export default function AdminProducts() {
 
   const fetch = () => {
     setLoading(true)
+    setApiError(null)
     const p = new URLSearchParams()
     if (catFilter !== 'all') p.set('category', catFilter)
     if (search) p.set('search', search)
-    api.get(`/products?${p}`).then(r => setProducts(r.data)).finally(() => setLoading(false))
+    api.get(`/products?${p}`)
+      .then(r => setProducts(r.data))
+      .catch(err => setApiError(err.response?.data?.message || err.message || 'Failed to load products'))
+      .finally(() => setLoading(false))
   }
 
   useEffect(() => { fetch() }, [catFilter, search])
@@ -109,6 +114,12 @@ export default function AdminProducts() {
                 [...Array(5)].map((_, i) => (
                   <tr key={i}><td colSpan={6} style={{ padding: '12px 16px' }}><div className="skeleton" style={{ height: '40px', borderRadius: '8px' }} /></td></tr>
                 ))
+              ) : apiError ? (
+                <tr><td colSpan={6} style={{ textAlign: 'center', padding: '40px', color: '#C44569' }}>
+                  <div style={{ marginBottom: '8px', fontWeight: 600 }}>API Error</div>
+                  <div style={{ fontSize: '0.875rem', marginBottom: '16px' }}>{apiError}</div>
+                  <button className="btn-primary" style={{ fontSize: '0.875rem' }} onClick={fetch}>Retry</button>
+                </td></tr>
               ) : products.length === 0 ? (
                 <tr><td colSpan={6} style={{ textAlign: 'center', padding: '40px', color: '#9E7B6C' }}>No products found</td></tr>
               ) : products.map(p => (
