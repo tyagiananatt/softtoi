@@ -107,20 +107,20 @@ export default function AdminProducts() {
   return (
     <AdminLayout title="Products">
       {/* Controls */}
-      <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap', alignItems: 'center' }}>
-        <div style={{ position: 'relative', flex: '1 1 200px' }}>
+      <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', flexWrap: 'wrap', alignItems: 'center' }}>
+        <div style={{ position: 'relative', flex: '1 1 160px', minWidth: 0 }}>
           <Search size={15} color="#C4A696" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search products..." className="form-input" style={{ paddingLeft: '36px' }} />
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search..." className="form-input" style={{ paddingLeft: '36px' }} />
         </div>
-        <select value={catFilter} onChange={e => setCatFilter(e.target.value)} className="form-input" style={{ width: 'auto' }}>
-          <option value="all">All Categories</option>
+        <select value={catFilter} onChange={e => setCatFilter(e.target.value)} className="form-input" style={{ width: 'auto', flex: '0 0 auto' }}>
+          <option value="all">All</option>
           {CATS.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
         </select>
-        <button onClick={openAdd} className="btn-primary" style={{ whiteSpace: 'nowrap' }}><Plus size={16} /> Add Product</button>
+        <button onClick={openAdd} className="btn-primary" style={{ whiteSpace: 'nowrap', padding: '10px 16px', fontSize: '0.8125rem' }}><Plus size={14} /> Add</button>
       </div>
 
-      {/* Table */}
-      <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid rgba(248,200,220,0.2)', overflow: 'hidden' }}>
+      {/* Desktop Table */}
+      <div className="admin-desktop-only" style={{ background: '#fff', borderRadius: '16px', border: '1px solid rgba(248,200,220,0.2)', overflow: 'hidden' }}>
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
@@ -177,12 +177,46 @@ export default function AdminProducts() {
         </div>
       </div>
 
+      {/* Mobile Card View */}
+      <div className="admin-mobile-only" style={{ display: 'none', flexDirection: 'column', gap: '12px' }}>
+        {loading ? (
+          [...Array(3)].map((_, i) => <div key={i} className="skeleton" style={{ height: '80px', borderRadius: '14px' }} />)
+        ) : apiError ? (
+          <div style={{ textAlign: 'center', padding: '32px', color: '#C44569', background: '#fff', borderRadius: '14px' }}>
+            <div style={{ marginBottom: '8px', fontWeight: 600 }}>API Error</div>
+            <div style={{ fontSize: '0.875rem', marginBottom: '16px' }}>{apiError}</div>
+            <button className="btn-primary" style={{ fontSize: '0.875rem' }} onClick={fetch}>Retry</button>
+          </div>
+        ) : products.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '40px', color: '#9E7B6C', background: '#fff', borderRadius: '14px' }}>No products found</div>
+        ) : products.map(p => (
+          <div key={p._id} style={{ background: '#fff', borderRadius: '14px', padding: '14px', border: '1px solid rgba(248,200,220,0.2)' }}>
+            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+              <img src={p.imageUrl || p.image} alt={p.name} style={{ width: '56px', height: '56px', borderRadius: '10px', objectFit: 'cover', background: '#FFF6EC', flexShrink: 0 }} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontWeight: 700, color: '#7A5C4E', fontSize: '0.875rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</div>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '4px', flexWrap: 'wrap' }}>
+                  <span style={{ fontWeight: 800, color: '#7A5C4E', fontSize: '0.9375rem' }}>₹{p.price.toLocaleString('en-IN')}</span>
+                  <span style={{ fontSize: '0.7rem', background: 'rgba(248,200,220,0.2)', color: '#9E7B6C', padding: '2px 8px', borderRadius: '50px', textTransform: 'capitalize' }}>{p.category.replace('-', ' ')}</span>
+                  <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: p.inStock ? '#16a34a' : '#dc2626' }} />
+                  {p.featured && <span style={{ fontSize: '0.65rem', color: '#E8A0B8', fontWeight: 700 }}>★ Featured</span>}
+                </div>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flexShrink: 0 }}>
+                <button onClick={() => openEdit(p)} style={{ width: '34px', height: '34px', border: '1.5px solid #EED6C4', borderRadius: '8px', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9E7B6C' }}><Edit2 size={14} /></button>
+                <button onClick={() => setDeleteId(p._id)} style={{ width: '34px', height: '34px', border: '1.5px solid #fca5a5', borderRadius: '8px', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#dc2626' }}><Trash2 size={14} /></button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
       {/* Add/Edit Modal */}
       {modal && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 2000, background: 'rgba(122,92,78,0.4)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}
           onClick={e => e.target === e.currentTarget && setModal(false)}
         >
-          <div style={{ background: '#fff', borderRadius: '20px', padding: '28px', width: '100%', maxWidth: '560px', maxHeight: '90vh', overflowY: 'auto' }}>
+          <div className="admin-modal-content" style={{ background: '#fff', borderRadius: '20px', padding: '28px', width: '100%', maxWidth: '560px', maxHeight: '90vh', overflowY: 'auto' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
               <h2 style={{ fontWeight: 800, color: '#7A5C4E' }}>{editing ? 'Edit Product' : 'Add Product'}</h2>
               <button onClick={() => setModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9E7B6C' }}><X size={20} /></button>
@@ -193,7 +227,7 @@ export default function AdminProducts() {
                 <label className="form-label">Description</label>
                 <textarea value={form.description} onChange={e => set('description', e.target.value)} rows={3} className="form-input" style={{ resize: 'vertical' }} required />
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div className="admin-modal-price-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <F label="Price (₹)" type="number" v={form.price} onChange={v => set('price', v)} required />
                 <F label="Original Price (₹)" type="number" v={form.originalPrice} onChange={v => set('originalPrice', v)} />
               </div>

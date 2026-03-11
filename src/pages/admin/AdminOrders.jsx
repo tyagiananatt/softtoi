@@ -39,19 +39,19 @@ export default function AdminOrders() {
   return (
     <AdminLayout title="Orders">
       {/* Controls */}
-      <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap', alignItems: 'center' }}>
-        <div style={{ position: 'relative', flex: '1 1 200px' }}>
+      <div style={{ display: 'flex', gap: '10px', marginBottom: '20px', flexWrap: 'wrap', alignItems: 'center' }}>
+        <div style={{ position: 'relative', flex: '1 1 160px', minWidth: 0 }}>
           <Search size={15} color="#C4A696" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by ID, name, email…" className="form-input" style={{ paddingLeft: '36px' }} />
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search orders..." className="form-input" style={{ paddingLeft: '36px' }} />
         </div>
-        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="form-input" style={{ width: 'auto', textTransform: 'capitalize' }}>
-          <option value="all">All Statuses</option>
+        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} className="form-input" style={{ width: 'auto', textTransform: 'capitalize', flex: '0 0 auto' }}>
+          <option value="all">All</option>
           {ALL_STATUSES.map(s => <option key={s} value={s} style={{ textTransform: 'capitalize' }}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
         </select>
       </div>
 
-      {/* Table */}
-      <div style={{ background: '#fff', borderRadius: '16px', border: '1px solid rgba(248,200,220,0.2)', overflow: 'hidden' }}>
+      {/* Desktop Table */}
+      <div className="admin-desktop-only" style={{ background: '#fff', borderRadius: '16px', border: '1px solid rgba(248,200,220,0.2)', overflow: 'hidden' }}>
         <div style={{ overflowX: 'auto' }}>
           <table style={{ width: '100%', borderCollapse: 'collapse' }}>
             <thead>
@@ -94,12 +94,36 @@ export default function AdminOrders() {
         </div>
       </div>
 
+      {/* Mobile Card View */}
+      <div className="admin-mobile-only" style={{ display: 'none', flexDirection: 'column', gap: '12px' }}>
+        {loading ? (
+          [...Array(3)].map((_, i) => <div key={i} className="skeleton" style={{ height: '90px', borderRadius: '14px' }} />)
+        ) : orders.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '40px', color: '#9E7B6C', background: '#fff', borderRadius: '14px' }}>No orders found</div>
+        ) : orders.map(o => (
+          <div key={o._id} style={{ background: '#fff', borderRadius: '14px', padding: '14px', border: '1px solid rgba(248,200,220,0.2)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px' }}>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontWeight: 700, color: '#7A5C4E', fontSize: '0.8rem', fontFamily: 'monospace' }}>#{o.orderId}</div>
+                <div style={{ fontWeight: 600, color: '#7A5C4E', fontSize: '0.8125rem', marginTop: '2px' }}>{o.shipping?.firstName} {o.shipping?.lastName}</div>
+                <div style={{ color: '#9E7B6C', fontSize: '0.72rem' }}>{fmt(o.createdAt)} · {o.items?.length} item(s)</div>
+              </div>
+              <div style={{ fontWeight: 800, color: '#7A5C4E', fontSize: '1rem', flexShrink: 0 }}>₹{o.total?.toLocaleString('en-IN')}</div>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <StatusSelect value={o.status} onChange={s => updateStatus(o._id, s)} />
+              <button onClick={() => setSelected(o)} style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '6px 12px', border: '1.5px solid #EED6C4', borderRadius: '8px', background: 'none', cursor: 'pointer', color: '#9E7B6C', fontSize: '0.75rem', fontWeight: 600 }}><Eye size={13} /> View</button>
+            </div>
+          </div>
+        ))}
+      </div>
+
       {/* Order Detail Modal */}
       {selected && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 2000, background: 'rgba(122,92,78,0.4)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}
+        <div style={{ position: 'fixed', inset: 0, zIndex: 2000, background: 'rgba(122,92,78,0.4)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '12px' }}
           onClick={e => e.target === e.currentTarget && setSelected(null)}
         >
-          <div style={{ background: '#fff', borderRadius: '20px', padding: '28px', width: '100%', maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto' }}>
+          <div style={{ background: '#fff', borderRadius: '20px', padding: '20px', width: '100%', maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
               <div>
                 <h2 style={{ fontWeight: 800, color: '#7A5C4E' }}>Order #{selected.orderId}</h2>

@@ -471,3 +471,75 @@ body {
 .img-zoom { overflow: hidden; border-radius: 1rem; }
 .img-zoom img { transition: transform 0.45s ease; width: 100%; height: 100%; object-fit: cover; }
 .img-zoom:hover img { transform: scale(1.06); }
+
+/* ═══ Mobile responsiveness ═══ */
+@media (max-width: 768px) {
+  /* Prevent iOS zoom on input focus */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+
+  /* Admin layout mobile */
+  .admin-header-nav { display: none !important; }
+  .admin-mobile-nav { display: flex !important; }
+  .admin-header-user { display: none !important; }
+
+  /* Admin table scroll hint */
+  .admin-table-wrap { -webkit-overflow-scrolling: touch; }
+
+  /* Checkout grid stacks */
+  .checkout-grid { grid-template-columns: 1fr !important; }
+  .checkout-form-grid { grid-template-columns: 1fr !important; }
+}
+
+/* Admin mobile bottom nav */
+.admin-mobile-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border-top: 1px solid rgba(248,200,220,0.3);
+  box-shadow: 0 -2px 12px rgba(122,92,78,0.08);
+  z-index: 200;
+  justify-content: space-around;
+  padding: 8px 0 env(safe-area-inset-bottom, 8px);
+}
+.admin-mobile-nav a {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-decoration: none;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #9E7B6C;
+  padding: 6px 12px;
+  border-radius: 8px;
+  transition: color 0.2s;
+}
+.admin-mobile-nav a.active {
+  color: #C44569;
+  background: rgba(248,200,220,0.15);
+}
+
+/* Admin modal responsive */
+@media (max-width: 768px) {
+  .admin-modal-content {
+    padding: 18px !important;
+    border-radius: 16px !important;
+    max-height: 95vh !important;
+  }
+  .admin-modal-price-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Admin responsive table/card toggle */
+.admin-desktop-only { display: block; }
+.admin-mobile-only { display: none !important; }
+@media (max-width: 768px) {
+  .admin-desktop-only { display: none !important; }
+  .admin-mobile-only { display: flex !important; }
+}

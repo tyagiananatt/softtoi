@@ -1,47 +1,75 @@
 import { useState, useEffect } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { IndianRupee, ShoppingBag, Package, Clock, LogOut, LayoutDashboard, List, ChevronRight } from 'lucide-react'
+import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { IndianRupee, ShoppingBag, Package, Clock, LogOut, LayoutDashboard, List, ChevronRight, Menu, X } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import api from '../../utils/api'
 
 const STATUS_COLORS = { pending: 'status-pending', confirmed: 'status-confirmed', processing: 'status-processing', shipped: 'status-shipped', delivered: 'status-delivered', cancelled: 'status-cancelled' }
 
+const NAV_ITEMS = [
+  { label: 'Dashboard', to: '/admin', icon: LayoutDashboard },
+  { label: 'Products', to: '/admin/products', icon: Package },
+  { label: 'Orders', to: '/admin/orders', icon: List },
+]
+
 function AdminLayout({ children, title }) {
   const { logout, adminUser } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
+  const [mobileMenu, setMobileMenu] = useState(false)
   const handleLogout = () => { logout(); navigate('/admin/login') }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#FFF6EC', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ minHeight: '100vh', background: '#FFF6EC', display: 'flex', flexDirection: 'column', paddingBottom: '72px' }}>
       {/* Top bar */}
-      <header style={{ background: '#fff', borderBottom: '1px solid rgba(248,200,220,0.3)', padding: '0 24px', height: '64px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 100, boxShadow: '0 1px 10px rgba(122,92,78,0.06)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+      <header style={{ background: '#fff', borderBottom: '1px solid rgba(248,200,220,0.3)', padding: '0 16px', height: '56px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 100, boxShadow: '0 1px 10px rgba(122,92,78,0.06)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <Link to="/admin" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: 'linear-gradient(135deg,#F8C8DC,#EED6C4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, color: '#7A5C4E', fontSize: '0.875rem' }}>S</div>
             <span style={{ fontWeight: 800, color: '#7A5C4E' }}>SOFT<span style={{ color: '#E8A0B8' }}>toi</span> <span style={{ color: '#9E7B6C', fontWeight: 500, fontSize: '0.875rem' }}>Admin</span></span>
           </Link>
-          <div style={{ display: 'flex', gap: '4px' }}>
-            {[{ label: 'Dashboard', to: '/admin', icon: LayoutDashboard }, { label: 'Products', to: '/admin/products', icon: Package }, { label: 'Orders', to: '/admin/orders', icon: List }].map(n => (
-              <Link key={n.to} to={n.to} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 14px', borderRadius: '10px', textDecoration: 'none', fontSize: '0.875rem', fontWeight: 500, color: '#7A5C4E', background: window.location.pathname === n.to ? 'rgba(248,200,220,0.25)' : 'transparent', transition: 'background 0.2s' }}
-                onMouseEnter={e => e.currentTarget.style.background = 'rgba(248,200,220,0.2)'}
-                onMouseLeave={e => e.currentTarget.style.background = window.location.pathname === n.to ? 'rgba(248,200,220,0.25)' : 'transparent'}
-              >
+          {/* Desktop nav */}
+          <div className="admin-header-nav" style={{ display: 'flex', gap: '4px' }}>
+            {NAV_ITEMS.map(n => (
+              <Link key={n.to} to={n.to} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 14px', borderRadius: '10px', textDecoration: 'none', fontSize: '0.875rem', fontWeight: 500, color: '#7A5C4E', background: location.pathname === n.to ? 'rgba(248,200,220,0.25)' : 'transparent', transition: 'background 0.2s' }}>
                 <n.icon size={15} /> {n.label}
               </Link>
             ))}
           </div>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        {/* Desktop user/logout */}
+        <div className="admin-header-user" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <span style={{ fontSize: '0.8125rem', color: '#9E7B6C' }}>Hi, {adminUser?.username || 'Admin'}</span>
           <button onClick={handleLogout} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 14px', borderRadius: '10px', background: 'none', border: '1.5px solid #EED6C4', color: '#9E7B6C', cursor: 'pointer', fontSize: '0.8125rem', fontWeight: 600 }}>
             <LogOut size={14} /> Logout
           </button>
         </div>
+        {/* Mobile logout button in header */}
+        <button className="admin-mobile-nav-btn" onClick={handleLogout}
+          style={{ display: 'none', alignItems: 'center', gap: '4px', padding: '6px 12px', borderRadius: '8px', background: 'none', border: '1.5px solid #EED6C4', color: '#9E7B6C', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 600 }}>
+          <LogOut size={13} />
+        </button>
       </header>
-      <main style={{ flex: 1, padding: '32px 24px' }}>
-        {title && <h1 style={{ fontSize: '1.5rem', fontWeight: 900, color: '#7A5C4E', marginBottom: '28px' }}>{title}</h1>}
+
+      {/* Mobile bottom navigation */}
+      <nav className="admin-mobile-nav">
+        {NAV_ITEMS.map(n => (
+          <Link key={n.to} to={n.to} className={location.pathname === n.to ? 'active' : ''}>
+            <n.icon size={20} />
+            {n.label}
+          </Link>
+        ))}
+      </nav>
+
+      <main style={{ flex: 1, padding: '20px 12px' }}>
+        {title && <h1 style={{ fontSize: 'clamp(1.125rem, 3vw, 1.5rem)', fontWeight: 900, color: '#7A5C4E', marginBottom: '20px' }}>{title}</h1>}
         {children}
       </main>
+      <style>{`
+        @media (max-width: 768px) {
+          .admin-mobile-nav-btn { display: flex !important; }
+        }
+      `}</style>
     </div>
   )
 }

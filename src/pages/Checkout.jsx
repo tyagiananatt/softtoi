@@ -74,11 +74,11 @@ export default function Checkout() {
 
   return (
     <div style={{ paddingTop: '70px', minHeight: '100vh', background: '#FFF6EC' }}>
-      <div className="page-container" style={{ padding: '40px 1.5rem 64px' }}>
+<div className="page-container checkout-page" style={{ padding: '40px 1.5rem 64px' }}>
 
         {/* Success */}
         {step === 3 ? (
-          <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} style={{ textAlign: 'center', maxWidth: '480px', margin: '40px auto', background: '#fff', borderRadius: '24px', padding: '48px 32px', boxShadow: '0 4px 24px rgba(122,92,78,0.08)' }}>
+          <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="checkout-success" style={{ textAlign: 'center', maxWidth: '480px', margin: '40px auto', background: '#fff', borderRadius: '24px', padding: '48px 32px', boxShadow: '0 4px 24px rgba(122,92,78,0.08)' }}>
             <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}>
               <CheckCircle size={72} color="#16a34a" style={{ margin: '0 auto 24px', display: 'block' }} />
             </motion.div>
@@ -97,7 +97,7 @@ export default function Checkout() {
         ) : (
           <>
             {/* Steps */}
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '40px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', marginBottom: '32px', flexWrap: 'wrap' }}>
               {STEPS.map((s, i) => (
                 <div key={s} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -114,14 +114,14 @@ export default function Checkout() {
               ))}
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 320px', gap: '28px', alignItems: 'start' }}>
+            <div className="checkout-grid" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 320px', gap: '28px', alignItems: 'start' }}>
 
               {/* Main */}
-              <div style={{ background: '#fff', borderRadius: '20px', padding: '28px', border: '1px solid rgba(248,200,220,0.2)' }}>
+              <div className="checkout-main" style={{ background: '#fff', borderRadius: '20px', padding: '28px', border: '1px solid rgba(248,200,220,0.2)' }}>
                 {step === 0 && (
                   <div>
                     <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#7A5C4E', marginBottom: '24px' }}>Shipping Information</h2>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                    <div className="checkout-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                       <F label="First Name" v={form.firstName} onChange={v => set('firstName', v)} err={errors.firstName} />
                       <F label="Last Name" v={form.lastName} onChange={v => set('lastName', v)} err={errors.lastName} />
                       <F label="Email" type="email" v={form.email} onChange={v => set('email', v)} err={errors.email} />
@@ -199,7 +199,7 @@ export default function Checkout() {
               </div>
 
               {/* Sidebar */}
-              <div style={{ background: '#fff', borderRadius: '20px', padding: '24px', border: '1px solid rgba(248,200,220,0.2)', position: 'sticky', top: '90px' }}>
+              <div className="checkout-sidebar" style={{ background: '#fff', borderRadius: '20px', padding: '24px', border: '1px solid rgba(248,200,220,0.2)', position: 'sticky', top: '90px' }}>
                 <h3 style={{ fontWeight: 800, color: '#7A5C4E', marginBottom: '16px' }}>Your Order</h3>
                 {items.map(item => (
                   <div key={item._id} style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '12px' }}>
@@ -227,7 +227,16 @@ export default function Checkout() {
           </>
         )}
       </div>
-      <style>{`@media(max-width:768px){div[style*="grid-template-columns: minmax"]{grid-template-columns:1fr !important;} div[style*="grid-template-columns: 1fr 1fr"]{grid-template-columns:1fr !important;}}`}</style>
+      <style>{`
+        @media(max-width:768px){
+          .checkout-grid { grid-template-columns: 1fr !important; }
+          .checkout-form-grid { grid-template-columns: 1fr !important; }
+          .checkout-main { padding: 18px !important; }
+          .checkout-sidebar { position: static !important; }
+          .checkout-success { padding: 32px 18px !important; margin: 16px auto !important; }
+          .checkout-page { padding: 24px 1rem 40px !important; }
+        }
+      `}</style>
     </div>
   )
 }
