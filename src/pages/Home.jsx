@@ -306,6 +306,7 @@ export default function Home() {
   const [featured, setFeatured] = useState([])
   const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
+  const [apiError, setApiError] = useState(null)
 
   useEffect(() => {
     Promise.all([
@@ -314,7 +315,8 @@ export default function Home() {
     ]).then(([p, c]) => {
       setFeatured(p.data)
       setCategories(c.data)
-    }).catch(() => {}).finally(() => setLoading(false))
+      setApiError(null)
+    }).catch(err => setApiError(err.response?.data?.message || err.message || 'Failed to load data')).finally(() => setLoading(false))
   }, [])
 
   return (
@@ -476,9 +478,11 @@ export default function Home() {
             </div>
           </AnimatedSection>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '28px' }}>
-            {categories.length === 0
+            {loading
               ? [0, 1, 2].map(i => <div key={i} className="skeleton" style={{ aspectRatio: '4/5', borderRadius: '24px' }} />)
-              : categories.map((cat, i) => <CategoryCard key={cat._id} category={cat} index={i} />)
+              : apiError
+                ? <p style={{ color: '#C44569', gridColumn: '1/-1', textAlign: 'center', padding: '40px 0' }}>{apiError}</p>
+                : categories.map((cat, i) => <CategoryCard key={cat._id} category={cat} index={i} />)
             }
           </div>
         </div>
@@ -507,6 +511,8 @@ export default function Home() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '24px' }}>
               {[...Array(8)].map((_, i) => <div key={i} className="skeleton" style={{ height: '340px', borderRadius: '20px' }} />)}
             </div>
+          ) : apiError ? (
+            <p style={{ color: '#C44569', textAlign: 'center', padding: '40px 0' }}>{apiError}</p>
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '24px' }}>
               {featured.map((p, i) => <ProductCard key={p._id} product={p} index={i} />)}

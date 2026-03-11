@@ -22,6 +22,7 @@ export default function Products() {
   const [searchParams, setSearchParams] = useSearchParams()
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [search, setSearch] = useState(searchParams.get('search') || '')
   const [category, setCategory] = useState(searchParams.get('category') || 'all')
   const [sort, setSort] = useState('featured')
@@ -41,8 +42,8 @@ export default function Products() {
     if (search) params.set('search', search)
     if (sort !== 'featured') params.set('sort', sort)
     api.get(`/products?${params}`)
-      .then(res => setProducts(res.data))
-      .catch(() => {})
+      .then(res => { setProducts(res.data); setError(null) })
+      .catch(err => setError(err.response?.data?.message || err.message || 'Failed to load products'))
       .finally(() => setLoading(false))
   }, [category, search, sort])
 
@@ -132,6 +133,13 @@ export default function Products() {
         {loading ? (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '24px' }}>
             {[...Array(12)].map((_, i) => <div key={i} className="skeleton" style={{ height: '320px', borderRadius: '20px' }} />)}
+          </div>
+        ) : error ? (
+          <div style={{ textAlign: 'center', padding: '80px 0', color: '#9E7B6C' }}>
+            <SlidersHorizontal size={48} color="#E8A0B8" style={{ margin: '0 auto 16px', display: 'block' }} />
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: '#C44569', marginBottom: '8px' }}>Could not load products</h3>
+            <p style={{ marginBottom: '20px', fontSize: '0.875rem' }}>{error}</p>
+            <button className="btn-primary" onClick={() => { setError(null); setLoading(true); api.get(`/products`).then(r => setProducts(r.data)).catch(e => setError(e.message)).finally(() => setLoading(false)) }}>Try Again</button>
           </div>
         ) : products.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '80px 0', color: '#9E7B6C' }}>
