@@ -53,7 +53,7 @@ export default function Cart() {
                 >
                   <Link to={`/products/${item._id}`} style={{ flexShrink: 0 }}>
                     <div style={{ width: '80px', height: '80px', borderRadius: '12px', overflow: 'hidden', background: '#FFF6EC' }}>
-                      <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <img src={item.imageUrl || item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     </div>
                   </Link>
                   <div style={{ flex: 1, minWidth: 0 }}>

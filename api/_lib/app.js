@@ -1,8 +1,10 @@
 const express = require('express');
 const cors = require('cors');
+const compression = require('compression');
 
 const app = express();
 
+app.use(compression());
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' ? true : 'http://localhost:5173',
   credentials: true,

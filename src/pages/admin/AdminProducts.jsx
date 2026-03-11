@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Plus, Edit2, Trash2, Search, X, Image as Img } from 'lucide-react'
+import { Plus, Edit2, Trash2, Search, X, Image as Img, Link2 } from 'lucide-react'
 import { AdminLayout } from './Dashboard'
 import { useToast } from '../../context/ToastContext'
 import api from '../../utils/api'
@@ -18,6 +18,7 @@ export default function AdminProducts() {
   const [form, setForm] = useState(EMPTY)
   const [saving, setSaving] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
+  const [imageUrlInput, setImageUrlInput] = useState('')
   const { addToast } = useToast()
 
   const fetch = () => {
@@ -34,8 +35,17 @@ export default function AdminProducts() {
 
   useEffect(() => { fetch() }, [catFilter, search])
 
-  const openAdd = () => { setEditing(null); setForm(EMPTY); setModal(true) }
-  const openEdit = (p) => { setEditing(p._id); setForm({ name: p.name, description: p.description, price: p.price, originalPrice: p.originalPrice || '', category: p.category, image: p.image, images: p.images || [], badge: p.badge || '', inStock: p.inStock, featured: p.featured }); setModal(true) }
+  const openAdd = () => { setEditing(null); setForm(EMPTY); setImageUrlInput(''); setModal(true) }
+  const openEdit = async (p) => {
+    try {
+      const res = await api.get(`/products/${p._id}`)
+      const full = res.data
+      setEditing(full._id)
+      setForm({ name: full.name, description: full.description, price: full.price, originalPrice: full.originalPrice || '', category: full.category, image: full.image, images: full.images || [], badge: full.badge || '', inStock: full.inStock, featured: full.featured })
+      setImageUrlInput('')
+      setModal(true)
+    } catch { addToast('Failed to load product details', 'error') }
+  }
 
   const handleSave = async (e) => {
     e.preventDefault()
@@ -81,6 +91,17 @@ export default function AdminProducts() {
       all.splice(idx, 1)
       return { ...f, image: all[0] || '', images: all.slice(1) }
     })
+  }
+
+  const addImageUrl = () => {
+    const url = imageUrlInput.trim()
+    if (!url) return
+    try { new URL(url) } catch { addToast('Please enter a valid URL', 'error'); return }
+    setForm(f => {
+      if (!f.image) return { ...f, image: url }
+      return { ...f, images: [...(f.images || []), url] }
+    })
+    setImageUrlInput('')
   }
 
   return (
@@ -129,7 +150,7 @@ export default function AdminProducts() {
                 >
                   <td style={{ padding: '12px 16px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <img src={p.image} alt={p.name} style={{ width: '44px', height: '44px', borderRadius: '10px', objectFit: 'cover', background: '#FFF6EC' }} />
+                      <img src={p.imageUrl || p.image} alt={p.name} style={{ width: '44px', height: '44px', borderRadius: '10px', objectFit: 'cover', background: '#FFF6EC' }} />
                       <div>
                         <div style={{ fontWeight: 600, color: '#7A5C4E', fontSize: '0.875rem' }}>{p.name}</div>
                         {p.badge && <span style={{ fontSize: '0.65rem', background: '#FDE8F0', color: '#E8A0B8', padding: '2px 6px', borderRadius: '50px', fontWeight: 700 }}>{p.badge}</span>}
@@ -185,6 +206,24 @@ export default function AdminProducts() {
               {/* Multi-image upload */}
               <div>
                 <label className="form-label">Product Photos</label>
+                {/* Option 1: Image URL */}
+                <div style={{ display: 'flex', gap: '8px', marginBottom: '10px' }}>
+                  <div style={{ position: 'relative', flex: 1 }}>
+                    <Link2 size={15} color="#C4A696" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+                    <input
+                      type="url"
+                      value={imageUrlInput}
+                      onChange={e => setImageUrlInput(e.target.value)}
+                      onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); addImageUrl() } }}
+                      placeholder="Paste image URL (Cloudinary, Imgur, etc.)"
+                      className="form-input"
+                      style={{ paddingLeft: '36px' }}
+                    />
+                  </div>
+                  <button type="button" onClick={addImageUrl} className="btn-primary" style={{ padding: '10px 18px', whiteSpace: 'nowrap', fontSize: '0.8rem' }}>Add URL</button>
+                </div>
+                <div style={{ textAlign: 'center', fontSize: '0.72rem', color: '#C4A696', fontWeight: 600, marginBottom: '10px' }}>— OR —</div>
+                {/* Option 2: Upload from device */}
                 <label
                   style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer', padding: '14px 16px', border: '1.5px dashed #EED6C4', borderRadius: '12px', background: '#FFFBF8', transition: 'border-color 0.2s' }}
                   onMouseEnter={e => e.currentTarget.style.borderColor = '#E8A0B8'}

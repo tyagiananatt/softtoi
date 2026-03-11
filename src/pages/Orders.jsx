@@ -112,7 +112,7 @@ export default function Orders() {
                       <div style={{ marginTop: '16px', marginBottom: '16px' }}>
                         {order.items?.map((item, j) => (
                           <div key={j} style={{ display: 'flex', gap: '12px', alignItems: 'center', padding: '10px 0', borderBottom: '1px solid rgba(238,214,196,0.3)' }}>
-                            <img src={item.image} alt={item.name} style={{ width: '52px', height: '52px', borderRadius: '10px', objectFit: 'cover' }} />
+                            <img src={item.imageUrl || item.image} alt={item.name} style={{ width: '52px', height: '52px', borderRadius: '10px', objectFit: 'cover' }} />
                             <div style={{ flex: 1 }}>
                               <div style={{ fontWeight: 600, color: '#7A5C4E', fontSize: '0.875rem' }}>{item.name}</div>
                               <div style={{ fontSize: '0.75rem', color: '#9E7B6C' }}>Qty: {item.quantity} × ₹{item.price?.toLocaleString('en-IN')}</div>

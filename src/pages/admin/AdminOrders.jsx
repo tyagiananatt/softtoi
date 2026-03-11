@@ -119,7 +119,7 @@ export default function AdminOrders() {
               <div style={{ fontSize: '0.75rem', fontWeight: 700, color: '#9E7B6C', textTransform: 'uppercase', marginBottom: '12px' }}>Items</div>
               {selected.items?.map((item, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '10px 0', borderBottom: '1px solid #FDE8F0' }}>
-                  <img src={item.image} alt={item.name} style={{ width: '48px', height: '48px', borderRadius: '10px', objectFit: 'cover', background: '#FFF6EC' }} />
+                  <img src={item.imageUrl || item.image} alt={item.name} style={{ width: '48px', height: '48px', borderRadius: '10px', objectFit: 'cover', background: '#FFF6EC' }} />
                   <div style={{ flex: 1 }}>
                     <div style={{ fontWeight: 600, color: '#7A5C4E', fontSize: '0.875rem' }}>{item.name}</div>
                     <div style={{ color: '#9E7B6C', fontSize: '0.75rem' }}>Qty: {item.quantity}</div>

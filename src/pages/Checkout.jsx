@@ -56,7 +56,7 @@ export default function Checkout() {
     setPlacing(true)
     try {
       const payload = {
-        items: items.map(i => ({ product: i._id, name: i.name, image: i.image, price: i.price, quantity: i.quantity })),
+        items: items.map(i => ({ product: i._id, name: i.name, image: i.imageUrl || i.image, price: i.price, quantity: i.quantity })),
         shipping: form, subtotal, shippingCost, total, paymentMethod: 'COD',
       }
       const res = await api.post('/orders', payload)
@@ -161,7 +161,7 @@ export default function Checkout() {
                     </div>
                     {items.map(item => (
                       <div key={item._id} style={{ display: 'flex', gap: '14px', alignItems: 'center', padding: '12px 0', borderBottom: '1px solid rgba(238,214,196,0.4)' }}>
-                        <img src={item.image} alt={item.name} style={{ width: '60px', height: '60px', borderRadius: '10px', objectFit: 'cover' }} />
+                        <img src={item.imageUrl || item.image} alt={item.name} style={{ width: '60px', height: '60px', borderRadius: '10px', objectFit: 'cover' }} />
                         <div style={{ flex: 1 }}>
                           <div style={{ fontWeight: 600, color: '#7A5C4E', fontSize: '0.875rem' }}>{item.name}</div>
                           <div style={{ color: '#9E7B6C', fontSize: '0.75rem' }}>Qty: {item.quantity}</div>
@@ -203,7 +203,7 @@ export default function Checkout() {
                 <h3 style={{ fontWeight: 800, color: '#7A5C4E', marginBottom: '16px' }}>Your Order</h3>
                 {items.map(item => (
                   <div key={item._id} style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '12px' }}>
-                    <img src={item.image} alt={item.name} style={{ width: '48px', height: '48px', borderRadius: '8px', objectFit: 'cover' }} />
+                    <img src={item.imageUrl || item.image} alt={item.name} style={{ width: '48px', height: '48px', borderRadius: '8px', objectFit: 'cover' }} />
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontWeight: 600, fontSize: '0.8rem', color: '#7A5C4E', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.name}</div>
                       <div style={{ fontSize: '0.75rem', color: '#9E7B6C' }}>× {item.quantity}</div>

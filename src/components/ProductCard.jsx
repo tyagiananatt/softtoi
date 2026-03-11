@@ -71,7 +71,7 @@ export default function ProductCard({ product, index = 0 }) {
         <div style={{ position: 'relative', aspectRatio: '1/1', overflow: 'hidden', background: '#FFF6EC' }}>
           {!imgLoaded && <div className="skeleton" style={{ position: 'absolute', inset: 0, borderRadius: 0 }} />}
           <motion.img
-            src={product.image}
+            src={product.imageUrl || product.image}
             alt={product.name}
             loading="lazy"
             onLoad={() => setImgLoaded(true)}
