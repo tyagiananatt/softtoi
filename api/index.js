@@ -46,29 +46,45 @@ async function resolveSrvUri(uri) {
     const timeout = new Promise((_, reject) =>
       setTimeout(() => reject(new Error('DNS timeout')), 3000)
     );
-    const [srvRecords, txtRecords] = await Promise.race([
+    const result = await Promise.race([
       Promise.all([
         dns.resolveSrv(`_mongodb._tcp.${srvHost}`),
         dns.resolveTxt(srvHost).catch(() => []),
       ]),
       timeout,
-    ]).catch(() => null) || [null, []];
+    ]).catch(() => null);
 
-    if (!srvRecords || srvRecords.length === 0) {
+    if (!result || !result[0] || result[0].length === 0) {
       console.warn('SRV resolution returned no records, falling back to original URI');
       return uri;
     }
 
+    const [srvRecords, txtRecords] = result;
     const hosts = srvRecords.map((r) => `${r.name}:${r.port}`).join(',');
-    const txtOpts = (txtRecords[0] || []).join('');        // e.g. authSource=admin&replicaSet=...
+    const txtOpts = (txtRecords[0] || []).join(''); // e.g. authSource=admin&replicaSet=...
 
-    // Build direct URI; always add tls=true because Atlas requires TLS
-    const sep = dbAndParams.includes('?') ? '&' : '?';
-    const extraParams = txtOpts
-      ? `${sep}${txtOpts}&tls=true&authSource=admin`
-      : `${sep}tls=true&authSource=admin`;
+    // Collect all params from the original URI and TXT record, then deduplicate.
+    // Build a merged params map so no option ever appears twice.
+    const merged = new Map();
 
-    const directUri = `mongodb://${creds}@${hosts}${dbAndParams}${extraParams}`;
+    // Parse params already in the original URI (e.g. ?retryWrites=true&w=majority)
+    const qIdx = dbAndParams.indexOf('?');
+    const dbName = qIdx === -1 ? dbAndParams : dbAndParams.slice(0, qIdx);
+    const origParams = qIdx === -1 ? '' : dbAndParams.slice(qIdx + 1);
+    for (const pair of origParams.split('&').filter(Boolean)) {
+      const [k, v] = pair.split('=');
+      merged.set(k, v);
+    }
+    // Merge TXT record options (Atlas puts replicaSet + authSource here)
+    for (const pair of txtOpts.split('&').filter(Boolean)) {
+      const [k, v] = pair.split('=');
+      merged.set(k, v);
+    }
+    // Always need tls=true for Atlas direct connections
+    merged.set('tls', 'true');
+
+    const queryString = Array.from(merged.entries()).map(([k, v]) => `${k}=${v}`).join('&');
+    const directUri = `mongodb://${creds}@${hosts}${dbName}?${queryString}`;
     console.log(`SRV resolved to ${srvRecords.length} host(s)`);
     return directUri;
   } catch (e) {
