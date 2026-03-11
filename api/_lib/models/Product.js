@@ -17,4 +17,12 @@ const productSchema = new mongoose.Schema({
   featured: { type: Boolean, default: false },
 }, { timestamps: true });
 
+// Indexes on all sort fields so MongoDB uses index scans instead of in-memory sorts.
+// This prevents the 32MB sort memory limit from being exceeded on Atlas M0.
+productSchema.index({ featured: -1 });
+productSchema.index({ price: 1 });
+productSchema.index({ price: -1 });
+productSchema.index({ rating: -1 });
+productSchema.index({ category: 1, featured: -1 });
+
 module.exports = mongoose.models.Product || mongoose.model('Product', productSchema);

@@ -18,7 +18,9 @@ router.get('/', async (req, res) => {
     else if (sort === 'rating') sortOption.rating = -1;
     else sortOption.featured = -1;
 
-    const products = await Product.find(query).sort(sortOption);
+    // Exclude the large base64 `images` array from list responses to reduce memory usage.
+    // The full images array is returned only on the single-product endpoint below.
+    const products = await Product.find(query).sort(sortOption).select('-images').lean();
     res.json(products);
   } catch (err) {
     res.status(500).json({ message: err.message });
