@@ -65,11 +65,25 @@ export default function Navbar() {
 
           {/* Logo */}
           <Link to="/" className="navbar-logo" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
-            <img
-              src="/logo.jpeg"
-              alt="SoftToi"
-              style={{ height: '52px', width: 'auto', objectFit: 'contain' }}
-            />
+            <span
+              className="navbar-logo-circle"
+              style={{
+                width: '52px',
+                height: '52px',
+                borderRadius: '50%',
+                overflow: 'hidden',
+                display: 'inline-block',
+                border: '2px solid rgba(248,200,220,0.55)',
+                boxShadow: '0 8px 20px rgba(196,69,105,0.14)',
+                background: '#fff',
+              }}
+            >
+              <img
+                src="/logo.jpeg"
+                alt="SoftToi"
+                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+              />
+            </span>
           </Link>
 
           {/* Desktop nav */}
