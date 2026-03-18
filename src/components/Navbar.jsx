@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Search, Heart, ShoppingBag, User, Menu, X } from 'lucide-react'
+import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
 
@@ -22,9 +23,11 @@ export default function Navbar() {
   const [searchQ, setSearchQ] = useState('')
   const { itemCount } = useCart()
   const { items: wishItems } = useWishlist()
+  const { isCustomerAuth } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
   const fullPath = location.pathname + location.search
+  const accountPath = isCustomerAuth ? '/profile' : '/login'
 
   const isActive = (to) => {
     if (to === '/') return location.pathname === '/'
@@ -51,17 +54,17 @@ export default function Navbar() {
 
   return (
     <>
-      <nav style={{
+      <nav className="navbar-shell" style={{
         position: 'fixed', top: 0, left: 0, right: 0, zIndex: 1000,
         transition: 'background 0.35s, box-shadow 0.35s, border-color 0.35s',
         background: scrolled ? 'rgba(255,255,255,0.97)' : 'transparent',
         backdropFilter: scrolled ? 'blur(20px)' : 'none',
         boxShadow: scrolled ? '0 1px 0 rgba(196,69,105,0.1), 0 4px 24px rgba(26,10,5,0.06)' : 'none',
       }}>
-        <div className="page-container" style={{ display: 'flex', alignItems: 'center', height: '70px', gap: '24px' }}>
+        <div className="page-container navbar-inner" style={{ display: 'flex', alignItems: 'center', height: '70px', gap: '24px', width: '100%', minWidth: 0 }}>
 
           {/* Logo */}
-          <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+          <Link to="/" className="navbar-logo" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
             <img
               src="/logo.jpeg"
               alt="SoftToi"
@@ -88,7 +91,7 @@ export default function Navbar() {
           </div>
 
           {/* Right icons */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
+          <div className="navbar-right" style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0, minWidth: 0 }}>
             <IconBtn label="Search" onClick={() => setSearchOpen(true)}>
               <Search size={20} />
             </IconBtn>
@@ -104,7 +107,7 @@ export default function Navbar() {
                 {itemCount > 0 && <Badge count={itemCount} animate />}
               </IconBtn>
             </Link>
-            <Link to="/admin" style={{ textDecoration: 'none' }} className="hide-mobile">
+            <Link to={accountPath} style={{ textDecoration: 'none' }}>
               <IconBtn label="Admin" as="div">
                 <User size={20} />
               </IconBtn>
@@ -135,6 +138,7 @@ export default function Navbar() {
                 borderTop: '1px solid rgba(248,200,220,0.3)',
                 padding: '16px',
               }}
+              className="navbar-mobile-panel"
             >
               {LINKS.map(l => (
                 <Link key={l.to} to={l.to} style={{
@@ -146,15 +150,15 @@ export default function Navbar() {
                   {l.label}
                 </Link>
               ))}
-              <div style={{ display: 'flex', gap: '8px', padding: '8px 16px 4px' }}>
-                <Link to="/wishlist" style={{ flex: 1 }}>
-                  <button className="btn-secondary" style={{ width: '100%', justifyContent: 'center' }}>
-                    <Heart size={16} /> Wishlist
+              <div className="navbar-mobile-actions" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', padding: '8px 0 4px' }}>
+                <Link to={accountPath} style={{ minWidth: 0 }}>
+                  <button className="btn-secondary" style={{ width: '100%', justifyContent: 'center', padding: '12px 14px' }}>
+                    <User size={16} /> {isCustomerAuth ? 'Profile' : 'Login'}
                   </button>
                 </Link>
-                <Link to="/admin" style={{ flex: 1 }}>
+                <Link to="/wishlist" style={{ minWidth: 0 }}>
                   <button className="btn-secondary" style={{ width: '100%', justifyContent: 'center' }}>
-                    <User size={16} /> Admin
+                    <Heart size={16} /> Wishlist
                   </button>
                 </Link>
               </div>

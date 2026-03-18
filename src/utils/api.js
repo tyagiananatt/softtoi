@@ -5,9 +5,20 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 })
 
+export const adminRequestConfig = { headers: { 'X-Softtoi-Admin': 'true' } }
+
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('softtoi_admin_token')
-  if (token) config.headers.Authorization = `Bearer ${token}`
+  const adminToken = localStorage.getItem('softtoi_admin_token')
+  const userToken = localStorage.getItem('softtoi_user_token')
+  const url = config.url || ''
+  const isAdminRequest = config.headers?.['X-Softtoi-Admin'] === 'true' || url.startsWith('/admin')
+  const isUserRequest = url.startsWith('/users') || url.startsWith('/orders')
+
+  if (isAdminRequest && adminToken) {
+    config.headers.Authorization = `Bearer ${adminToken}`
+  } else if (isUserRequest && userToken) {
+    config.headers.Authorization = `Bearer ${userToken}`
+  }
   return config
 })
 
@@ -23,7 +34,12 @@ api.interceptors.response.use(
   },
   (err) => {
     if (err.response?.status === 401) {
-      localStorage.removeItem('softtoi_admin_token')
+      const url = err.config?.url || ''
+      const isAdminRequest = err.config?.headers?.['X-Softtoi-Admin'] === 'true' || url.startsWith('/admin')
+      if (isAdminRequest) localStorage.removeItem('softtoi_admin_token')
+      if (!isAdminRequest && (url.startsWith('/users') || url.startsWith('/orders'))) {
+        localStorage.removeItem('softtoi_user_token')
+      }
     }
     return Promise.reject(err)
   }

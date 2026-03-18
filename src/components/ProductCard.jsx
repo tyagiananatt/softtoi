@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ShoppingBag, Heart, Eye, Star } from 'lucide-react'
+import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
 import { useToast } from '../context/ToastContext'
@@ -25,6 +26,8 @@ const CAT_COLORS = {
 export default function ProductCard({ product, index = 0 }) {
   const [imgLoaded, setImgLoaded] = useState(false)
   const [hovered, setHovered] = useState(false)
+  const navigate = useNavigate()
+  const { isCustomerAuth } = useAuth()
   const { addToCart } = useCart()
   const { toggleWishlist, isWishlisted } = useWishlist()
   const { addToast } = useToast()
@@ -38,6 +41,11 @@ export default function ProductCard({ product, index = 0 }) {
   const handleAddToCart = (e) => {
     e.preventDefault()
     e.stopPropagation()
+    if (!isCustomerAuth) {
+      addToast('Please log in first to add items to cart', 'info')
+      navigate('/login')
+      return
+    }
     addToCart(product)
     addToast(`${product.name} added to cart!`, 'success')
   }
@@ -45,6 +53,11 @@ export default function ProductCard({ product, index = 0 }) {
   const handleWishlist = (e) => {
     e.preventDefault()
     e.stopPropagation()
+    if (!isCustomerAuth) {
+      addToast('Please log in first to use your wishlist', 'info')
+      navigate('/login')
+      return
+    }
     toggleWishlist(product)
     addToast(isWishlisted(product._id) ? 'Removed from wishlist' : `${product.name} wishlisted!`, 'info')
   }

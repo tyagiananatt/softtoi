@@ -543,3 +543,42 @@ body {
   .admin-desktop-only { display: none !important; }
   .admin-mobile-only { display: flex !important; }
 }
+
+/* Navbar responsive fixes */
+.navbar-shell {
+  overflow-x: clip;
+}
+
+.navbar-inner {
+  width: 100%;
+  min-width: 0;
+}
+
+.navbar-mobile-panel {
+  overflow-x: clip;
+}
+
+@media (max-width: 768px) {
+  .navbar-inner {
+    height: 64px !important;
+    gap: 10px !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  .navbar-logo img {
+    height: 44px !important;
+  }
+
+  .navbar-right {
+    gap: 2px !important;
+  }
+
+  .navbar-mobile-panel {
+    padding: 12px 1rem 16px !important;
+  }
+
+  .navbar-mobile-actions {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}

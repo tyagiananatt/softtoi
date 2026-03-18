@@ -17,6 +17,7 @@ function buildHandler() {
   app.use('/api/products',   require('./_lib/routes/products'));
   app.use('/api/orders',     require('./_lib/routes/orders'));
   app.use('/api/categories', require('./_lib/routes/categories'));
+  app.use('/api/users',      require('./_lib/routes/users'));
   app.use('/api/admin',      require('./_lib/routes/admin'));
   app.get('/api/health', (_req, res) => res.json({ status: 'ok', time: new Date().toISOString() }));
   app.use((err, _req, res, _next) => {

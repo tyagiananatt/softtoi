@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Package, ChevronDown, ChevronUp } from 'lucide-react'
 import AnimatedSection from '../components/AnimatedSection'
+import { useAuth } from '../context/AuthContext'
 import api from '../utils/api'
 
 const STATUS_COLORS = {
@@ -18,9 +19,35 @@ export default function Orders() {
   const [email, setEmail] = useState('')
   const [searched, setSearched] = useState(false)
   const [expanded, setExpanded] = useState(null)
+  const { isCustomerAuth, customerUser } = useAuth()
+
+  useEffect(() => {
+    if (!isCustomerAuth || !customerUser?.email) {
+      setLoading(false)
+      return
+    }
+
+    setEmail(customerUser.email)
+    setLoading(true)
+    api.get('/users/me/orders')
+      .then(res => {
+        setOrders(res.data)
+        setSearched(true)
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [customerUser, isCustomerAuth])
 
   const fetchOrders = (e) => {
     e?.preventDefault()
+    if (isCustomerAuth) {
+      setLoading(true)
+      api.get('/users/me/orders')
+        .then(res => { setOrders(res.data); setSearched(true) })
+        .catch(() => {})
+        .finally(() => setLoading(false))
+      return
+    }
     if (!email.trim()) return
     setLoading(true)
     api.get(`/orders?email=${encodeURIComponent(email.trim())}`)
@@ -46,12 +73,13 @@ export default function Orders() {
           <form onSubmit={fetchOrders} style={{ background: '#fff', borderRadius: '16px', padding: '24px', marginBottom: '28px', border: '1px solid rgba(248,200,220,0.2)', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
             <input
               type="email" value={email} onChange={e => setEmail(e.target.value)}
-              placeholder="Enter your email to find your orders..."
+              placeholder={isCustomerAuth ? 'Signed in account email' : 'Enter your email to find your orders...'}
               className="form-input" style={{ flex: '1 1 260px' }}
               required
+              disabled={isCustomerAuth}
             />
             <button type="submit" className="btn-primary" style={{ padding: '12px 24px' }}>
-              <Package size={16} /> Find Orders
+              <Package size={16} /> {isCustomerAuth ? 'Refresh Orders' : 'Find Orders'}
             </button>
           </form>
         </AnimatedSection>
@@ -59,7 +87,7 @@ export default function Orders() {
         {!searched ? (
           <div style={{ textAlign: 'center', padding: '60px 0', color: '#9E7B6C' }}>
             <Package size={56} color="#E8A0B8" style={{ margin: '0 auto 16px', display: 'block' }} />
-            <p style={{ fontSize: '1rem' }}>Enter your email above to track your orders</p>
+            <p style={{ fontSize: '1rem' }}>{isCustomerAuth ? 'Use refresh to load the orders linked to your account' : 'Enter your email above to track your orders'}</p>
           </div>
         ) : loading ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>

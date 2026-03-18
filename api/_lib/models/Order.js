@@ -22,6 +22,7 @@ const shippingSchema = new mongoose.Schema({
 
 const orderSchema = new mongoose.Schema({
   orderId: { type: String, required: true, unique: true },
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
   items: [orderItemSchema],
   shipping: shippingSchema,
   subtotal: Number,

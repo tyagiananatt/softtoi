@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Search, Eye, X, ChevronDown } from 'lucide-react'
 import { AdminLayout } from './Dashboard'
 import { useToast } from '../../context/ToastContext'
-import api from '../../utils/api'
+import api, { adminRequestConfig } from '../../utils/api'
 
 const STATUS_COLORS = { pending: 'status-pending', confirmed: 'status-confirmed', processing: 'status-processing', shipped: 'status-shipped', delivered: 'status-delivered', cancelled: 'status-cancelled' }
 const ALL_STATUSES = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled']
@@ -20,14 +20,14 @@ export default function AdminOrders() {
     const p = new URLSearchParams({ all: 'true' })
     if (search) p.set('search', search)
     if (statusFilter !== 'all') p.set('status', statusFilter)
-    api.get(`/orders?${p}`).then(r => setOrders(r.data)).finally(() => setLoading(false))
+    api.get(`/orders?${p}`, adminRequestConfig).then(r => setOrders(r.data)).finally(() => setLoading(false))
   }
 
   useEffect(() => { fetchOrders() }, [search, statusFilter])
 
   const updateStatus = async (id, status) => {
     try {
-      await api.put(`/orders/${id}`, { status })
+      await api.put(`/orders/${id}`, { status }, adminRequestConfig)
       addToast('Status updated', 'success')
       fetchOrders()
       if (selected?._id === id) setSelected(o => ({ ...o, status }))

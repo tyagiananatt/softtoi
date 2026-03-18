@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Plus, Edit2, Trash2, Search, X, Image as Img, Link2 } from 'lucide-react'
 import { AdminLayout } from './Dashboard'
 import { useToast } from '../../context/ToastContext'
-import api from '../../utils/api'
+import api, { adminRequestConfig } from '../../utils/api'
 
 const EMPTY = { name: '', description: '', price: '', originalPrice: '', category: 'keychains', image: '', images: [], badge: '', inStock: true, featured: false }
 const CATS = [{ label: 'Keychains', value: 'keychains' }, { label: 'Soft Toys', value: 'soft-toys' }, { label: 'Flowers', value: 'flowers' }]
@@ -53,8 +53,8 @@ export default function AdminProducts() {
     try {
       if (!form.image) { addToast('Please upload at least one photo', 'error'); setSaving(false); return }
       const data = { ...form, price: Number(form.price), originalPrice: form.originalPrice ? Number(form.originalPrice) : undefined }
-      if (editing) await api.put(`/products/${editing}`, data)
-      else await api.post('/products', data)
+      if (editing) await api.put(`/products/${editing}`, data, adminRequestConfig)
+      else await api.post('/products', data, adminRequestConfig)
       addToast(editing ? 'Product updated!' : 'Product created!', 'success')
       setModal(false); fetch()
     } catch { addToast('Failed to save product', 'error') }
@@ -63,7 +63,7 @@ export default function AdminProducts() {
 
   const handleDelete = async () => {
     try {
-      await api.delete(`/products/${deleteId}`)
+      await api.delete(`/products/${deleteId}`, adminRequestConfig)
       addToast('Product deleted', 'info')
       setDeleteId(null); fetch()
     } catch { addToast('Failed to delete', 'error') }

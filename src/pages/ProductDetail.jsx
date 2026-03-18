@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Star, ShoppingBag, Heart, Share2, Truck, Shield, RotateCcw, ChevronLeft, ChevronRight, Minus, Plus, CheckCircle } from 'lucide-react'
 import AnimatedSection from '../components/AnimatedSection'
 import ProductCard from '../components/ProductCard'
+import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
 import { useToast } from '../context/ToastContext'
@@ -21,12 +22,14 @@ function StarRating({ rating, size = 14 }) {
 
 export default function ProductDetail() {
   const { id } = useParams()
+  const navigate = useNavigate()
   const [product, setProduct] = useState(null)
   const [related, setRelated] = useState([])
   const [activeImg, setActiveImg] = useState(0)
   const [slideDir, setSlideDir] = useState(1)
   const [qty, setQty] = useState(1)
   const [loading, setLoading] = useState(true)
+  const { isCustomerAuth } = useAuth()
   const { addToCart } = useCart()
   const { toggleWishlist, isWishlisted } = useWishlist()
   const { addToast } = useToast()
@@ -74,8 +77,23 @@ export default function ProductDetail() {
   const goNext = () => { setSlideDir(1); setActiveImg(i => (i + 1) % images.length) }
 
   const handleAddToCart = () => {
+    if (!isCustomerAuth) {
+      addToast('Please log in first to add items to cart', 'info')
+      navigate('/login')
+      return
+    }
     addToCart(product, qty)
     addToast(`${product.name} added to cart!`, 'success')
+  }
+
+  const handleWishlist = () => {
+    if (!isCustomerAuth) {
+      addToast('Please log in first to use your wishlist', 'info')
+      navigate('/login')
+      return
+    }
+    toggleWishlist(product)
+    addToast(wishlisted ? 'Removed from wishlist' : 'Added to wishlist!', 'info')
   }
 
   const handleShare = () => {
@@ -225,7 +243,7 @@ export default function ProductDetail() {
                 <button onClick={handleAddToCart} className="btn-primary" style={{ flex: '1 1 200px', justifyContent: 'center' }}>
                   <ShoppingBag size={16} /> Add to Cart
                 </button>
-                <button onClick={() => { toggleWishlist(product); addToast(wishlisted ? 'Removed from wishlist' : 'Added to wishlist!', 'info') }}
+                <button onClick={handleWishlist}
                   style={{
                     width: '48px', height: '48px', border: `2px solid ${wishlisted ? '#E8A0B8' : '#EED6C4'}`,
                     borderRadius: '50%', background: wishlisted ? '#FDE8F0' : 'transparent',

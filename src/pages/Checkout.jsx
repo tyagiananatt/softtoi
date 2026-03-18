@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { CheckCircle, ChevronRight, Package } from 'lucide-react'
+import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
 import { useToast } from '../context/ToastContext'
 import api from '../utils/api'
@@ -19,7 +20,23 @@ export default function Checkout() {
   const [order, setOrder] = useState(null)
   const { items, subtotal, shippingCost, total, clearCart } = useCart()
   const { addToast } = useToast()
+  const { customerUser, isCustomerAuth } = useAuth()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    if (!customerUser) return
+    setForm(current => ({
+      ...current,
+      firstName: current.firstName || customerUser.fullName?.split(' ')[0] || '',
+      lastName: current.lastName || customerUser.fullName?.split(' ').slice(1).join(' ') || '',
+      email: current.email || customerUser.email || '',
+      phone: current.phone || customerUser.phone || '',
+      address: current.address || customerUser.defaultAddress?.address || '',
+      city: current.city || customerUser.defaultAddress?.city || '',
+      state: current.state || customerUser.defaultAddress?.state || '',
+      zipCode: current.zipCode || customerUser.defaultAddress?.zipCode || '',
+    }))
+  }, [customerUser])
 
   if (items.length === 0 && !order) {
     return (
@@ -118,6 +135,11 @@ export default function Checkout() {
 
               {/* Main */}
               <div className="checkout-main" style={{ background: '#fff', borderRadius: '20px', padding: '28px', border: '1px solid rgba(248,200,220,0.2)' }}>
+                {isCustomerAuth && (
+                  <div style={{ marginBottom: '20px', background: 'linear-gradient(135deg, rgba(248,200,220,0.18), rgba(238,214,196,0.24))', border: '1px solid rgba(248,200,220,0.28)', borderRadius: '14px', padding: '12px 14px', color: '#7A5C4E', fontSize: '0.875rem', lineHeight: 1.6 }}>
+                    Signed in as <strong>{customerUser?.email}</strong>. Your saved profile details are pre-filled here.
+                  </div>
+                )}
                 {step === 0 && (
                   <div>
                     <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#7A5C4E', marginBottom: '24px' }}>Shipping Information</h2>
