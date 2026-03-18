@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Search, Heart, ShoppingBag, User, Menu, X } from 'lucide-react'
+import { Home, Search, Heart, ShoppingBag, User, Menu, X } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
@@ -61,7 +61,7 @@ export default function Navbar() {
         backdropFilter: scrolled ? 'blur(20px)' : 'none',
         boxShadow: scrolled ? '0 1px 0 rgba(196,69,105,0.1), 0 4px 24px rgba(26,10,5,0.06)' : 'none',
       }}>
-        <div className="page-container navbar-inner" style={{ display: 'flex', alignItems: 'center', height: '70px', gap: '24px', width: '100%', minWidth: 0 }}>
+        <div className="page-container navbar-inner" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: '70px', gap: '12px', width: '100%', minWidth: 0 }}>
 
           {/* Logo */}
           <Link to="/" className="navbar-logo" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
@@ -105,7 +105,12 @@ export default function Navbar() {
           </div>
 
           {/* Right icons */}
-          <div className="navbar-right" style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0, minWidth: 0 }}>
+          <div className="navbar-right" style={{ display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0, minWidth: 0, marginLeft: 'auto' }}>
+            <Link to="/" className="show-mobile" style={{ textDecoration: 'none' }}>
+              <IconBtn label="Home" as="div">
+                <Home size={19} />
+              </IconBtn>
+            </Link>
             <IconBtn label="Search" onClick={() => setSearchOpen(true)}>
               <Search size={20} />
             </IconBtn>
@@ -241,13 +246,13 @@ function IconBtn({ children, onClick, label, as = 'button' }) {
     cursor: 'pointer', background: 'transparent', border: 'none',
   }
   if (as === 'div') return (
-    <div style={style} aria-label={label}
+    <div className="icon-btn" style={style} aria-label={label}
       onMouseEnter={e => e.currentTarget.style.background = 'rgba(248,200,220,0.2)'}
       onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
     >{children}</div>
   )
   return (
-    <button style={style} onClick={onClick} aria-label={label}
+    <button className="icon-btn" style={style} onClick={onClick} aria-label={label}
       onMouseEnter={e => e.currentTarget.style.background = 'rgba(248,200,220,0.2)'}
       onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
     >{children}</button>

@@ -561,7 +561,7 @@ body {
 @media (max-width: 768px) {
   .navbar-inner {
     height: 64px !important;
-    gap: 10px !important;
+    gap: 8px !important;
     padding-left: 1rem !important;
     padding-right: 1rem !important;
   }
@@ -572,7 +572,24 @@ body {
   }
 
   .navbar-right {
-    gap: 2px !important;
+    gap: 4px !important;
+    margin-left: auto !important;
+  }
+
+  .navbar-right .icon-btn,
+  .navbar-right > .show-mobile {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+  }
+
+  .navbar-right .icon-btn {
+    border-radius: 9px !important;
+  }
+
+  .navbar-right .show-mobile {
+    align-items: center !important;
+    justify-content: center !important;
   }
 
   .navbar-mobile-panel {
