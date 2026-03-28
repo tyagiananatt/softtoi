@@ -57,7 +57,7 @@ export default function Footer() {
                 fontWeight: 800, fontSize: '1rem', color: '#7A5C4E',
               }}>S</div>
               <span style={{ fontWeight: 800, fontSize: '1.2rem', color: '#7A5C4E' }}>
-                <span>SOFT</span><span style={{ color: '#E8A0B8' }}>toi</span>
+                <span>SOFT</span><span style={{ color: '#7A5C4E' }}>OI</span>
               </span>
             </div>
             <p style={{ fontSize: '0.875rem', color: '#9E7B6C', lineHeight: 1.7, marginBottom: '20px' }}>
@@ -105,9 +105,9 @@ export default function Footer() {
           <div>
             <h4 style={{ fontWeight: 700, color: '#7A5C4E', marginBottom: '16px', fontSize: '0.9375rem' }}>Get in Touch</h4>
             {[
-              [MapPin, '123 Craft Lane, Mumbai, India 400001'],
-              [Phone, '+91 98765 43210'],
-              [Mail, 'hello@softtoi.com'],
+              [MapPin, 'Jalandhar City, Punjab, India, 144411'],
+              [Phone, '+91 8922090280'],
+              [Mail, 'softoi@gmail.com'],
             ].map(([Icon, text]) => (
               <div key={text} style={{ display: 'flex', gap: '10px', marginBottom: '12px', alignItems: 'flex-start' }}>
                 <Icon size={15} color="#E8A0B8" style={{ flexShrink: 0, marginTop: '2px' }} />
