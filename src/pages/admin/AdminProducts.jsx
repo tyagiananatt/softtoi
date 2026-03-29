@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react'
-import { Plus, Edit2, Trash2, Search, X, Image as Img, Link2 } from 'lucide-react'
+import { Plus, Edit2, Trash2, Search, X, Image as Img, Link2, Star, Tag } from 'lucide-react'
 import { AdminLayout } from './Dashboard'
 import { useToast } from '../../context/ToastContext'
 import api, { adminRequestConfig } from '../../utils/api'
 
-const EMPTY = { name: '', description: '', price: '', originalPrice: '', category: 'keychains', image: '', images: [], badge: '', inStock: true, featured: false }
-const CATS = [{ label: 'Keychains', value: 'keychains' }, { label: 'Soft Toys', value: 'soft-toys' }, { label: 'Flowers', value: 'flowers' }]
+const EMPTY = { name: '', description: '', price: '', originalPrice: '', category: '', image: '', images: [], badge: '', inStock: true, featured: false }
 
 export default function AdminProducts() {
   const [products, setProducts] = useState([])
+  const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
   const [apiError, setApiError] = useState(null)
   const [search, setSearch] = useState('')
@@ -19,7 +19,15 @@ export default function AdminProducts() {
   const [saving, setSaving] = useState(false)
   const [deleteId, setDeleteId] = useState(null)
   const [imageUrlInput, setImageUrlInput] = useState('')
+  const [customCatName, setCustomCatName] = useState('')
+  const [creatingCat, setCreatingCat] = useState(false)
   const { addToast } = useToast()
+
+  const loadCategories = () =>
+    api.get('/categories').then(r => {
+      setCategories(r.data)
+      return r.data
+    })
 
   const fetch = () => {
     setLoading(true)
@@ -33,18 +41,37 @@ export default function AdminProducts() {
       .finally(() => setLoading(false))
   }
 
+  useEffect(() => { loadCategories() }, [])
   useEffect(() => { fetch() }, [catFilter, search])
 
-  const openAdd = () => { setEditing(null); setForm(EMPTY); setImageUrlInput(''); setModal(true) }
+  const openAdd = () => {
+    setEditing(null)
+    setForm({ ...EMPTY, category: categories[0]?.slug || '' })
+    setImageUrlInput(''); setCustomCatName(''); setModal(true)
+  }
   const openEdit = async (p) => {
     try {
       const res = await api.get(`/products/${p._id}`)
       const full = res.data
       setEditing(full._id)
       setForm({ name: full.name, description: full.description, price: full.price, originalPrice: full.originalPrice || '', category: full.category, image: full.image, images: full.images || [], badge: full.badge || '', inStock: full.inStock, featured: full.featured })
-      setImageUrlInput('')
-      setModal(true)
+      setImageUrlInput(''); setCustomCatName(''); setModal(true)
     } catch { addToast('Failed to load product details', 'error') }
+  }
+
+  const handleCreateCategory = async () => {
+    const name = customCatName.trim()
+    if (!name) return
+    setCreatingCat(true)
+    try {
+      const res = await api.post('/categories', { name }, adminRequestConfig)
+      const updated = await loadCategories()
+      set('category', res.data.slug)
+      setCustomCatName('')
+      addToast(`Category "${name}" created!`, 'success')
+    } catch (err) {
+      addToast(err.response?.data?.message || 'Failed to create category', 'error')
+    } finally { setCreatingCat(false) }
   }
 
   const handleSave = async (e) => {
@@ -114,7 +141,7 @@ export default function AdminProducts() {
         </div>
         <select value={catFilter} onChange={e => setCatFilter(e.target.value)} className="form-input" style={{ width: 'auto', flex: '0 0 auto' }}>
           <option value="all">All</option>
-          {CATS.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+          {categories.map(c => <option key={c.slug} value={c.slug}>{c.name}</option>)}
         </select>
         <button onClick={openAdd} className="btn-primary" style={{ whiteSpace: 'nowrap', padding: '10px 16px', fontSize: '0.8125rem' }}><Plus size={14} /> Add</button>
       </div>
@@ -234,8 +261,62 @@ export default function AdminProducts() {
               <div>
                 <label className="form-label">Category</label>
                 <select value={form.category} onChange={e => set('category', e.target.value)} className="form-input" style={{ appearance: 'auto' }}>
-                  {CATS.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
+                  {categories.map(c => <option key={c.slug} value={c.slug}>{c.name}</option>)}
+                  <option value="__custom__">+ Create custom category…</option>
                 </select>
+                {form.category === '__custom__' && (
+                  <div style={{ display: 'flex', gap: '8px', marginTop: '10px' }}>
+                    <div style={{ position: 'relative', flex: 1 }}>
+                      <Tag size={14} color="#C4A696" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
+                      <input
+                        type="text"
+                        value={customCatName}
+                        onChange={e => setCustomCatName(e.target.value)}
+                        onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); handleCreateCategory() } }}
+                        placeholder="e.g. Wall Hangings"
+                        className="form-input"
+                        style={{ paddingLeft: '36px' }}
+                        autoFocus
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleCreateCategory}
+                      disabled={creatingCat || !customCatName.trim()}
+                      className="btn-primary"
+                      style={{ padding: '10px 16px', whiteSpace: 'nowrap', fontSize: '0.8rem' }}
+                    >
+                      {creatingCat ? 'Creating…' : 'Create'}
+                    </button>
+                  </div>
+                )}
+              </div>
+              {/* Featured + In Stock */}
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <label style={{
+                  flex: 1, display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer',
+                  padding: '12px 16px', borderRadius: '12px', border: `2px solid ${form.inStock ? '#16a34a' : '#EED6C4'}`,
+                  background: form.inStock ? 'rgba(22,163,74,0.06)' : '#FFFBF8', transition: 'all 0.2s',
+                }}>
+                  <input type="checkbox" checked={form.inStock} onChange={e => set('inStock', e.target.checked)} style={{ accentColor: '#16a34a', width: 16, height: 16 }} />
+                  <div>
+                    <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#7A5C4E' }}>In Stock</div>
+                    <div style={{ fontSize: '0.68rem', color: '#9E7B6C' }}>Available to buy</div>
+                  </div>
+                </label>
+                <label style={{
+                  flex: 1, display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer',
+                  padding: '12px 16px', borderRadius: '12px', border: `2px solid ${form.featured ? '#C44569' : '#EED6C4'}`,
+                  background: form.featured ? 'rgba(196,69,105,0.06)' : '#FFFBF8', transition: 'all 0.2s',
+                }}>
+                  <input type="checkbox" checked={form.featured} onChange={e => set('featured', e.target.checked)} style={{ accentColor: '#C44569', width: 16, height: 16 }} />
+                  <div>
+                    <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#7A5C4E', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <Star size={12} color="#C44569" fill={form.featured ? '#C44569' : 'none'} /> Featured
+                    </div>
+                    <div style={{ fontSize: '0.68rem', color: '#9E7B6C' }}>Show on homepage</div>
+                  </div>
+                </label>
               </div>
               {/* Multi-image upload */}
               <div>
@@ -283,14 +364,6 @@ export default function AdminProducts() {
                 )}
               </div>
               <F label="Badge (optional)" v={form.badge} onChange={v => set('badge', v)} />
-              <div style={{ display: 'flex', gap: '20px' }}>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.875rem', color: '#7A5C4E', fontWeight: 600 }}>
-                  <input type="checkbox" checked={form.inStock} onChange={e => set('inStock', e.target.checked)} /> In Stock
-                </label>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.875rem', color: '#7A5C4E', fontWeight: 600 }}>
-                  <input type="checkbox" checked={form.featured} onChange={e => set('featured', e.target.checked)} /> Featured
-                </label>
-              </div>
               <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '8px' }}>
                 <button type="button" onClick={() => setModal(false)} className="btn-secondary">Cancel</button>
                 <button type="submit" disabled={saving} className="btn-primary">{saving ? 'Saving...' : editing ? 'Update' : 'Create'}</button>

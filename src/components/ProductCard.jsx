@@ -38,6 +38,18 @@ export default function ProductCard({ product, index = 0 }) {
     ? Math.round((1 - product.price / product.originalPrice) * 100)
     : null
 
+  const handleBuyNow = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (!isCustomerAuth) {
+      addToast('Please log in first to buy', 'info')
+      navigate('/login')
+      return
+    }
+    addToCart(product)
+    navigate('/checkout')
+  }
+
   const handleAddToCart = (e) => {
     e.preventDefault()
     e.stopPropagation()
@@ -215,32 +227,45 @@ export default function ProductCard({ product, index = 0 }) {
             <span style={{ fontSize: '0.7rem', color: '#9E7B6C', fontWeight: 500 }}>({product.reviewCount})</span>
           </div>
 
-          {/* Price + add */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '7px' }}>
-              <span style={{ fontSize: '1.05rem', fontWeight: 800, color: '#C44569' }}>
-                ₹{product.price.toLocaleString('en-IN')}
+          {/* Price row */}
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: '7px', marginBottom: '10px' }}>
+            <span style={{ fontSize: '1.05rem', fontWeight: 800, color: '#C44569' }}>
+              ₹{product.price.toLocaleString('en-IN')}
+            </span>
+            {product.originalPrice && (
+              <span style={{ fontSize: '0.78rem', color: '#C4A696', textDecoration: 'line-through' }}>
+                ₹{product.originalPrice.toLocaleString('en-IN')}
               </span>
-              {product.originalPrice && (
-                <span style={{ fontSize: '0.78rem', color: '#C4A696', textDecoration: 'line-through' }}>
-                  ₹{product.originalPrice.toLocaleString('en-IN')}
-                </span>
-              )}
-            </div>
+            )}
+          </div>
+          {/* Buttons — full width row, never crops */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '7px' }}>
             <button
               onClick={handleAddToCart}
               style={{
-                background: 'linear-gradient(135deg, #C44569, #E8607B)',
-                border: 'none', borderRadius: '50px',
-                padding: '7px 16px', fontSize: '0.72rem', fontWeight: 700,
-                color: '#fff', cursor: 'pointer', transition: 'all 0.2s',
-                whiteSpace: 'nowrap', boxShadow: '0 4px 12px rgba(196,69,105,0.28)',
-                display: 'flex', alignItems: 'center', gap: '5px',
+                background: 'rgba(196,69,105,0.08)', border: '1.5px solid rgba(196,69,105,0.25)',
+                borderRadius: '50px', padding: '8px 0', fontSize: '0.75rem', fontWeight: 700,
+                color: '#C44569', cursor: 'pointer', transition: 'all 0.2s',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px',
               }}
-              onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.04)'; e.currentTarget.style.boxShadow = '0 6px 18px rgba(196,69,105,0.42)' }}
-              onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(196,69,105,0.28)' }}
+              onMouseEnter={e => { e.currentTarget.style.background = 'rgba(196,69,105,0.15)' }}
+              onMouseLeave={e => { e.currentTarget.style.background = 'rgba(196,69,105,0.08)' }}
             >
               <ShoppingBag size={12} /> Add
+            </button>
+            <button
+              onClick={handleBuyNow}
+              style={{
+                background: 'linear-gradient(135deg, #C44569, #E8607B)',
+                border: 'none', borderRadius: '50px',
+                padding: '8px 0', fontSize: '0.75rem', fontWeight: 700,
+                color: '#fff', cursor: 'pointer', transition: 'all 0.2s',
+                boxShadow: '0 4px 12px rgba(196,69,105,0.28)',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 6px 18px rgba(196,69,105,0.42)' }}
+              onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 4px 12px rgba(196,69,105,0.28)' }}
+            >
+              Buy Now
             </button>
           </div>
         </div>

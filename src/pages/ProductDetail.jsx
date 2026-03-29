@@ -86,6 +86,16 @@ export default function ProductDetail() {
     addToast(`${product.name} added to cart!`, 'success')
   }
 
+  const handleBuyNow = () => {
+    if (!isCustomerAuth) {
+      addToast('Please log in first to buy', 'info')
+      navigate('/login')
+      return
+    }
+    addToCart(product, qty)
+    navigate('/checkout')
+  }
+
   const handleWishlist = () => {
     if (!isCustomerAuth) {
       addToast('Please log in first to use your wishlist', 'info')
@@ -240,8 +250,11 @@ export default function ProductDetail() {
 
               {/* CTAs */}
               <div style={{ display: 'flex', gap: '10px', marginBottom: '24px', flexWrap: 'wrap' }}>
-                <button onClick={handleAddToCart} className="btn-primary" style={{ flex: '1 1 200px', justifyContent: 'center' }}>
+                <button onClick={handleAddToCart} className="btn-secondary" style={{ flex: '1 1 140px', justifyContent: 'center' }}>
                   <ShoppingBag size={16} /> Add to Cart
+                </button>
+                <button onClick={handleBuyNow} className="btn-primary" style={{ flex: '1 1 140px', justifyContent: 'center' }}>
+                  Buy Now
                 </button>
                 <button onClick={handleWishlist}
                   style={{

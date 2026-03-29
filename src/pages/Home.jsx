@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from 'framer-motion'
 import { Sparkles, ShoppingBag, BookOpen, Gift, Truck, Shield, Star, Quote, ArrowRight, Heart, Zap } from 'lucide-react'
@@ -302,9 +302,159 @@ function LogoShowcase() {
   )
 }
 
+// ─── New Arrivals Slider ───────────────────────────────────────────────────
+const SLIDE_WIDTH = 280
+const SLIDE_GAP = 20
+
+function NewArrivalsSlider({ products }) {
+  const [current, setCurrent] = useState(0)
+  const [dragging, setDragging] = useState(false)
+  const [dragStart, setDragStart] = useState(0)
+  const [dragDelta, setDragDelta] = useState(0)
+  const timerRef = useRef(null)
+  const total = products.length
+
+  const resetTimer = useCallback(() => {
+    clearInterval(timerRef.current)
+    timerRef.current = setInterval(() => setCurrent(c => (c + 1) % total), 3200)
+  }, [total])
+
+  useEffect(() => {
+    if (total > 0) resetTimer()
+    return () => clearInterval(timerRef.current)
+  }, [total, resetTimer])
+
+  const goTo = (idx) => { setCurrent((idx + total) % total); resetTimer() }
+
+  const onDragStart = (clientX) => { setDragging(true); setDragStart(clientX); setDragDelta(0) }
+  const onDragMove = (clientX) => { if (dragging) setDragDelta(clientX - dragStart) }
+  const onDragEnd = () => {
+    if (Math.abs(dragDelta) > 60) goTo(dragDelta < 0 ? current + 1 : current - 1)
+    setDragging(false); setDragDelta(0)
+  }
+
+  if (!total) return null
+
+  return (
+    <div style={{ overflow: 'hidden' }}>
+      {/* Slider track */}
+      <div
+        style={{ position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', height: '460px', cursor: dragging ? 'grabbing' : 'grab', userSelect: 'none' }}
+        onMouseDown={e => onDragStart(e.clientX)}
+        onMouseMove={e => onDragMove(e.clientX)}
+        onMouseUp={onDragEnd}
+        onMouseLeave={onDragEnd}
+        onTouchStart={e => onDragStart(e.touches[0].clientX)}
+        onTouchMove={e => onDragMove(e.touches[0].clientX)}
+        onTouchEnd={onDragEnd}
+      >
+        {products.map((product, idx) => {
+          const offset = ((idx - current + total) % total)
+          const pos = offset <= total / 2 ? offset : offset - total
+          const isCenter = pos === 0
+          const isAdjacent = Math.abs(pos) === 1
+          const isVisible = Math.abs(pos) <= 2
+          if (!isVisible) return null
+          const x = pos * (SLIDE_WIDTH + SLIDE_GAP) + dragDelta
+          const scale = isCenter ? 1 : isAdjacent ? 0.88 : 0.76
+          const zIndex = isCenter ? 10 : isAdjacent ? 5 : 1
+          const opacity = isCenter ? 1 : isAdjacent ? 0.75 : 0.4
+
+          return (
+            <motion.div
+              key={product._id}
+              animate={{ x, scale, opacity, y: isCenter ? -8 : 0 }}
+              transition={{ type: 'spring', stiffness: 280, damping: 28 }}
+              style={{
+                position: 'absolute', width: SLIDE_WIDTH, zIndex,
+                borderRadius: '24px', overflow: 'hidden', background: '#fff',
+                boxShadow: isCenter ? '0 24px 64px rgba(196,69,105,0.22), 0 8px 24px rgba(61,35,20,0.1)' : '0 8px 24px rgba(61,35,20,0.08)',
+                border: isCenter ? '2px solid rgba(196,69,105,0.18)' : '1.5px solid rgba(196,69,105,0.07)',
+                cursor: isCenter ? 'default' : 'pointer',
+              }}
+              onClick={() => !isCenter && goTo(idx)}
+            >
+              <div style={{ position: 'relative', height: '240px', overflow: 'hidden', background: '#fff5f8' }}>
+                <motion.img
+                  src={product.imageUrl || product.images?.[0] || product.image}
+                  alt={product.name}
+                  style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  whileHover={isCenter ? { scale: 1.06 } : {}}
+                  transition={{ duration: 0.4 }}
+                />
+                <motion.div
+                  animate={{ opacity: isCenter ? 1 : 0, scale: isCenter ? 1 : 0.7 }}
+                  style={{ position: 'absolute', top: 14, left: 14, background: 'linear-gradient(135deg, #C44569, #E8607B)', color: '#fff', fontSize: '0.65rem', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '5px 12px', borderRadius: '50px', boxShadow: '0 4px 12px rgba(196,69,105,0.4)' }}
+                >
+                  ✦ New
+                </motion.div>
+                <motion.div
+                  animate={{ opacity: isCenter ? 1 : 0 }}
+                  style={{ position: 'absolute', top: 14, right: 14, width: 36, height: 36, borderRadius: '50%', background: 'rgba(255,255,255,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(61,35,20,0.12)' }}
+                >
+                  <Heart size={16} color="#C44569" />
+                </motion.div>
+              </div>
+              <div style={{ padding: '18px 20px 20px' }}>
+                <div style={{ fontSize: '0.72rem', color: '#C44569', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '6px' }}>
+                  {product.category?.name || 'Handmade'}
+                </div>
+                <div style={{ fontWeight: 700, color: '#1A0A05', fontSize: '1rem', marginBottom: '8px', lineHeight: 1.3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                  {product.name}
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ fontSize: '1.15rem', fontWeight: 900, background: 'linear-gradient(135deg, #C44569, #D4956B)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+                    ₹{product.price}
+                  </span>
+                  <motion.div whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.95 }} style={{ display: 'inline-block' }}>
+                    <Link to={`/products/${product._id}`} style={{ textDecoration: 'none' }}>
+                      <button style={{ background: 'linear-gradient(135deg, #C44569, #E8607B)', color: '#fff', border: 'none', borderRadius: '50px', padding: '8px 18px', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px', boxShadow: '0 4px 14px rgba(196,69,105,0.35)' }}>
+                        <ShoppingBag size={13} /> View
+                      </button>
+                    </Link>
+                  </motion.div>
+                </div>
+              </div>
+            </motion.div>
+          )
+        })}
+      </div>
+
+      {/* Dot indicators */}
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '28px' }}>
+        {products.map((_, idx) => (
+          <motion.button
+            key={idx}
+            onClick={() => goTo(idx)}
+            animate={{ width: idx === current ? 28 : 8, background: idx === current ? '#C44569' : 'rgba(196,69,105,0.25)' }}
+            transition={{ type: 'spring', stiffness: 400, damping: 28 }}
+            style={{ height: 8, borderRadius: 50, border: 'none', cursor: 'pointer', padding: 0 }}
+          />
+        ))}
+      </div>
+
+      {/* Prev / Next arrows */}
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginTop: '20px' }}>
+        {[['←', -1], ['→', 1]].map(([arrow, dir]) => (
+          <motion.button
+            key={arrow}
+            whileHover={{ scale: 1.1, background: 'linear-gradient(135deg, #C44569, #E8607B)', color: '#fff' }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => goTo(current + dir)}
+            style={{ width: 44, height: 44, borderRadius: '50%', border: '2px solid rgba(196,69,105,0.3)', background: '#fff', color: '#C44569', fontSize: '1.1rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 14px rgba(196,69,105,0.1)' }}
+          >
+            {arrow}
+          </motion.button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default function Home() {
   const [featured, setFeatured] = useState([])
   const [categories, setCategories] = useState([])
+  const [newArrivals, setNewArrivals] = useState([])
   const [loading, setLoading] = useState(true)
   const [apiError, setApiError] = useState(null)
 
@@ -312,9 +462,11 @@ export default function Home() {
     Promise.all([
       api.get('/products?featured=true'),
       api.get('/categories'),
-    ]).then(([p, c]) => {
+      api.get('/products?sort=newest&limit=8'),
+    ]).then(([p, c, n]) => {
       setFeatured(p.data)
       setCategories(c.data)
+      setNewArrivals(n.data)
       setApiError(null)
     }).catch(err => setApiError(err.response?.data?.message || err.message || 'Failed to load data')).finally(() => setLoading(false))
   }, [])
@@ -489,7 +641,7 @@ export default function Home() {
       </section>
 
       {/* ═══ FEATURED PRODUCTS ═══ */}
-      <section style={{ background: '#fff', padding: '96px 0' }}>
+      <section style={{ background: '#fff', padding: '96px 0 48px', overflow: 'hidden' }}>
         <div className="page-container">
           <AnimatedSection>
             <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '56px', flexWrap: 'wrap', gap: '16px' }}>
@@ -506,29 +658,48 @@ export default function Home() {
               </Link>
             </div>
           </AnimatedSection>
-
-          {loading ? (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '24px' }}>
-              {[...Array(8)].map((_, i) => <div key={i} className="skeleton" style={{ height: '340px', borderRadius: '20px' }} />)}
-            </div>
-          ) : apiError ? (
-            <p style={{ color: '#C44569', textAlign: 'center', padding: '40px 0' }}>{apiError}</p>
-          ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '24px' }}>
-              {featured.map((p, i) => <ProductCard key={p._id} product={p} index={i} />)}
-            </div>
-          )}
         </div>
+        {loading ? (
+          <div className="page-container" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '24px' }}>
+            {[...Array(4)].map((_, i) => <div key={i} className="skeleton" style={{ height: '340px', borderRadius: '20px' }} />)}
+          </div>
+        ) : apiError ? (
+          <p style={{ color: '#C44569', textAlign: 'center', padding: '40px 0' }}>{apiError}</p>
+        ) : (
+          <NewArrivalsSlider products={newArrivals.length > 0 ? newArrivals : featured} />
+        )}
       </section>
 
-      {/* ═══ BRAND STRIP — social proof bar ═══ */}
-      <section style={{ background: 'linear-gradient(135deg, #C44569 0%, #E8607B 50%, #D4956B 100%)', padding: '40px 0' }}>
-        <div className="page-container">
-          <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '48px' }}>
-            {[['🎨', 'All Handmade'], ['📦', 'Gift Ready'], ['🌸', 'Eco Friendly'], ['⚡', 'Fast Dispatch'], ['♻️', 'Sustainable']].map(([icon, label]) => (
-              <div key={label} style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'rgba(255,255,255,0.95)' }}>
-                <span style={{ fontSize: '1.3rem' }}>{icon}</span>
-                <span style={{ fontWeight: 700, fontSize: '0.9rem', letterSpacing: '0.02em' }}>{label}</span>
+      {/* ═══ BRAND STRIP — logo marquee ═══ */}
+      <section style={{
+        background: '#fff8f9',
+        borderTop: '1px solid rgba(196,69,105,0.1)',
+        borderBottom: '1px solid rgba(196,69,105,0.1)',
+        padding: '20px 0',
+      }}>
+        <div className="marquee-outer">
+          <div className="marquee-track">
+            {[...Array(4)].map((_, dupIdx) => (
+              <div key={dupIdx} style={{ display: 'flex', alignItems: 'center', flexShrink: 0 }}>
+                {[
+                  '/strip_logos/handmade.png',
+                  '/strip_logos/gift.png',
+                  '/strip_logos/eco.png',
+                  '/strip_logos/fast.png',
+                  '/strip_logos/sustainable.png',
+                  '/strip_logos/image.png',
+                ].map((src) => (
+                  <div
+                    key={src + dupIdx}
+                    style={{ padding: '0 44px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
+                  >
+                    <img
+                      src={src}
+                      alt=""
+                      style={{ height: 70, width: 'auto', objectFit: 'contain', display: 'block' }}
+                    />
+                  </div>
+                ))}
               </div>
             ))}
           </div>

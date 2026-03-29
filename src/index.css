@@ -43,6 +43,26 @@ body {
 ::-webkit-scrollbar-thumb { background: #F8C8DC; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #E8A0B8; }
 
+/* Marquee strip */
+@keyframes marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.marquee-outer {
+  overflow: hidden;
+  width: 100%;
+}
+.marquee-track {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  animation: marquee 18s linear infinite;
+  will-change: transform;
+}
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
 /* Gradient text */
 .gradient-text {
   background: linear-gradient(135deg, #C44569 10%, #E8607B 50%, #D4956B 100%);
