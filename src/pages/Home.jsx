@@ -464,29 +464,7 @@ export default function Home() {
       </section>
 
       {/* ═══ CATEGORIES ═══ */}
-      <section style={{ background: 'linear-gradient(180deg, #fff5f8 0%, #fffaf5 100%)', padding: '96px 0' }}>
-        <div className="page-container">
-          <AnimatedSection>
-            <div style={{ textAlign: 'center', marginBottom: '56px' }}>
-              <div className="section-label">Browse Collection</div>
-              <h2 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.75rem)', fontWeight: 900, color: '#1A0A05', letterSpacing: '-0.025em' }}>
-                Shop by Category
-              </h2>
-              <p style={{ color: '#8B6655', marginTop: '14px', fontSize: '1rem', maxWidth: '440px', margin: '14px auto 0', lineHeight: 1.7 }}>
-                Three unique collections, each handcrafted with finest materials and heartfelt care.
-              </p>
-            </div>
-          </AnimatedSection>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '28px' }}>
-            {loading
-              ? [0, 1, 2].map(i => <div key={i} className="skeleton" style={{ aspectRatio: '4/5', borderRadius: '24px' }} />)
-              : apiError
-                ? <p style={{ color: '#C44569', gridColumn: '1/-1', textAlign: 'center', padding: '40px 0' }}>{apiError}</p>
-                : categories.map((cat, i) => <CategoryCard key={cat._id} category={cat} index={i} />)
-            }
-          </div>
-        </div>
-      </section>
+
 
       {/* ═══ FEATURED PRODUCTS ═══ */}
       <section style={{ background: '#fff', padding: '96px 0' }}>
