@@ -80,7 +80,7 @@ export default function Profile() {
         <div style={{ position: 'absolute', top: '-40px', right: '-40px', width: '260px', height: '260px', borderRadius: '50%', background: 'rgba(255,255,255,0.07)', pointerEvents: 'none' }} />
         <div style={{ position: 'absolute', bottom: '-60px', left: '-30px', width: '200px', height: '200px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)', pointerEvents: 'none' }} />
         <div className="page-container" style={{ position: 'relative', zIndex: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }} className="profile-hero-row">
             {/* Avatar */}
             <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'rgba(255,255,255,0.2)', border: '3px solid rgba(255,255,255,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>
               {form.avatar
@@ -104,7 +104,7 @@ export default function Profile() {
 
       {/* Stat cards — pulled up over the banner */}
       <div className="page-container" style={{ marginTop: '-40px', position: 'relative', zIndex: 2 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px', marginBottom: '28px' }}>
+        <div className="profile-stat-grid">
           {[
             { icon: Package,  label: 'Total Orders',   value: orders.length },
             { icon: Heart,    label: 'Total Spent',    value: `₹${totalSpent.toLocaleString('en-IN')}` },
@@ -121,15 +121,13 @@ export default function Profile() {
         </div>
 
         {/* Tabs */}
-        <div style={{ display: 'flex', gap: '6px', background: '#fff', borderRadius: '16px', padding: '6px', border: '1px solid rgba(196,69,105,0.1)', marginBottom: '24px', width: 'fit-content' }}>
+        <div className="profile-tabs">
           {TABS.map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
+              className="profile-tab-btn"
               style={{
-                display: 'flex', alignItems: 'center', gap: '7px',
-                padding: '10px 20px', borderRadius: '12px', border: 'none', cursor: 'pointer',
-                fontWeight: 700, fontSize: '0.85rem', transition: 'all 0.2s',
                 background: activeTab === tab.id ? 'linear-gradient(135deg,#C44569,#E8607B)' : 'transparent',
                 color: activeTab === tab.id ? '#fff' : '#9E7B6C',
                 boxShadow: activeTab === tab.id ? '0 4px 14px rgba(196,69,105,0.3)' : 'none',
@@ -223,7 +221,7 @@ export default function Profile() {
                   <div style={{ display: 'grid', gap: '14px' }}>
                     {orders.map(order => (
                       <div key={order._id} style={{ borderRadius: '18px', border: '1px solid rgba(238,214,196,0.5)', padding: '18px', background: '#FFFDFC' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px', marginBottom: '12px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px', marginBottom: '12px' }} className="profile-order-meta">
                           <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
                             <Meta label="Order" value={`#${order.orderId}`} />
                             <Meta label="Date" value={formatDate(order.createdAt)} />
@@ -256,7 +254,7 @@ export default function Profile() {
 
           {activeTab === 'settings' && (
             <motion.div key="settings" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25 }}>
-              <div style={{ background: '#fff', borderRadius: '24px', padding: '28px', border: '1px solid rgba(196,69,105,0.08)', boxShadow: '0 4px 20px rgba(122,92,78,0.05)', maxWidth: '560px' }}>
+              <div style={{ background: '#fff', borderRadius: '24px', padding: '28px', border: '1px solid rgba(196,69,105,0.08)', boxShadow: '0 4px 20px rgba(122,92,78,0.05)' }} className="profile-settings-box">
                 <h3 style={{ fontWeight: 800, color: '#1A0A05', fontSize: '1.1rem', marginBottom: '6px' }}>Account Settings</h3>
                 <p style={{ color: '#9E7B6C', fontSize: '0.875rem', marginBottom: '24px', lineHeight: 1.6 }}>Keep your details up to date for faster checkout.</p>
                 <form onSubmit={handleSave} style={{ display: 'grid', gap: '16px' }}>
@@ -266,7 +264,7 @@ export default function Profile() {
                   <Field label="Avatar Image URL" value={form.avatar} onChange={v => setField('avatar', v)} placeholder="https://..." />
                   <div style={{ borderTop: '1px solid rgba(238,214,196,0.5)', paddingTop: '16px', marginTop: '4px' }}>
                     <div style={{ fontWeight: 700, color: '#1A0A05', fontSize: '0.9rem', marginBottom: '14px' }}>Default Delivery Address</div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                    <div className="profile-address-grid">
                       <div style={{ gridColumn: '1/-1' }}><Field label="Street Address" value={form.defaultAddress.address} onChange={v => setAddr('address', v)} /></div>
                       <Field label="City"     value={form.defaultAddress.city}    onChange={v => setAddr('city', v)} />
                       <Field label="State"    value={form.defaultAddress.state}   onChange={v => setAddr('state', v)} />
@@ -286,8 +284,24 @@ export default function Profile() {
       <div style={{ height: '60px' }} />
 
       <style>{`
+        .profile-stat-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 28px; }
+        .profile-tabs { display: flex; gap: 6px; background: #fff; border-radius: 16px; padding: 6px; border: 1px solid rgba(196,69,105,0.1); margin-bottom: 24px; width: 100%; }
+        .profile-tab-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 7px; padding: 10px 12px; border-radius: 12px; border: none; cursor: pointer; font-weight: 700; font-size: 0.82rem; transition: all 0.2s; white-space: nowrap; }
+        .profile-hero-row { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+        .profile-address-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         @media (max-width: 600px) {
-          .profile-stats-grid { grid-template-columns: 1fr !important; }
+          .profile-stat-grid { grid-template-columns: repeat(3,1fr); gap: 8px; }
+          .profile-stat-grid > div { padding: 12px 10px !important; border-radius: 14px !important; }
+          .profile-stat-grid > div > div:first-child { width: 28px !important; height: 28px !important; margin-bottom: 6px !important; }
+          .profile-stat-grid > div > div:nth-child(2) { font-size: 1rem !important; }
+          .profile-stat-grid > div > div:nth-child(3) { font-size: 0.65rem !important; }
+          .profile-tabs { gap: 4px; padding: 4px; }
+          .profile-tab-btn { padding: 8px 6px !important; font-size: 0.72rem !important; gap: 4px !important; }
+          .profile-hero-row { flex-direction: column; align-items: flex-start; gap: 12px; }
+          .profile-address-grid { grid-template-columns: 1fr !important; }
+          .profile-settings-box { padding: 18px !important; max-width: 100% !important; }
+          .profile-order-meta { flex-direction: column !important; gap: 8px !important; }
+          .profile-order-meta > div:last-child { text-align: left !important; }
         }
       `}</style>
     </div>
