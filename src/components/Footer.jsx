@@ -122,10 +122,10 @@ export default function Footer() {
       <div style={{ borderTop: '1px solid rgba(248,200,220,0.3)', padding: '20px 0' }}>
         <div className="page-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
           <span style={{ fontSize: '0.8125rem', color: '#9E7B6C' }}>
-            © {new Date().getFullYear()} Softtoi. All rights reserved.
+            © {new Date().getFullYear()} Softoi. All rights reserved.
           </span>
           <span style={{ fontSize: '0.8125rem', color: '#9E7B6C', display: 'flex', alignItems: 'center', gap: '4px' }}>
-            Made with <Heart size={12} fill="#E8A0B8" color="#E8A0B8" /> by Softtoi
+            Made with <Heart size={12} fill="#E8A0B8" color="#E8A0B8" /> Softoi.
           </span>
         </div>
       </div>
