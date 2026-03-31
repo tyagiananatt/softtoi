@@ -5,6 +5,7 @@ import { Sparkles, ShoppingBag, BookOpen, Gift, Truck, Shield, Star, Quote, Arro
 import AnimatedSection from '../components/AnimatedSection'
 import ProductCard from '../components/ProductCard'
 import CategoryCard from '../components/CategoryCard'
+import LoadingQuote from '../components/LoadingQuote'
 import api from '../utils/api'
 
 // Curated Unsplash images for hero
@@ -35,17 +36,14 @@ const TESTIMONIALS = [
   {
     text: 'The rose keychain I ordered was absolutely stunning. The craftsmanship is beyond what I expected. It arrived perfectly packaged — looked like a luxury gift!',
     name: 'Priya Sharma', role: 'Verified Customer', stars: 5,
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=80&h=80&q=80',
   },
   {
     text: 'My daughter absolutely loves the teddy bear. The quality is incredible and it\'s so soft! Will definitely be ordering again for every occasion.',
     name: 'Neha Gupta', role: 'Verified Customer', stars: 5,
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=80&h=80&q=80',
   },
   {
     text: 'Ordered the cherry blossom branch for my office and everyone keeps asking where I got it. So unique and beautifully made. Totally worth every rupee!',
     name: 'Anjali Patel', role: 'Verified Customer', stars: 5,
-    avatar: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=80&h=80&q=80',
   },
 ]
 
@@ -645,8 +643,11 @@ export default function Home() {
           </AnimatedSection>
         </div>
         {loading ? (
-          <div className="page-container" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '24px' }}>
-            {[...Array(4)].map((_, i) => <div key={i} className="skeleton" style={{ height: '340px', borderRadius: '20px' }} />)}
+          <div className="page-container">
+            <LoadingQuote style={{ marginBottom: '20px' }} />
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '24px' }}>
+              {[...Array(4)].map((_, i) => <div key={i} className="skeleton" style={{ height: '340px', borderRadius: '20px' }} />)}
+            </div>
           </div>
         ) : apiError ? (
           <p style={{ color: '#C44569', textAlign: 'center', padding: '40px 0' }}>{apiError}</p>
@@ -742,10 +743,9 @@ export default function Home() {
                   </p>
                   {/* Author */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <img
-                      src={t.avatar} alt={t.name}
-                      style={{ width: '46px', height: '46px', borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(196,69,105,0.2)' }}
-                    />
+                    <div style={{ width: '46px', height: '46px', borderRadius: '50%', background: 'linear-gradient(135deg, #F8C8DC, #EED6C4)', border: '2px solid rgba(196,69,105,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontWeight: 800, fontSize: '1rem', color: '#C44569' }}>
+                      {t.name.charAt(0)}
+                    </div>
                     <div>
                       <div style={{ fontWeight: 700, color: '#1A0A05', fontSize: '0.9375rem' }}>{t.name}</div>
                       <div style={{ fontSize: '0.75rem', color: '#C44569', fontWeight: 600 }}>{t.role}</div>

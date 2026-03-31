@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { Search, SlidersHorizontal, X } from 'lucide-react'
 import AnimatedSection from '../components/AnimatedSection'
 import ProductCard from '../components/ProductCard'
+import LoadingQuote from '../components/LoadingQuote'
 import api from '../utils/api'
 
 const SORTS = [
@@ -128,8 +129,11 @@ export default function Products() {
 
         {/* Results */}
         {loading ? (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '24px' }}>
-            {[...Array(12)].map((_, i) => <div key={i} className="skeleton" style={{ height: '320px', borderRadius: '20px' }} />)}
+          <div>
+            <LoadingQuote style={{ marginBottom: '20px' }} />
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '24px' }}>
+              {[...Array(12)].map((_, i) => <div key={i} className="skeleton" style={{ height: '320px', borderRadius: '20px' }} />)}
+            </div>
           </div>
         ) : error ? (
           <div style={{ textAlign: 'center', padding: '80px 0', color: '#9E7B6C' }}>

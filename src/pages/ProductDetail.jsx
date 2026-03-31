@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Star, ShoppingBag, Heart, Share2, Truck, Shield, RotateCcw, ChevronLeft, ChevronRight, Minus, Plus, CheckCircle } from 'lucide-react'
 import AnimatedSection from '../components/AnimatedSection'
 import ProductCard from '../components/ProductCard'
+import LoadingQuote from '../components/LoadingQuote'
 import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
@@ -51,6 +52,7 @@ export default function ProductDetail() {
   if (loading) return (
     <div style={{ paddingTop: '70px', minHeight: '100vh' }}>
       <div className="page-container" style={{ padding: '40px 1.5rem' }}>
+        <LoadingQuote style={{ marginBottom: '28px' }} />
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '48px' }}>
           <div className="skeleton" style={{ aspectRatio: '1/1', borderRadius: '20px' }} />
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>

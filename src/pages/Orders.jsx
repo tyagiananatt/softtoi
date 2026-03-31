@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Package, ChevronDown, ChevronUp } from 'lucide-react'
 import AnimatedSection from '../components/AnimatedSection'
+import LoadingQuote from '../components/LoadingQuote'
 import { useAuth } from '../context/AuthContext'
 import api from '../utils/api'
 
@@ -91,6 +92,7 @@ export default function Orders() {
           </div>
         ) : loading ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <LoadingQuote style={{ marginBottom: '8px' }} />
             {[1, 2].map(i => <div key={i} className="skeleton" style={{ height: '120px', borderRadius: '16px' }} />)}
           </div>
         ) : orders.length === 0 ? (
