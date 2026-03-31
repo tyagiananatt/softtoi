@@ -674,7 +674,7 @@ export default function Home() {
               ? [0, 1, 2].map(i => <div key={i} className="skeleton" style={{ aspectRatio: '4/5', borderRadius: '24px' }} />)
               : apiError
                 ? <p style={{ color: '#C44569', gridColumn: '1/-1', textAlign: 'center', padding: '40px 0' }}>{apiError}</p>
-                : categories.map((cat, i) => <CategoryCard key={cat._id} category={cat} index={i} />)
+                : categories.filter(cat => ['keychains','soft-toys','flowers'].includes(cat.slug)).map((cat, i) => <CategoryCard key={cat._id} category={cat} index={i} />)
             }
           </div>
         </div>

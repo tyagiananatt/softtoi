@@ -5,12 +5,6 @@ import AnimatedSection from '../components/AnimatedSection'
 import ProductCard from '../components/ProductCard'
 import api from '../utils/api'
 
-const CATEGORIES = [
-  { label: 'All', value: 'all' },
-  { label: 'Keychains', value: 'keychains' },
-  { label: 'Soft Toys', value: 'soft-toys' },
-  { label: 'Flowers', value: 'flowers' },
-]
 const SORTS = [
   { label: 'Featured', value: 'featured' },
   { label: 'Price: Low → High', value: 'price-asc' },
@@ -21,18 +15,21 @@ const SORTS = [
 export default function Products() {
   const [searchParams, setSearchParams] = useSearchParams()
   const [products, setProducts] = useState([])
+  const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [search, setSearch] = useState(searchParams.get('search') || '')
   const [category, setCategory] = useState(searchParams.get('category') || 'all')
   const [sort, setSort] = useState('featured')
 
-  // Sync state whenever URL params change (e.g. clicking category links in Navbar)
   useEffect(() => {
-    const urlSearch = searchParams.get('search') || ''
-    const urlCat = searchParams.get('category') || 'all'
-    setSearch(urlSearch)
-    setCategory(urlCat)
+    api.get('/categories').then(r => setCategories(r.data)).catch(() => {})
+  }, [])
+
+  // Sync state whenever URL params change
+  useEffect(() => {
+    setSearch(searchParams.get('search') || '')
+    setCategory(searchParams.get('category') || 'all')
   }, [searchParams.toString()])
 
   useEffect(() => {
@@ -87,7 +84,7 @@ export default function Products() {
 
             {/* Category pills */}
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-              {CATEGORIES.map(c => (
+              {[{ label: 'All', value: 'all' }, ...categories.map(c => ({ label: c.name, value: c.slug }))].map(c => (
                 <button
                   key={c.value}
                   onClick={() => setCategory(c.value)}

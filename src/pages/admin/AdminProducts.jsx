@@ -65,8 +65,9 @@ export default function AdminProducts() {
     setCreatingCat(true)
     try {
       const res = await api.post('/categories', { name }, adminRequestConfig)
-      const updated = await loadCategories()
-      set('category', res.data.slug)
+      await loadCategories()
+      // Directly set the new slug so form.category is correct when saving
+      setForm(f => ({ ...f, category: res.data.slug }))
       setCustomCatName('')
       addToast(`Category "${name}" created!`, 'success')
     } catch (err) {
@@ -79,6 +80,10 @@ export default function AdminProducts() {
     setSaving(true)
     try {
       if (!form.image) { addToast('Please upload at least one photo', 'error'); setSaving(false); return }
+      // Guard: if category is still __custom__ (user didn't finish creating), block save
+      if (!form.category || form.category === '__custom__') {
+        addToast('Please create or select a valid category first', 'error'); setSaving(false); return
+      }
       const data = { ...form, price: Number(form.price), originalPrice: form.originalPrice ? Number(form.originalPrice) : undefined }
       if (editing) await api.put(`/products/${editing}`, data, adminRequestConfig)
       else await api.post('/products', data, adminRequestConfig)
