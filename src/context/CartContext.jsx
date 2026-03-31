@@ -10,6 +10,7 @@ export function CartProvider({ children }) {
       return []
     }
   })
+  const [isLPU, setIsLPU] = useState(false)
 
   useEffect(() => {
     localStorage.setItem('softtoi_cart', JSON.stringify(items))
@@ -36,11 +37,12 @@ export function CartProvider({ children }) {
 
   const itemCount = items.reduce((sum, i) => sum + i.quantity, 0)
   const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0)
-  const shippingCost = subtotal >= 999 ? 0 : (subtotal > 0 ? 99 : 0)
+  // LPU campus = free, outside LPU = ₹19 flat
+  const shippingCost = subtotal === 0 ? 0 : (isLPU ? 0 : 19)
   const total = subtotal + shippingCost
 
   return (
-    <CartContext.Provider value={{ items, addToCart, removeFromCart, updateQuantity, clearCart, itemCount, subtotal, shippingCost, total }}>
+    <CartContext.Provider value={{ items, addToCart, removeFromCart, updateQuantity, clearCart, itemCount, subtotal, shippingCost, total, isLPU, setIsLPU }}>
       {children}
     </CartContext.Provider>
   )

@@ -18,7 +18,7 @@ export default function Checkout() {
   const [errors, setErrors] = useState({})
   const [placing, setPlacing] = useState(false)
   const [order, setOrder] = useState(null)
-  const { items, subtotal, shippingCost, total, clearCart } = useCart()
+  const { items, subtotal, shippingCost, total, clearCart, isLPU, setIsLPU } = useCart()
   const { addToast } = useToast()
   const { customerUser, isCustomerAuth } = useAuth()
   const navigate = useNavigate()
@@ -142,7 +142,40 @@ export default function Checkout() {
                 )}
                 {step === 0 && (
                   <div>
-                    <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#7A5C4E', marginBottom: '24px' }}>Shipping Information</h2>
+                    <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#7A5C4E', marginBottom: '20px' }}>Shipping Information</h2>
+
+                    {/* Delivery location toggle */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '24px' }}>
+                      <button
+                        type="button"
+                        onClick={() => setIsLPU(true)}
+                        style={{
+                          padding: '14px 12px', borderRadius: '14px', cursor: 'pointer', textAlign: 'left',
+                          border: `2px solid ${isLPU ? '#C44569' : '#EED6C4'}`,
+                          background: isLPU ? 'rgba(196,69,105,0.06)' : '#FFFBF8',
+                          transition: 'all 0.2s',
+                        }}
+                      >
+                        <div style={{ fontSize: '1.1rem', marginBottom: '4px' }}>🎓</div>
+                        <div style={{ fontWeight: 700, fontSize: '0.85rem', color: '#7A5C4E' }}>Inside LPU Campus</div>
+                        <div style={{ fontSize: '0.72rem', color: '#16a34a', fontWeight: 600, marginTop: '2px' }}>FREE Delivery</div>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setIsLPU(false)}
+                        style={{
+                          padding: '14px 12px', borderRadius: '14px', cursor: 'pointer', textAlign: 'left',
+                          border: `2px solid ${!isLPU ? '#C44569' : '#EED6C4'}`,
+                          background: !isLPU ? 'rgba(196,69,105,0.06)' : '#FFFBF8',
+                          transition: 'all 0.2s',
+                        }}
+                      >
+                        <div style={{ fontSize: '1.1rem', marginBottom: '4px' }}>🚚</div>
+                        <div style={{ fontWeight: 700, fontSize: '0.85rem', color: '#7A5C4E' }}>Outside LPU Campus</div>
+                        <div style={{ fontSize: '0.72rem', color: '#C44569', fontWeight: 600, marginTop: '2px' }}>₹19 Delivery Charge</div>
+                      </button>
+                    </div>
+
                     <div className="checkout-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                       <F label="First Name" v={form.firstName} onChange={v => set('firstName', v)} err={errors.firstName} />
                       <F label="Last Name" v={form.lastName} onChange={v => set('lastName', v)} err={errors.lastName} />

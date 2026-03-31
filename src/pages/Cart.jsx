@@ -25,8 +25,6 @@ export default function Cart() {
     </div>
   )
 
-  const freeShipProgress = Math.min((subtotal / 999) * 100, 100)
-
   return (
     <div style={{ paddingTop: '70px', minHeight: '100vh', background: '#FFF6EC' }}>
       <div className="page-container" style={{ padding: '40px 1.5rem 64px' }}>
@@ -87,15 +85,12 @@ export default function Cart() {
             <div style={{ background: '#fff', borderRadius: '20px', padding: '24px', border: '1px solid rgba(248,200,220,0.2)', position: 'sticky', top: '90px' }}>
               <h2 style={{ fontSize: '1.125rem', fontWeight: 800, color: '#7A5C4E', marginBottom: '20px' }}>Order Summary</h2>
 
-              {/* Free shipping progress */}
+              {/* Shipping info */}
               {shippingCost > 0 && (
                 <div style={{ marginBottom: '20px', background: 'rgba(248,200,220,0.1)', borderRadius: '12px', padding: '12px' }}>
-                  <div style={{ fontSize: '0.8rem', color: '#9E7B6C', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <div style={{ fontSize: '0.8rem', color: '#9E7B6C', display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <Truck size={14} color="#E8A0B8" />
-                    Add ₹{(999 - subtotal).toLocaleString('en-IN')} more for free shipping
-                  </div>
-                  <div style={{ height: '6px', background: '#EED6C4', borderRadius: '3px', overflow: 'hidden' }}>
-                    <motion.div animate={{ width: `${freeShipProgress}%` }} style={{ height: '100%', background: 'linear-gradient(90deg, #F8C8DC, #E8A0B8)', borderRadius: '3px' }} />
+                    ₹19 delivery charge applies · <span style={{ color: '#16a34a', fontWeight: 600 }}>Free inside LPU campus</span>
                   </div>
                 </div>
               )}

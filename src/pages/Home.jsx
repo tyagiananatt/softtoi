@@ -18,7 +18,7 @@ const FEATURES = [
     color: '#FDE8F0', iconColor: '#C44569',
   },
   {
-    icon: Truck, title: 'Free Shipping ₹999+', desc: 'Enjoy free delivery on all orders above ₹999.',
+    icon: Truck, title: 'Free Delivery on Campus', desc: 'Inside LPU campus delivery is free. Outside campus: ₹19 flat charge.',
     color: '#FFF6EC', iconColor: '#D4956B',
   },
   {

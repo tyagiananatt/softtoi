@@ -273,7 +273,7 @@ export default function ProductDetail() {
               {/* Features */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '24px' }}>
                 {[
-                  [Truck, 'Free Shipping', '₹999+'],
+                  [Truck, 'LPU Campus', 'Free delivery'],
                   [Shield, 'Secure Payment', 'Guaranteed'],
                   [RotateCcw, 'Easy Returns', '7 days'],
                 ].map(([Icon, title, sub]) => (
