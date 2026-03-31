@@ -587,91 +587,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ═══ FEATURE STRIP ═══ */}
-      <section style={{ background: '#fff', borderTop: '1px solid rgba(196,69,105,0.08)', borderBottom: '1px solid rgba(196,69,105,0.08)', padding: '0' }}>
-        <div className="page-container">
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0' }}>
-            {FEATURES.map((f, i) => (
-              <AnimatedSection key={f.title} delay={i * 0.08}>
-                <div style={{
-                  display: 'flex', gap: '16px', alignItems: 'flex-start',
-                  padding: '32px 24px',
-                  borderRight: i < FEATURES.length - 1 ? '1px solid rgba(196,69,105,0.08)' : 'none',
-                }}>
-                  <div style={{
-                    width: '50px', height: '50px', borderRadius: '14px',
-                    background: f.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-                  }}>
-                    <f.icon size={22} color={f.iconColor} />
-                  </div>
-                  <div>
-                    <div style={{ fontWeight: 700, color: '#1A0A05', marginBottom: '4px', fontSize: '0.9375rem' }}>{f.title}</div>
-                    <div style={{ fontSize: '0.8rem', color: '#8B6655', lineHeight: 1.6 }}>{f.desc}</div>
-                  </div>
-                </div>
-              </AnimatedSection>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ═══ CATEGORIES ═══ */}
-
-
-      {/* ═══ FEATURED PRODUCTS ═══ */}
-      <section style={{ background: '#fff', padding: '96px 0 48px', overflow: 'hidden' }}>
-        <div className="page-container">
-          <AnimatedSection>
-            <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '56px', flexWrap: 'wrap', gap: '16px' }}>
-              <div>
-                <div className="section-label">Curated Selection</div>
-                <h2 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.75rem)', fontWeight: 900, color: '#1A0A05', letterSpacing: '-0.025em' }}>
-                  Featured Products
-                </h2>
-              </div>
-              <Link to="/products" style={{ textDecoration: 'none' }}>
-                <button className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  View All <ArrowRight size={16} />
-                </button>
-              </Link>
-            </div>
-          </AnimatedSection>
-        </div>
-        {loading ? (
-          <div className="page-container" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '24px' }}>
-            {[...Array(4)].map((_, i) => <div key={i} className="skeleton" style={{ height: '340px', borderRadius: '20px' }} />)}
-          </div>
-        ) : apiError ? (
-          <p style={{ color: '#C44569', textAlign: 'center', padding: '40px 0' }}>{apiError}</p>
-        ) : (
-          <NewArrivalsSlider products={newArrivals.length > 0 ? newArrivals : featured} />
-        )}
-      </section>
-      {/* ═══ CATEGORIES ═══ */}
-      <section style={{ background: 'linear-gradient(180deg, #fff5f8 0%, #fffaf5 100%)', padding: '96px 0' }}>
-        <div className="page-container">
-          <AnimatedSection>
-            <div style={{ textAlign: 'center', marginBottom: '56px' }}>
-              <div className="section-label">Browse Collection</div>
-              <h2 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.75rem)', fontWeight: 900, color: '#1A0A05', letterSpacing: '-0.025em' }}>
-                Shop by Category
-              </h2>
-              <p style={{ color: '#8B6655', marginTop: '14px', fontSize: '1rem', maxWidth: '440px', margin: '14px auto 0', lineHeight: 1.7 }}>
-                Three unique collections, each handcrafted with finest materials and heartfelt care.
-              </p>
-            </div>
-          </AnimatedSection>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '28px' }}>
-            {loading
-              ? [0, 1, 2].map(i => <div key={i} className="skeleton" style={{ aspectRatio: '4/5', borderRadius: '24px' }} />)
-              : apiError
-                ? <p style={{ color: '#C44569', gridColumn: '1/-1', textAlign: 'center', padding: '40px 0' }}>{apiError}</p>
-                : categories.map((cat, i) => <CategoryCard key={cat._id} category={cat} index={i} />)
-            }
-          </div>
-        </div>
-      </section>
-
       {/* ═══ BRAND STRIP — logo marquee ═══ */}
       <section style={{
         background: '#fff8f9',
@@ -707,6 +622,92 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* ═══ CATEGORIES ═══ */}
+
+      {/* ═══ FEATURED PRODUCTS ═══ */}
+      <section style={{ background: '#fff', padding: '96px 0 48px', overflow: 'hidden' }}>
+        <div className="page-container">
+          <AnimatedSection>
+            <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: '56px', flexWrap: 'wrap', gap: '16px' }}>
+              <div>
+                <div className="section-label">Curated Selection</div>
+                <h2 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.75rem)', fontWeight: 900, color: '#1A0A05', letterSpacing: '-0.025em' }}>
+                  Featured Products
+                </h2>
+              </div>
+              <Link to="/products" style={{ textDecoration: 'none' }}>
+                <button className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  View All <ArrowRight size={16} />
+                </button>
+              </Link>
+            </div>
+          </AnimatedSection>
+        </div>
+        {loading ? (
+          <div className="page-container" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '24px' }}>
+            {[...Array(4)].map((_, i) => <div key={i} className="skeleton" style={{ height: '340px', borderRadius: '20px' }} />)}
+          </div>
+        ) : apiError ? (
+          <p style={{ color: '#C44569', textAlign: 'center', padding: '40px 0' }}>{apiError}</p>
+        ) : (
+          <NewArrivalsSlider products={newArrivals.length > 0 ? newArrivals : featured} />
+        )}
+      </section>
+      
+      {/* ═══ CATEGORIES ═══ */}
+      <section style={{ background: 'linear-gradient(180deg, #fff5f8 0%, #fffaf5 100%)', padding: '96px 0' }}>
+        <div className="page-container">
+          <AnimatedSection>
+            <div style={{ textAlign: 'center', marginBottom: '56px' }}>
+              <div className="section-label">Browse Collection</div>
+              <h2 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.75rem)', fontWeight: 900, color: '#1A0A05', letterSpacing: '-0.025em' }}>
+                Shop by Category
+              </h2>
+              <p style={{ color: '#8B6655', marginTop: '14px', fontSize: '1rem', maxWidth: '440px', margin: '14px auto 0', lineHeight: 1.7 }}>
+                Three unique collections, each handcrafted with finest materials and heartfelt care.
+              </p>
+            </div>
+          </AnimatedSection>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '28px' }}>
+            {loading
+              ? [0, 1, 2].map(i => <div key={i} className="skeleton" style={{ aspectRatio: '4/5', borderRadius: '24px' }} />)
+              : apiError
+                ? <p style={{ color: '#C44569', gridColumn: '1/-1', textAlign: 'center', padding: '40px 0' }}>{apiError}</p>
+                : categories.map((cat, i) => <CategoryCard key={cat._id} category={cat} index={i} />)
+            }
+          </div>
+        </div>
+      </section>
+            {/* ═══ FEATURE STRIP ═══ */}
+      <section style={{ background: '#fff', borderTop: '1px solid rgba(196,69,105,0.08)', borderBottom: '1px solid rgba(196,69,105,0.08)', padding: '0' }}>
+        <div className="page-container">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0' }}>
+            {FEATURES.map((f, i) => (
+              <AnimatedSection key={f.title} delay={i * 0.08}>
+                <div style={{
+                  display: 'flex', gap: '16px', alignItems: 'flex-start',
+                  padding: '32px 24px',
+                  borderRight: i < FEATURES.length - 1 ? '1px solid rgba(196,69,105,0.08)' : 'none',
+                }}>
+                  <div style={{
+                    width: '50px', height: '50px', borderRadius: '14px',
+                    background: f.color, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                  }}>
+                    <f.icon size={22} color={f.iconColor} />
+                  </div>
+                  <div>
+                    <div style={{ fontWeight: 700, color: '#1A0A05', marginBottom: '4px', fontSize: '0.9375rem' }}>{f.title}</div>
+                    <div style={{ fontSize: '0.8rem', color: '#8B6655', lineHeight: 1.6 }}>{f.desc}</div>
+                  </div>
+                </div>
+              </AnimatedSection>
+            ))}
+          </div>
+        </div>
+      </section>
+
+    
 
       {/* ═══ TESTIMONIALS ═══ */}
       <section style={{ padding: '96px 0', background: 'linear-gradient(180deg, #fffaf5 0%, #fff5f8 100%)' }}>
