@@ -5,10 +5,13 @@ const compression = require('compression');
 const app = express();
 
 app.use(compression());
-app.use(cors({
-  origin: process.env.NODE_ENV === 'production' ? true : 'http://localhost:5173',
+const corsOptions = {
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://softoi.shop', 'https://www.softoi.shop', 'http://localhost:3000']
+    : 'http://localhost:5173',
   credentials: true,
-}));
+};
+app.use(cors(corsOptions));
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 

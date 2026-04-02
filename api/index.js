@@ -10,7 +10,11 @@ let handler = null;
 function buildHandler() {
   if (handler) return handler;
   const app = express();
-  app.use(cors({ origin: true, credentials: true }));
+  const corsOptions = {
+    origin: ['https://softoi.shop', 'https://www.softoi.shop', 'http://localhost:5173', 'http://localhost:3000'],
+    credentials: true,
+  };
+  app.use(cors(corsOptions));
   app.use(express.json({ limit: '10mb' }));
   app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
