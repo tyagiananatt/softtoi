@@ -11,7 +11,7 @@ function buildHandler() {
   if (handler) return handler;
   const app = express();
   const corsOptions = {
-    origin: ['https://softoi.shop', 'https://www.softoi.shop', 'http://localhost:5173', 'http://localhost:3000'],
+    origin: ['https://softoi.shop', 'https://www.softoi.shop', 'https://softtoi.vercel.app', 'http://localhost:5173', 'http://localhost:3000'],
     credentials: true,
   };
   app.use(cors(corsOptions));
