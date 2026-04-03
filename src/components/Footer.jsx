@@ -65,7 +65,7 @@ export default function Footer() {
             </p>
             <div style={{ display: 'flex', gap: '10px' }}>
               {[Instagram, Facebook, Twitter].map((Icon, i) => (
-                <a key={i} href="#" style={{
+                <a key={i} href="https://www.instagram.com/softoi.shop/" style={{
                   width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(248,200,220,0.3)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   color: '#9E7B6C', transition: 'background 0.2s', textDecoration: 'none',
