@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Search, Eye, X, ChevronDown } from 'lucide-react'
+import { Search, Eye, X, Trash2 } from 'lucide-react'
 import { AdminLayout } from './Dashboard'
 import { useToast } from '../../context/ToastContext'
 import api, { adminRequestConfig } from '../../utils/api'
@@ -13,6 +13,7 @@ export default function AdminOrders() {
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [selected, setSelected] = useState(null)
+  const [deleteId, setDeleteId] = useState(null)
   const { addToast } = useToast()
 
   const fetchOrders = () => {
@@ -32,6 +33,16 @@ export default function AdminOrders() {
       fetchOrders()
       if (selected?._id === id) setSelected(o => ({ ...o, status }))
     } catch { addToast('Update failed', 'error') }
+  }
+
+  const handleDelete = async () => {
+    try {
+      await api.delete(`/orders/${deleteId}`, adminRequestConfig)
+      addToast('Order deleted', 'info')
+      setDeleteId(null)
+      if (selected?._id === deleteId) setSelected(null)
+      fetchOrders()
+    } catch { addToast('Failed to delete order', 'error') }
   }
 
   const fmt = (d) => new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
@@ -85,7 +96,10 @@ export default function AdminOrders() {
                     <StatusSelect value={o.status} onChange={s => updateStatus(o._id, s)} />
                   </td>
                   <td style={{ padding: '12px 16px' }}>
-                    <button onClick={() => setSelected(o)} style={{ width: '34px', height: '34px', border: '1.5px solid #EED6C4', borderRadius: '8px', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9E7B6C' }}><Eye size={14} /></button>
+                    <div style={{ display: 'flex', gap: '6px' }}>
+                      <button onClick={() => setSelected(o)} style={{ width: '34px', height: '34px', border: '1.5px solid #EED6C4', borderRadius: '8px', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9E7B6C' }}><Eye size={14} /></button>
+                      <button onClick={() => setDeleteId(o._id)} style={{ width: '34px', height: '34px', border: '1.5px solid #fca5a5', borderRadius: '8px', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#dc2626' }}><Trash2 size={14} /></button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -112,7 +126,10 @@ export default function AdminOrders() {
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <StatusSelect value={o.status} onChange={s => updateStatus(o._id, s)} />
-              <button onClick={() => setSelected(o)} style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '6px 12px', border: '1.5px solid #EED6C4', borderRadius: '8px', background: 'none', cursor: 'pointer', color: '#9E7B6C', fontSize: '0.75rem', fontWeight: 600 }}><Eye size={13} /> View</button>
+              <div style={{ display: 'flex', gap: '6px' }}>
+                <button onClick={() => setSelected(o)} style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '6px 12px', border: '1.5px solid #EED6C4', borderRadius: '8px', background: 'none', cursor: 'pointer', color: '#9E7B6C', fontSize: '0.75rem', fontWeight: 600 }}><Eye size={13} /> View</button>
+                <button onClick={() => setDeleteId(o._id)} style={{ width: '34px', height: '34px', border: '1.5px solid #fca5a5', borderRadius: '8px', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#dc2626' }}><Trash2 size={13} /></button>
+              </div>
             </div>
           </div>
         ))}
@@ -171,6 +188,21 @@ export default function AdminOrders() {
               <div style={{ borderTop: '1px solid #F8C8DC', marginTop: '8px', paddingTop: '8px' }}>
                 <Row k="Total" v={`₹${selected.total?.toLocaleString('en-IN')}`} bold />
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Delete confirmation */}
+      {deleteId && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 3000, background: 'rgba(122,92,78,0.4)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+          <div style={{ background: '#fff', borderRadius: '20px', padding: '32px', maxWidth: '360px', width: '100%', textAlign: 'center' }}>
+            <Trash2 size={40} color="#dc2626" style={{ margin: '0 auto 16px', display: 'block' }} />
+            <h3 style={{ fontWeight: 800, color: '#7A5C4E', marginBottom: '8px' }}>Delete Order?</h3>
+            <p style={{ color: '#9E7B6C', marginBottom: '6px', fontSize: '0.875rem' }}>This will permanently remove the order and all its data.</p>
+            <p style={{ color: '#dc2626', fontWeight: 700, fontSize: '0.8rem', marginBottom: '24px' }}>This action cannot be undone.</p>
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+              <button onClick={() => setDeleteId(null)} className="btn-secondary">Cancel</button>
+              <button onClick={handleDelete} style={{ background: '#dc2626', color: '#fff', padding: '12px 24px', borderRadius: '50px', fontWeight: 600, fontSize: '0.875rem', border: 'none', cursor: 'pointer' }}>Yes, Delete</button>
             </div>
           </div>
         </div>

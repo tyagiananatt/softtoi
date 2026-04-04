@@ -42,7 +42,7 @@ export default function About() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '56px', alignItems: 'center' }}>
             <AnimatedSection direction="left">
               <div style={{ borderRadius: '24px', overflow: 'hidden', boxShadow: '0 12px 40px rgba(122,92,78,0.12)', aspectRatio: '4/3' }}>
-                <img src="https://picsum.photos/seed/about1/600/450" alt="Our story" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <img src="/about.png" alt="Our story" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               </div>
             </AnimatedSection>
             <AnimatedSection direction="right">

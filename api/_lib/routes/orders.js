@@ -98,4 +98,15 @@ router.put('/:id', authMiddleware, async (req, res) => {
   }
 });
 
+// DELETE order (admin)
+router.delete('/:id', authMiddleware, async (req, res) => {
+  try {
+    const deleted = await Order.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ message: 'Order not found' });
+    res.json({ message: 'Order deleted' });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 module.exports = router;
