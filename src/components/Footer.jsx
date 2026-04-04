@@ -107,7 +107,7 @@ export default function Footer() {
             {[
               [MapPin, 'Jalandhar City, Punjab, India, 144411'],
               [Phone, '+91 8922090280'],
-              [Mail, 'softoi@gmail.com'],
+              [Mail, 'ilovesoftoi@gmail.com'],
             ].map(([Icon, text]) => (
               <div key={text} style={{ display: 'flex', gap: '10px', marginBottom: '12px', alignItems: 'flex-start' }}>
                 <Icon size={15} color="#E8A0B8" style={{ flexShrink: 0, marginTop: '2px' }} />
