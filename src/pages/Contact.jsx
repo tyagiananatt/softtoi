@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Mail, Phone, MapPin, Clock, Send, CheckCircle } from 'lucide-react'
 import AnimatedSection from '../components/AnimatedSection'
+import api from '../utils/api'
 
 const INFO = [
   { icon: Mail, title: 'Email Us', details: 'ilovesoftoi@gmail.com', sub: 'We reply within 24 hours' },
@@ -27,12 +28,19 @@ export default function Contact() {
     setErrors(e); return Object.keys(e).length === 0
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (!validate()) return
     setSending(true)
-    setTimeout(() => { setSent(true); setSending(false) }, 800)
-    setTimeout(() => { setSent(false); setForm({ name: '', email: '', subject: '', message: '' }) }, 5800)
+    try {
+      await api.post('/contact', form)
+      setSent(true)
+      setTimeout(() => { setSent(false); setForm({ name: '', email: '', subject: '', message: '' }) }, 5000)
+    } catch {
+      setErrors(e => ({ ...e, message: 'Failed to send. Please try again.' }))
+    } finally {
+      setSending(false)
+    }
   }
 
   return (

@@ -23,6 +23,7 @@ function buildHandler() {
   app.use('/api/categories', require('./_lib/routes/categories'));
   app.use('/api/users',      require('./_lib/routes/users'));
   app.use('/api/admin',      require('./_lib/routes/admin'));
+  app.use('/api/contact',    require('./_lib/routes/contact'));
   app.get('/api/health', (_req, res) => res.json({ status: 'ok', time: new Date().toISOString() }));
   app.use((err, _req, res, _next) => {
     console.error(err);

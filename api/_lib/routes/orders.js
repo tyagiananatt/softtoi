@@ -3,6 +3,7 @@ const router = express.Router();
 const Order = require('../models/Order');
 const optionalAuth = require('../middleware/optionalAuth');
 const authMiddleware = require('../middleware/auth');
+const { sendOrderConfirmation } = require('../utils/email');
 
 const generateOrderId = () => `ST-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
 
@@ -79,6 +80,7 @@ router.post('/', optionalAuth, async (req, res) => {
       paymentMethod: paymentMethod || 'COD',
     });
     const saved = await order.save();
+    sendOrderConfirmation(saved).catch(err => console.error('Order email failed:', err.message));
     res.status(201).json(saved);
   } catch (err) {
     res.status(400).json({ message: err.message });
