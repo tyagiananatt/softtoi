@@ -4,9 +4,9 @@ import { Mail, Phone, MapPin, Clock, Send, CheckCircle } from 'lucide-react'
 import AnimatedSection from '../components/AnimatedSection'
 
 const INFO = [
-  { icon: Mail, title: 'Email Us', details: 'hello@softtoi.com', sub: 'We reply within 24 hours' },
-  { icon: Phone, title: 'Call Us', details: '+91 98765 43210', sub: 'Mon–Sat, 10AM–7PM' },
-  { icon: MapPin, title: 'Visit Us', details: '123 Craft Lane, Mumbai', sub: 'Maharashtra, India 400001' },
+  { icon: Mail, title: 'Email Us', details: 'Jalandhar City, Punjab, India, 144411', sub: 'We reply within 24 hours' },
+  { icon: Phone, title: 'Call Us', details: '+91 8922090280', sub: 'Mon–Sat, 10AM–7PM' },
+  { icon: MapPin, title: 'Visit Us', details: 'Jalandhar City, Punjab, India, 144411' },
   { icon: Clock, title: 'Business Hours', details: 'Mon–Sat: 10AM–7PM', sub: 'Sun: 11AM–5PM' },
 ]
 
