@@ -12,7 +12,7 @@ const transporter = nodemailer.createTransport({
 // Send contact form email
 async function sendContactEmail({ name, email, subject, message }) {
   const mailOptions = {
-    from: `"Softtoi Contact Form" <${process.env.EMAIL_USER || 'ilovesoftoi@gmail.com'}>`,
+    from: `"Softoi Contact Form" <${process.env.EMAIL_USER || 'ilovesoftoi@gmail.com'}>`,
     to: 'ilovesoftoi@gmail.com',
     replyTo: email,
     subject: `[Contact Form] ${subject}`,
@@ -49,7 +49,7 @@ async function sendOrderConfirmation(order) {
   `).join('');
 
   const mailOptions = {
-    from: `"Softtoi" <${process.env.EMAIL_USER || 'ilovesoftoi@gmail.com'}>`,
+    from: `"Softoi" <${process.env.EMAIL_USER || 'ilovesoftoi@gmail.com'}>`,
     to: order.shipping.email,
     subject: `Order Confirmed #${order.orderId} 🎉`,
     html: `
@@ -100,7 +100,7 @@ async function sendOrderConfirmation(order) {
         </div>
 
         <div style="background: #fff5f8; padding: 20px; text-align: center; color: #9E7B6C; font-size: 0.8rem;">
-          <p style="margin: 0;">Made with ❤️ by Softtoi | Handmade with Love</p>
+          <p style="margin: 0;">Made with ❤️ by Softoi | Handmade with Love</p>
         </div>
       </div>
     `,
