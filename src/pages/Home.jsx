@@ -525,13 +525,13 @@ export default function Home() {
                 initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }}
                 style={{ fontSize: '1.075rem', color: '#6B4533', lineHeight: 1.78, marginBottom: '36px', maxWidth: '430px', fontWeight: 400 }}
               >
-                Shop handmade keychains, soft toys, and unique gifts at Softoi. Discover cutest and affordable handmade products crafted with love in India.
+                Shop handmade keychains, soft toys, and unique gifts at Softoi. Discover cutest and affordable handmade products crafted with love.
                 <div>
-                <h2 style={{ fontSize: '1.3rem', fontWeight: 700, color: '#1A0A05', marginBottom: '8px' }}>
+                <h2 style={{ fontSize: '1.3rem', fontWeight: 700, color: '#1A0A05',marginTop: '20px', marginBottom: '8px' }}>
                   Why Choose Handmade Gifts?
                 </h2>
                 <p>
-                    Handmade gifts are unique, personal, and crafted with care. At Softtoi, we offer handmade keychains, soft toys, and gifts perfect for every occasion in India.
+                    Handmade gifts are unique, personal, and crafted with care. At Softoi, we offer handmade keychains, soft toys, and gifts perfect for every occasion in India.
                 </p>
               </div>
               </motion.p>
