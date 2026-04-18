@@ -643,6 +643,9 @@ export default function Home() {
                 <h2 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.75rem)', fontWeight: 900, color: '#1A0A05', letterSpacing: '-0.025em' }}>
                   Featured Products
                 </h2>
+                <p style={{ fontSize: '1.3rem', fontWeight: 700, color: '#1A0A05'}}>
+                    Explore our <a href="/products">handmade Unique </a> products right now.
+                </p>
               </div>
               <Link to="/products" style={{ textDecoration: 'none' }}>
                 <button className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -761,9 +764,7 @@ export default function Home() {
                       <div style={{ fontSize: '0.75rem', color: '#C44569', fontWeight: 600 }}>{t.role}</div>
                     </div>
                   </div>
-                  <p>
-                    Explore our <a href="/products">handmade Unique </a> products right now.
-                  </p>
+                  
                 </div>
               </AnimatedSection>
             ))}
