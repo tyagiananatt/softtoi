@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
-import { IndianRupee, ShoppingBag, Package, Clock, LogOut, LayoutDashboard, List, ChevronRight, Menu, X } from 'lucide-react'
+import { IndianRupee, ShoppingBag, Package, Clock, LogOut, LayoutDashboard, List, Star, ChevronRight, Menu, X } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import api from '../../utils/api'
 
@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { label: 'Dashboard', to: '/admin', icon: LayoutDashboard },
   { label: 'Products', to: '/admin/products', icon: Package },
   { label: 'Orders', to: '/admin/orders', icon: List },
+  { label: 'Reviews', to: '/admin/reviews', icon: Star },
 ]
 
 function AdminLayout({ children, title }) {

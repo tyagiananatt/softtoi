@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Heart, Loader, LogOut, Mail, MapPin, Package, Phone, Save, Sparkles, UserRound, ShoppingBag, Settings, Clock } from 'lucide-react'
+import { Heart, Loader, LogOut, Mail, MapPin, Package, Phone, Save, Sparkles, UserRound, ShoppingBag, Settings, Clock, Star, X, Image as ImgIcon, Send } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
 import LoadingQuote from '../components/LoadingQuote'
@@ -19,6 +19,7 @@ const STATUS_COLORS = {
 const TABS = [
   { id: 'overview', label: 'Overview', icon: Sparkles },
   { id: 'orders',   label: 'My Orders', icon: Package },
+  { id: 'reviews',  label: 'My Reviews', icon: Star },
   { id: 'settings', label: 'Settings',  icon: Settings },
 ]
 
@@ -33,6 +34,11 @@ export default function Profile() {
   const [orders, setOrders] = useState([])
   const [loadingOrders, setLoadingOrders] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [reviewModal, setReviewModal] = useState(null)
+  const [reviewForm, setReviewForm] = useState({ rating: 5, comment: '', images: [] })
+  const [submittingReview, setSubmittingReview] = useState(false)
+  const [reviewedProducts, setReviewedProducts] = useState(new Set())
+  const [myReviews, setMyReviews] = useState([])
 
   useEffect(() => {
     if (!customerUser) return
@@ -52,7 +58,16 @@ export default function Profile() {
   useEffect(() => {
     let active = true
     api.get('/users/me/orders')
-      .then(res => { if (active) setOrders(res.data) })
+      .then(res => {
+        if (active) setOrders(res.data)
+        // Load which products user already reviewed
+        api.get('/reviews/my').then(r => {
+          if (active) {
+            setReviewedProducts(new Set(r.data.map(rv => String(rv.product?._id || rv.product))))
+            setMyReviews(r.data)
+          }
+        }).catch(() => {})
+      })
       .catch(() => { if (active) addToast('Could not load orders', 'error') })
       .finally(() => { if (active) setLoadingOrders(false) })
     return () => { active = false }
@@ -72,6 +87,49 @@ export default function Profile() {
   }
 
   const initials = customerUser?.fullName?.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() || '?'
+
+  const openReview = (order, item) => {
+    setReviewModal({ order, item })
+    setReviewForm({ rating: 5, comment: '', images: [] })
+  }
+
+  const handleReviewImageUpload = (e) => {
+    Array.from(e.target.files).forEach(file => {
+      const reader = new FileReader()
+      reader.onload = ev => setReviewForm(f => ({ ...f, images: [...f.images, ev.target.result] }))
+      reader.readAsDataURL(file)
+    })
+    e.target.value = ''
+  }
+
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault()
+    if (!reviewForm.comment.trim()) return addToast('Please write a comment', 'info')
+    setSubmittingReview(true)
+    try {
+      await api.post('/reviews', {
+        productId: reviewModal.item.product?._id || reviewModal.item.product,
+        orderId: reviewModal.order._id,
+        rating: reviewForm.rating,
+        comment: reviewForm.comment,
+        images: reviewForm.images,
+      })
+      const pid = String(reviewModal.item.product?._id || reviewModal.item.product)
+      setReviewedProducts(prev => new Set([...prev, pid]))
+      setMyReviews(prev => [{
+        _id: Date.now(),
+        product: { _id: pid, name: reviewModal.item.name },
+        rating: reviewForm.rating,
+        comment: reviewForm.comment,
+        images: reviewForm.images,
+        createdAt: new Date(),
+      }, ...prev])
+      addToast('Review submitted! 🎉', 'success')
+      setReviewModal(null)
+    } catch (err) {
+      addToast(err.response?.data?.message || 'Failed to submit review', 'error')
+    } finally { setSubmittingReview(false) }
+  }
 
   return (
     <div style={{ paddingTop: '70px', minHeight: '100vh', background: 'linear-gradient(160deg, #fff5f8 0%, #fffaf5 60%, #fff 100%)' }}>
@@ -233,21 +291,127 @@ export default function Profile() {
                           </div>
                         </div>
                         <div style={{ display: 'grid', gap: '8px' }}>
-                          {order.items?.map((item, idx) => (
-                            <div key={idx} style={{ display: 'flex', gap: '10px', alignItems: 'center', paddingTop: '8px', borderTop: '1px solid rgba(238,214,196,0.35)' }}>
-                              <img src={item.image} alt={item.name} style={{ width: '48px', height: '48px', borderRadius: '10px', objectFit: 'cover', background: '#FFF6EC', flexShrink: 0 }} />
-                              <div style={{ flex: 1, minWidth: 0 }}>
-                                <div style={{ fontWeight: 700, color: '#1A0A05', fontSize: '0.85rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name}</div>
-                                <div style={{ color: '#9E7B6C', fontSize: '0.75rem' }}>Qty {item.quantity} × ₹{item.price?.toLocaleString('en-IN')}</div>
+                          {order.items?.map((item, idx) => {
+                            const pid = String(item.product?._id || item.product)
+                            const canReview = ['delivered','shipped','confirmed','processing'].includes(order.status) && !reviewedProducts.has(pid)
+                            const alreadyReviewed = ['delivered','shipped','confirmed','processing'].includes(order.status) && reviewedProducts.has(pid)
+                            return (
+                              <div key={idx} style={{ display: 'flex', gap: '10px', alignItems: 'center', paddingTop: '8px', borderTop: '1px solid rgba(238,214,196,0.35)', flexWrap: 'wrap' }}>
+                                <img src={item.image} alt={item.name} style={{ width: '48px', height: '48px', borderRadius: '10px', objectFit: 'cover', background: '#FFF6EC', flexShrink: 0 }} />
+                                <div style={{ flex: 1, minWidth: 0 }}>
+                                  <div style={{ fontWeight: 700, color: '#1A0A05', fontSize: '0.85rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name}</div>
+                                  <div style={{ color: '#9E7B6C', fontSize: '0.75rem' }}>Qty {item.quantity} × ₹{item.price?.toLocaleString('en-IN')}</div>
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+                                  <div style={{ fontWeight: 800, color: '#7A5C4E', fontSize: '0.875rem' }}>₹{(item.price * item.quantity).toLocaleString('en-IN')}</div>
+                                  {canReview && (
+                                    <button onClick={() => openReview(order, item)} style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '5px 12px', borderRadius: '50px', background: 'linear-gradient(135deg,#C44569,#E8607B)', color: '#fff', border: 'none', cursor: 'pointer', fontSize: '0.72rem', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                                      <Star size={11} /> Review
+                                    </button>
+                                  )}
+                                  {alreadyReviewed && (
+                                    <span style={{ fontSize: '0.68rem', color: '#16a34a', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '3px' }}>
+                                      <Star size={11} fill="#16a34a" stroke="#16a34a" /> Reviewed
+                                    </span>
+                                  )}
+                                </div>
                               </div>
-                              <div style={{ fontWeight: 800, color: '#7A5C4E', fontSize: '0.875rem' }}>₹{(item.price * item.quantity).toLocaleString('en-IN')}</div>
-                            </div>
-                          ))}
+                            )
+                          })}
                         </div>
                       </div>
                     ))}
                   </div>
                 )}
+              </div>
+            </motion.div>
+          )}
+
+          {activeTab === 'reviews' && (
+            <motion.div key="reviews" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.25 }}>
+              <div style={{ display: 'grid', gap: '20px' }}>
+
+                {/* Pending reviews — products bought but not reviewed */}
+                {(() => {
+                  const pending = []
+                  orders.forEach(order => {
+                    if (!['delivered','shipped','confirmed','processing'].includes(order.status)) return
+                    order.items?.forEach(item => {
+                      const pid = String(item.product?._id || item.product)
+                      if (!reviewedProducts.has(pid)) {
+                        pending.push({ order, item, pid })
+                      }
+                    })
+                  })
+                  if (pending.length === 0) return null
+                  return (
+                    <div style={{ background: '#fff', borderRadius: '24px', padding: '24px', border: '1px solid rgba(196,69,105,0.08)', boxShadow: '0 4px 20px rgba(122,92,78,0.05)' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+                        <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#F59E0B' }} />
+                        <h3 style={{ fontWeight: 800, color: '#1A0A05', fontSize: '1rem' }}>Pending Reviews</h3>
+                        <span style={{ background: '#FEF9C3', color: '#854D0E', fontSize: '0.7rem', fontWeight: 700, padding: '2px 8px', borderRadius: '50px' }}>{pending.length}</span>
+                      </div>
+                      <div style={{ display: 'grid', gap: '10px' }}>
+                        {pending.map(({ order, item, pid }) => (
+                          <div key={pid} style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 14px', borderRadius: '14px', background: '#FFFBF8', border: '1px solid rgba(238,214,196,0.5)' }}>
+                            <img src={item.image} alt={item.name} style={{ width: '48px', height: '48px', borderRadius: '10px', objectFit: 'cover', background: '#FFF6EC', flexShrink: 0 }} />
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ fontWeight: 700, color: '#1A0A05', fontSize: '0.875rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name}</div>
+                              <div style={{ fontSize: '0.72rem', color: '#9E7B6C', marginTop: '2px' }}>Order #{order.orderId}</div>
+                            </div>
+                            <button onClick={() => openReview(order, item)}
+                              style={{ display: 'flex', alignItems: 'center', gap: '5px', padding: '7px 14px', borderRadius: '50px', background: 'linear-gradient(135deg,#C44569,#E8607B)', color: '#fff', border: 'none', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 700, whiteSpace: 'nowrap', boxShadow: '0 4px 12px rgba(196,69,105,0.3)', flexShrink: 0 }}>
+                              <Star size={12} /> Write Review
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )
+                })()}
+
+                {/* My submitted reviews */}
+                <div style={{ background: '#fff', borderRadius: '24px', padding: '24px', border: '1px solid rgba(196,69,105,0.08)', boxShadow: '0 4px 20px rgba(122,92,78,0.05)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+                    <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#16a34a' }} />
+                    <h3 style={{ fontWeight: 800, color: '#1A0A05', fontSize: '1rem' }}>My Reviews</h3>
+                    <span style={{ background: '#DCFCE7', color: '#14532D', fontSize: '0.7rem', fontWeight: 700, padding: '2px 8px', borderRadius: '50px' }}>{myReviews.length}</span>
+                  </div>
+                  {myReviews.length === 0 ? (
+                    <div style={{ textAlign: 'center', padding: '32px 0', color: '#9E7B6C' }}>
+                      <Star size={36} color="#F8C8DC" style={{ margin: '0 auto 10px', display: 'block' }} />
+                      <p style={{ fontSize: '0.875rem' }}>You haven't written any reviews yet.</p>
+                    </div>
+                  ) : (
+                    <div style={{ display: 'grid', gap: '12px' }}>
+                      {myReviews.map((r, i) => (
+                        <div key={r._id || i} style={{ padding: '14px 16px', borderRadius: '14px', background: 'linear-gradient(145deg,#fff,#fff9f5)', border: '1px solid rgba(238,214,196,0.5)', position: 'relative', overflow: 'hidden' }}>
+                          <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: 'linear-gradient(90deg,#C44569,#E8607B,#D4956B)' }} />
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px', flexWrap: 'wrap', gap: '6px' }}>
+                            <Link to={`/products/${r.product?._id || r.product}`} style={{ textDecoration: 'none' }}>
+                              <div style={{ fontWeight: 700, color: '#C44569', fontSize: '0.875rem', cursor: 'pointer' }}
+                                onMouseEnter={e => e.currentTarget.style.textDecoration = 'underline'}
+                                onMouseLeave={e => e.currentTarget.style.textDecoration = 'none'}
+                              >
+                                {r.product?.name || 'View Product'}
+                              </div>
+                            </Link>
+                            <div style={{ display: 'flex', gap: '2px' }}>
+                              {[1,2,3,4,5].map(s => <Star key={s} size={13} fill={s <= r.rating ? '#F59E0B' : 'none'} stroke="#F59E0B" />)}
+                            </div>
+                          </div>
+                          <p style={{ color: '#4A2E20', fontSize: '0.85rem', lineHeight: 1.6, margin: '0 0 8px 0', fontStyle: 'italic' }}>"{r.comment}"</p>
+                          {r.images?.length > 0 && (
+                            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginBottom: '8px' }}>
+                              {r.images.map((img, j) => <img key={j} src={img} alt="" style={{ width: '52px', height: '52px', borderRadius: '8px', objectFit: 'cover', border: '1.5px solid rgba(196,69,105,0.15)' }} />)}
+                            </div>
+                          )}
+                          <div style={{ fontSize: '0.68rem', color: '#C4A696' }}>{new Date(r.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </motion.div>
           )}
@@ -282,6 +446,80 @@ export default function Profile() {
       </div>
 
       <div style={{ height: '60px' }} />
+
+      {/* Review Modal */}
+      <AnimatePresence>
+        {reviewModal && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            style={{ position: 'fixed', inset: 0, zIndex: 3000, background: 'rgba(122,92,78,0.45)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}
+            onClick={e => e.target === e.currentTarget && setReviewModal(null)}
+          >
+            <motion.div initial={{ scale: 0.92, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.92, y: 20 }}
+              style={{ background: '#fff', borderRadius: '24px', padding: '28px', width: '100%', maxWidth: '480px', maxHeight: '90vh', overflowY: 'auto' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                <h3 style={{ fontWeight: 800, color: '#1A0A05', fontSize: '1.1rem' }}>Review Product</h3>
+                <button onClick={() => setReviewModal(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9E7B6C' }}><X size={20} /></button>
+              </div>
+
+              {/* Product info */}
+              <div style={{ display: 'flex', gap: '12px', alignItems: 'center', padding: '12px', background: '#FFF9F5', borderRadius: '12px', marginBottom: '20px' }}>
+                <img src={reviewModal.item.image} alt={reviewModal.item.name} style={{ width: '52px', height: '52px', borderRadius: '10px', objectFit: 'cover', background: '#FFF6EC' }} />
+                <div style={{ fontWeight: 700, color: '#1A0A05', fontSize: '0.9rem' }}>{reviewModal.item.name}</div>
+              </div>
+
+              <form onSubmit={handleReviewSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                {/* Star rating */}
+                <div>
+                  <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#7A5C4E', marginBottom: '8px' }}>Your Rating</div>
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    {[1,2,3,4,5].map(s => (
+                      <button key={s} type="button" onClick={() => setReviewForm(f => ({ ...f, rating: s }))}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px' }}>
+                        <Star size={32} fill={s <= reviewForm.rating ? '#F59E0B' : 'none'} stroke="#F59E0B" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Comment */}
+                <div>
+                  <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#7A5C4E', marginBottom: '6px' }}>Your Review</div>
+                  <textarea value={reviewForm.comment} onChange={e => setReviewForm(f => ({ ...f, comment: e.target.value }))}
+                    rows={4} className="form-input" placeholder="Share your experience with this product..." style={{ resize: 'vertical' }} required />
+                </div>
+
+                {/* Photo upload */}
+                <div>
+                  <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#7A5C4E', marginBottom: '8px' }}>Add Photos (optional)</div>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', padding: '10px 14px', border: '1.5px dashed #EED6C4', borderRadius: '10px', background: '#FFFBF8' }}>
+                    <ImgIcon size={16} color="#E8A0B8" />
+                    <span style={{ fontSize: '0.8rem', color: '#7A5C4E' }}>Upload photos</span>
+                    <input type="file" accept="image/*" multiple onChange={handleReviewImageUpload} style={{ display: 'none' }} />
+                  </label>
+                  {reviewForm.images.length > 0 && (
+                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '10px' }}>
+                      {reviewForm.images.map((img, i) => (
+                        <div key={i} style={{ position: 'relative' }}>
+                          <img src={img} alt="" style={{ width: '64px', height: '64px', borderRadius: '8px', objectFit: 'cover', border: '2px solid #EED6C4' }} />
+                          <button type="button" onClick={() => setReviewForm(f => ({ ...f, images: f.images.filter((_, j) => j !== i) }))}
+                            style={{ position: 'absolute', top: '-6px', right: '-6px', width: '18px', height: '18px', background: '#dc2626', border: 'none', borderRadius: '50%', cursor: 'pointer', color: '#fff', fontSize: '11px', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>×</button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
+                  <button type="button" onClick={() => setReviewModal(null)} className="btn-secondary">Cancel</button>
+                  <button type="submit" disabled={submittingReview} className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <Send size={14} /> {submittingReview ? 'Submitting...' : 'Submit Review'}
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <style>{`
         .profile-stat-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 28px; }

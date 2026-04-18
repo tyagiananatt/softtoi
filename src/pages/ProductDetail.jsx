@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Star, ShoppingBag, Heart, Share2, Truck, Shield, RotateCcw, ChevronLeft, ChevronRight, Minus, Plus, CheckCircle } from 'lucide-react'
+import { Star, ShoppingBag, Heart, Share2, Truck, Shield, RotateCcw, ChevronLeft, ChevronRight, Minus, Plus, CheckCircle, MessageSquare, Send } from 'lucide-react'
 import AnimatedSection from '../components/AnimatedSection'
 import ProductCard from '../components/ProductCard'
 import LoadingQuote from '../components/LoadingQuote'
@@ -30,7 +30,12 @@ export default function ProductDetail() {
   const [slideDir, setSlideDir] = useState(1)
   const [qty, setQty] = useState(1)
   const [loading, setLoading] = useState(true)
-  const { isCustomerAuth } = useAuth()
+  const [reviews, setReviews] = useState([])
+  const [userOrders, setUserOrders] = useState([])
+  const [reviewForm, setReviewForm] = useState({ rating: 5, comment: '', orderId: '' })
+  const [submittingReview, setSubmittingReview] = useState(false)
+  const [lightboxImg, setLightboxImg] = useState(null)
+  const { isCustomerAuth, customerUser } = useAuth()
   const { addToCart } = useCart()
   const { toggleWishlist, isWishlisted } = useWishlist()
   const { addToast } = useToast()
@@ -44,10 +49,14 @@ export default function ProductDetail() {
         api.get(`/products?category=${res.data.category}`).then(r => {
           setRelated(r.data.filter(p => p._id !== id).slice(0, 4))
         })
+        api.get(`/reviews/product/${id}`).then(r => setReviews(r.data)).catch(() => {})
       })
       .catch(() => {})
       .finally(() => setLoading(false))
-  }, [id])
+    if (isCustomerAuth) {
+      api.get('/users/me/orders').then(r => setUserOrders(r.data)).catch(() => {})
+    }
+  }, [id, isCustomerAuth])
 
   if (loading) return (
     <div style={{ paddingTop: '70px', minHeight: '100vh' }}>
@@ -113,7 +122,28 @@ export default function ProductDetail() {
     addToast('Link copied!', 'info')
   }
 
+  const eligibleOrder = userOrders.find(o =>
+    o.items?.some(item => String(item.product) === id || String(item.product?._id) === id) &&
+    ['delivered','shipped','confirmed','processing'].includes(o.status)
+  )
+  const alreadyReviewed = reviews.some(r => String(r.user) === String(customerUser?._id))
+
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault()
+    if (!reviewForm.comment.trim()) return addToast('Please write a comment', 'info')
+    setSubmittingReview(true)
+    try {
+      const res = await api.post('/reviews', { productId: id, orderId: eligibleOrder._id, rating: reviewForm.rating, comment: reviewForm.comment })
+      setReviews(prev => [res.data, ...prev])
+      setReviewForm({ rating: 5, comment: '', orderId: '' })
+      addToast('Review submitted! 🎉', 'success')
+    } catch (err) {
+      addToast(err.response?.data?.message || 'Failed to submit review', 'error')
+    } finally { setSubmittingReview(false) }
+  }
+
   return (
+    <>
     <div style={{ paddingTop: '70px', minHeight: '100vh', background: '#FFF6EC' }}>
       <div className="page-container" style={{ padding: '32px 1.5rem 64px' }}>
 
@@ -234,7 +264,13 @@ export default function ProductDetail() {
                 )}
               </div>
 
-              <p style={{ color: '#9E7B6C', lineHeight: 1.8, marginBottom: '24px', fontSize: '0.9375rem' }}>{product.description}</p>
+              <div style={{ color: '#9E7B6C', lineHeight: 1.8, marginBottom: '24px', fontSize: '0.9375rem' }}>
+                {product.description.split('\n').map((line, i) =>
+                  line.startsWith('• ')
+                    ? <div key={i} style={{ display: 'flex', gap: '8px', marginBottom: '4px' }}><span style={{ color: '#C44569', flexShrink: 0 }}>•</span><span>{line.slice(2)}</span></div>
+                    : <p key={i} style={{ margin: line === '' ? '8px 0' : '0 0 4px 0' }}>{line}</p>
+                )}
+              </div>
 
               {/* Quantity */}
               <div style={{ marginBottom: '24px' }}>
@@ -309,6 +345,128 @@ export default function ProductDetail() {
           </AnimatedSection>
         </div>
 
+        {/* Reviews Section */}
+        <div style={{ marginTop: '64px' }}>
+          <AnimatedSection>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '28px' }}>
+              <MessageSquare size={22} color="#C44569" />
+              <h2 style={{ fontSize: '1.5rem', fontWeight: 800, color: '#7A5C4E' }}>Customer Reviews</h2>
+              <span style={{ background: '#FDE8F0', color: '#C44569', fontSize: '0.75rem', fontWeight: 700, padding: '3px 10px', borderRadius: '50px' }}>{reviews.length}</span>
+            </div>
+          </AnimatedSection>
+
+          {/* Write review — only for buyers */}
+          {isCustomerAuth && eligibleOrder && !alreadyReviewed && (
+            <div style={{ background: '#fff', borderRadius: '20px', padding: '24px', border: '1px solid rgba(196,69,105,0.12)', marginBottom: '28px', boxShadow: '0 4px 16px rgba(122,92,78,0.06)' }}>
+              <h3 style={{ fontWeight: 700, color: '#7A5C4E', marginBottom: '16px', fontSize: '1rem' }}>Write a Review</h3>
+              <form onSubmit={handleReviewSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                <div>
+                  <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#7A5C4E', marginBottom: '8px' }}>Your Rating</div>
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    {[1,2,3,4,5].map(s => (
+                      <button key={s} type="button" onClick={() => setReviewForm(f => ({ ...f, rating: s }))}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px' }}>
+                        <Star size={28} fill={s <= reviewForm.rating ? '#F59E0B' : 'none'} stroke="#F59E0B" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.8rem', fontWeight: 600, color: '#7A5C4E', marginBottom: '6px' }}>Your Review</div>
+                  <textarea value={reviewForm.comment} onChange={e => setReviewForm(f => ({ ...f, comment: e.target.value }))}
+                    rows={3} className="form-input" placeholder="Share your experience with this product..." style={{ resize: 'vertical' }} required />
+                </div>
+                <button type="submit" disabled={submittingReview} className="btn-primary" style={{ alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Send size={15} /> {submittingReview ? 'Submitting...' : 'Submit Review'}
+                </button>
+              </form>
+            </div>
+          )}
+
+          {!isCustomerAuth && (
+            <div style={{ background: '#FFF6EC', borderRadius: '16px', padding: '20px', marginBottom: '24px', textAlign: 'center', border: '1px solid rgba(238,214,196,0.5)' }}>
+              <p style={{ color: '#9E7B6C', marginBottom: '12px' }}>Login and purchase this product to leave a review</p>
+              <Link to="/login"><button className="btn-secondary" style={{ fontSize: '0.875rem' }}>Login to Review</button></Link>
+            </div>
+          )}
+
+          {/* Reviews list */}
+          {reviews.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '40px', color: '#9E7B6C', background: '#fff', borderRadius: '16px', border: '1px solid rgba(238,214,196,0.3)' }}>
+              <Star size={36} color="#F8C8DC" style={{ margin: '0 auto 12px', display: 'block' }} />
+              <p>No reviews yet. Be the first to review!</p>
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
+              {reviews.map(r => (
+                <div key={r._id} style={{
+                  background: 'linear-gradient(145deg, #fff 0%, #fff9f5 100%)',
+                  borderRadius: '22px', padding: '22px',
+                  border: '1px solid rgba(196,69,105,0.1)',
+                  boxShadow: '0 4px 24px rgba(196,69,105,0.08), 0 1px 4px rgba(122,92,78,0.06)',
+                  transition: 'transform 0.2s, box-shadow 0.2s',
+                  position: 'relative', overflow: 'hidden',
+                }}
+                  onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 12px 36px rgba(196,69,105,0.14)' }}
+                  onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 24px rgba(196,69,105,0.08)' }}
+                >
+                  {/* Decorative top accent */}
+                  <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: 'linear-gradient(90deg, #C44569, #E8607B, #D4956B)' }} />
+
+                  {/* Stars row */}
+                  <div style={{ display: 'flex', gap: '3px', marginBottom: '14px', marginTop: '4px' }}>
+                    {[1,2,3,4,5].map(s => (
+                      <Star key={s} size={16}
+                        fill={s <= r.rating ? '#F59E0B' : 'rgba(245,158,11,0.15)'}
+                        stroke={s <= r.rating ? '#F59E0B' : 'rgba(245,158,11,0.3)'}
+                      />
+                    ))}
+                    <span style={{ marginLeft: '6px', fontSize: '0.75rem', fontWeight: 700, color: '#F59E0B' }}>{r.rating}.0</span>
+                  </div>
+
+                  {/* Comment */}
+                  <p style={{ color: '#4A2E20', lineHeight: 1.75, fontSize: '0.9rem', margin: '0 0 16px 0', fontStyle: 'italic' }}>
+                    "{r.comment}"
+                  </p>
+
+                  {/* Images */}
+                  {r.images?.length > 0 && (
+                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '16px' }}>
+                      {r.images.map((img, i) => (
+                        <img key={i} src={img} alt="" onClick={() => setLightboxImg(img)}
+                          style={{ width: '68px', height: '68px', borderRadius: '10px', objectFit: 'cover', border: '2px solid rgba(196,69,105,0.15)', cursor: 'zoom-in', transition: 'transform 0.2s' }}
+                          onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.08)'}
+                          onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
+                        />
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Author */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingTop: '14px', borderTop: '1px solid rgba(238,214,196,0.5)' }}>
+                    <div style={{
+                      width: 36, height: 36, borderRadius: '50%', flexShrink: 0,
+                      background: 'linear-gradient(135deg, #C44569, #E8607B)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontWeight: 900, color: '#fff', fontSize: '0.9rem',
+                      boxShadow: '0 4px 10px rgba(196,69,105,0.3)',
+                    }}>
+                      {(r.userName || 'C').charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <div style={{ fontWeight: 700, color: '#1A0A05', fontSize: '0.85rem' }}>{r.userName || 'Customer'}</div>
+                      <div style={{ fontSize: '0.68rem', color: '#9E7B6C' }}>{new Date(r.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+                    </div>
+                    <div style={{ marginLeft: 'auto', background: '#FDE8F0', borderRadius: '50px', padding: '3px 10px', fontSize: '0.65rem', fontWeight: 800, color: '#C44569', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                      Verified
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
         {/* Related Products */}
         {related.length > 0 && (
           <div style={{ marginTop: '64px' }}>
@@ -322,5 +480,33 @@ export default function ProductDetail() {
         )}
       </div>
     </div>
+
+    {/* Lightbox */}
+    <AnimatePresence>
+      {lightboxImg && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={() => setLightboxImg(null)}
+          style={{ position: 'fixed', inset: 0, zIndex: 9999, background: 'rgba(0,0,0,0.88)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px', cursor: 'zoom-out' }}
+        >
+          <motion.img
+            src={lightboxImg}
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.8, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 28 }}
+            onClick={e => e.stopPropagation()}
+            style={{ maxWidth: '90vw', maxHeight: '88vh', borderRadius: '16px', objectFit: 'contain', boxShadow: '0 24px 80px rgba(0,0,0,0.5)', cursor: 'default' }}
+          />
+          <button onClick={() => setLightboxImg(null)}
+            style={{ position: 'fixed', top: '20px', right: '20px', width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(255,255,255,0.15)', border: '1.5px solid rgba(255,255,255,0.3)', color: '#fff', fontSize: '1.2rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(8px)' }}>
+            ×
+          </button>
+        </motion.div>
+      )}
+    </AnimatePresence>
+    </>
   )
 }

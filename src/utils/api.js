@@ -12,7 +12,7 @@ api.interceptors.request.use((config) => {
   const userToken = localStorage.getItem('softtoi_user_token')
   const url = config.url || ''
   const isAdminRequest = config.headers?.['X-Softtoi-Admin'] === 'true' || url.startsWith('/admin')
-  const isUserRequest = url.startsWith('/users') || url.startsWith('/orders')
+  const isUserRequest = url.startsWith('/users') || url.startsWith('/orders') || url.startsWith('/reviews')
 
   if (isAdminRequest && adminToken) {
     config.headers.Authorization = `Bearer ${adminToken}`

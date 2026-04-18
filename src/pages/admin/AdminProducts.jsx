@@ -257,7 +257,7 @@ export default function AdminProducts() {
               <F label="Name" v={form.name} onChange={v => set('name', v)} required />
               <div>
                 <label className="form-label">Description</label>
-                <textarea value={form.description} onChange={e => set('description', e.target.value)} rows={3} className="form-input" style={{ resize: 'vertical' }} required />
+                <SmartDescriptionEditor value={form.description} onChange={v => set('description', v)} />
               </div>
               <div className="admin-modal-price-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <F label="Price (₹)" type="number" v={form.price} onChange={v => set('price', v)} required />
@@ -401,6 +401,65 @@ function F({ label, v, onChange, type = 'text', required }) {
     <div>
       <label className="form-label">{label}</label>
       <input type={type} value={v} onChange={e => onChange(e.target.value)} className="form-input" required={required} />
+    </div>
+  )
+}
+
+function SmartDescriptionEditor({ value, onChange }) {
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      const ta = e.target
+      const start = ta.selectionStart
+      const lines = value.substring(0, start).split('\n')
+      const currentLine = lines[lines.length - 1]
+      // If current line starts with bullet, continue bullet on next line
+      const isBullet = currentLine.startsWith('• ')
+      // If bullet line is empty (just "• "), remove it and go normal
+      if (isBullet && currentLine === '• ') {
+        const before = value.substring(0, start - 2)
+        const after = value.substring(start)
+        const newVal = before + '\n' + after
+        onChange(newVal)
+        setTimeout(() => { ta.selectionStart = ta.selectionEnd = start - 1 }, 0)
+      } else {
+        const insert = isBullet ? '\n• ' : '\n'
+        const newVal = value.substring(0, start) + insert + value.substring(start)
+        onChange(newVal)
+        setTimeout(() => { ta.selectionStart = ta.selectionEnd = start + insert.length }, 0)
+      }
+    }
+    // Type "- " at start of line → convert to bullet
+    if (e.key === ' ') {
+      const ta = e.target
+      const start = ta.selectionStart
+      const lines = value.substring(0, start).split('\n')
+      const currentLine = lines[lines.length - 1]
+      if (currentLine === '-') {
+        e.preventDefault()
+        const lineStart = start - 1
+        const newVal = value.substring(0, lineStart) + '• ' + value.substring(start)
+        onChange(newVal)
+        setTimeout(() => { ta.selectionStart = ta.selectionEnd = lineStart + 2 }, 0)
+      }
+    }
+  }
+
+  return (
+    <div>
+      <textarea
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        onKeyDown={handleKeyDown}
+        rows={5}
+        className="form-input"
+        style={{ resize: 'vertical', fontFamily: 'inherit', lineHeight: 1.7 }}
+        placeholder={'Type normally for paragraphs.\nStart a line with "- " to create a bullet point.\n• Bullets continue automatically on Enter.'}
+        required
+      />
+      <div style={{ fontSize: '0.7rem', color: '#C4A696', marginTop: '4px' }}>
+        💡 Type <strong>-</strong> then <strong>Space</strong> to start a bullet point
+      </div>
     </div>
   )
 }
