@@ -525,7 +525,7 @@ export default function Home() {
                 initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }}
                 style={{ fontSize: '1.075rem', color: '#6B4533', lineHeight: 1.78, marginBottom: '36px', maxWidth: '430px', fontWeight: 400 }}
               >
-                From charming keychains to cuddly soft toys and beautiful floral arrangements — every piece is crafted with heart by our talented artisans.
+                Shop handmade keychains, soft toys, and unique gifts at Softoi. Discover cutest and affordable handmade products crafted with love in India.
               </motion.p>
 
               <motion.div
