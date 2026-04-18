@@ -61,8 +61,8 @@ export default function Products() {
         <div className="page-container">
           <AnimatedSection>
             <div className="section-label">Our Products</div>
-            <h1 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 900, color: '#7A5C4E', marginBottom: '8px' }}>Our Collection</h1>
-            <p style={{ color: '#9E7B6C', fontSize: '1rem' }}>Handcrafted with love — {products.length} products found</p>
+            <h1 style={{ fontSize: 'clamp(2rem, 4vw, 3rem)', fontWeight: 900, color: '#7A5C4E', marginBottom: '8px' }}>Our Collection of Handmade Keychains, Soft Toys, Flowers & more.</h1>
+            <p style={{ color: '#9E7B6C', fontSize: '1rem' }}>Unique Products Handcrafted with love — {products.length} products available.</p>
           </AnimatedSection>
         </div>
       </div>
