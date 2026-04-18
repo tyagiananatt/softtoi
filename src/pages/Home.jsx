@@ -761,6 +761,9 @@ export default function Home() {
                       <div style={{ fontSize: '0.75rem', color: '#C44569', fontWeight: 600 }}>{t.role}</div>
                     </div>
                   </div>
+                  <p>
+                    Explore our <a href="/products">handmade Unique </a> products right now.
+                  </p>
                 </div>
               </AnimatedSection>
             ))}
