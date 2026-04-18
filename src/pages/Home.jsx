@@ -643,7 +643,7 @@ export default function Home() {
                 <h2 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.75rem)', fontWeight: 900, color: '#1A0A05', letterSpacing: '-0.025em' }}>
                   Featured Products
                 </h2>
-                <p style={{ color: '#8B6655', marginTop: '14px', fontSize: '1rem', maxWidth: '440px', margin: '14px auto 0', lineHeight: 1.7 }}>
+                <p style={{ color: '#8B6655', fontSize: '1rem', maxWidth: '440px', margin: '14px auto 0', lineHeight: 1.7 }}>
                     Explore our <a href="/products">handmade Unique </a> products right now.
                 </p>
               </div>
