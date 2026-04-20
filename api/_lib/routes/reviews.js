@@ -40,14 +40,22 @@ router.post('/', userAuth, async (req, res) => {
     if (!productId || !orderId || !rating || !comment)
       return res.status(400).json({ message: 'All fields required' });
 
-    // Verify user bought this product
+    // Verify user bought this product — check by user ID or by email
     const order = await Order.findOne({
       _id: orderId,
-      user: req.user.id,
-      'items.product': productId,
+      $or: [
+        { user: req.user.id },
+        { 'shipping.email': req.user.email },
+      ],
       status: { $in: ['delivered', 'shipped', 'confirmed', 'processing'] },
     });
     if (!order) return res.status(403).json({ message: 'You can only review products you have purchased' });
+
+    // Verify the product is actually in this order
+    const hasProduct = order.items.some(item =>
+      String(item.product) === String(productId)
+    );
+    if (!hasProduct) return res.status(403).json({ message: 'This product is not in your order' });
 
     // Check duplicate
     const existing = await Review.findOne({ product: productId, user: req.user.id });
