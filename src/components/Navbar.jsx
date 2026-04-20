@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Home, Search, Heart, ShoppingBag, User, Menu, X } from 'lucide-react'
+import { Home, Search, Heart, ShoppingBag, ShoppingCart, User, Menu, X, Store } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
@@ -111,6 +111,11 @@ export default function Navbar() {
                 <Home size={19} />
               </IconBtn>
             </Link>
+            <Link to="/products" className="show-mobile" style={{ textDecoration: 'none' }}>
+              <IconBtn label="Shop" as="div">
+                <Store size={19} />
+              </IconBtn>
+            </Link>
             <IconBtn label="Search" onClick={() => setSearchOpen(true)}>
               <Search size={20} />
             </IconBtn>
@@ -122,7 +127,7 @@ export default function Navbar() {
             </Link>
             <Link to="/cart" style={{ position: 'relative', textDecoration: 'none' }}>
               <IconBtn label="Cart" as="div">
-                <ShoppingBag size={20} />
+                <ShoppingCart size={20} />
                 {itemCount > 0 && <Badge count={itemCount} animate />}
               </IconBtn>
             </Link>
