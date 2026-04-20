@@ -72,10 +72,13 @@ export default function Navbar() {
                 height: '52px',
                 borderRadius: '50%',
                 overflow: 'hidden',
-                display: 'inline-block',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
                 border: '2px solid rgba(248,200,220,0.55)',
                 boxShadow: '0 8px 20px rgba(196,69,105,0.14)',
                 background: '#fff',
+                flexShrink: 0,
               }}
             >
               <img
