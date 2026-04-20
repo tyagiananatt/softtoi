@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { CheckCircle, ChevronRight, Package } from 'lucide-react'
+import emailjs from '@emailjs/browser'
 import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
 import { useToast } from '../context/ToastContext'
@@ -80,6 +81,27 @@ export default function Checkout() {
       setOrder(res.data)
       clearCart()
       setStep(3)
+
+      // Send order confirmation via EmailJS (non-blocking)
+      const itemsList = payload.items.map(i => `${i.name} × ${i.quantity} — ₹${(i.price * i.quantity).toLocaleString('en-IN')}`).join('\n')
+      emailjs.send(
+        import.meta.env.VITE_EMAILJS_SERVICE_ID,
+        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+        {
+          to_email:   form.email,
+          to_name:    `${form.firstName} ${form.lastName}`,
+          order_id:   res.data.orderId,
+          items_list: itemsList,
+          subtotal:   `₹${subtotal.toLocaleString('en-IN')}`,
+          shipping:   shippingCost === 0 ? 'FREE' : `₹${shippingCost}`,
+          total:      `₹${total.toLocaleString('en-IN')}`,
+          address:    `${form.address}, ${form.city}, ${form.state} - ${form.zipCode}`,
+          phone:      form.phone,
+        },
+        import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+      ).then(() => console.log('✅ Order email sent'))
+       .catch(err => console.error('❌ EmailJS error:', err))
+
     } catch {
       addToast('Failed to place order. Please try again.', 'error')
     } finally {

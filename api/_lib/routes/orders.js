@@ -80,7 +80,7 @@ router.post('/', optionalAuth, async (req, res) => {
       paymentMethod: paymentMethod || 'COD',
     });
     const saved = await order.save();
-    sendOrderConfirmation(saved).catch(err => console.error('Order email failed:', err.message));
+    // Email handled by EmailJS on frontend
     res.status(201).json(saved);
   } catch (err) {
     res.status(400).json({ message: err.message });

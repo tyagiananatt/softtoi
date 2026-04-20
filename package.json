@@ -13,6 +13,7 @@
     "seed:atlas": "node api/_lib/seed.js"
   },
   "dependencies": {
+    "@emailjs/browser": "^4.4.1",
     "@tailwindcss/vite": "^4.0.14",
     "axios": "^1.7.9",
     "bcryptjs": "^2.4.3",
