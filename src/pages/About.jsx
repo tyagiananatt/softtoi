@@ -47,15 +47,21 @@ export default function About() {
             </AnimatedSection>
             <AnimatedSection direction="right">
               <div className="section-label">Who We Are</div>
-              <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2rem)', fontWeight: 800, color: '#7A5C4E', marginBottom: '20px' }}>A Labor of Love</h2>
+              <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2rem)', fontWeight: 800, color: '#7A5C4E', marginBottom: '20px' }}>A Story Woven with Love</h2>
               <p style={{ color: '#9E7B6C', lineHeight: 1.9, marginBottom: '16px', fontSize: '0.9375rem' }}>
-                Softtoi started as a passion project between two best friends who believed that handmade gifts carry a special kind of magic. What began in a tiny studio with basic tools has grown into a beloved brand serving thousands of customers across India.
+                Softtoi began with a mother’s forgotten passion and a dream to bring it back to life. My mom has always had incredible creative talent — from crochet and painting to beautiful handmade crafts. But like many women, family responsibilities and life’s demands slowly pushed her creativity into the background.
               </p>
               <p style={{ color: '#9E7B6C', lineHeight: 1.9, marginBottom: '16px', fontSize: '0.9375rem' }}>
-                Every keychain, soft toy, and flower arrangement you find in our store is made by hand, with thoughtful attention to detail. We pour our hearts into every creation because we know it's not just a product — it's a gift, a memory, a little piece of joy.
+                One day, I saw her crocheting again, creating simply for joy, and I was amazed. That moment inspired Softtoi — a platform to showcase not only her creativity, but also the hidden talents of many women who have set aside their passions while caring for others.
+              </p>
+              <p style={{ color: '#9E7B6C', lineHeight: 1.9, marginBottom: '16px', fontSize: '0.9375rem' }}>
+                Every keychain, soft toy, flower bouquet, and handmade piece in our store is made with love, patience, and attention to detail. These are more than products — they are little pieces of joy, crafted to hold memories.
+              </p>
+              <p style={{ color: '#9E7B6C', lineHeight: 1.9, marginBottom: '16px', fontSize: '0.9375rem' }}>
+                At Softtoi, we celebrate handmade artistry, support women creators, and believe creativity should never be forgotten. When you shop with us, you’re not just buying something beautiful — you’re supporting a dream.
               </p>
               <p style={{ color: '#9E7B6C', lineHeight: 1.9, fontSize: '0.9375rem' }}>
-                We are proud to support local artisans and use sustainable, eco-friendly materials wherever possible. When you shop with Softtoi, you're not just buying something beautiful — you're supporting a dream.
+                Our Softtoi family welcomes you to discover unique handmade treasures and heartfelt creations made with love. ✨
               </p>
             </AnimatedSection>
           </div>
