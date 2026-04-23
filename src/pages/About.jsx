@@ -49,19 +49,19 @@ export default function About() {
               <div className="section-label">Who We Are</div>
               <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2rem)', fontWeight: 800, color: '#7A5C4E', marginBottom: '20px' }}>A Story Woven with Love</h2>
               <p style={{ color: '#9E7B6C', lineHeight: 1.9, marginBottom: '16px', fontSize: '0.9375rem' }}>
-                Softtoi began with a mother’s forgotten passion and a dream to bring it back to life. My mom has always had incredible creative talent — from crochet and painting to beautiful handmade crafts. But like many women, family responsibilities and life’s demands slowly pushed her creativity into the background.
+                Softoi began with a mother’s forgotten passion and a dream to bring it back to life. My mom has always had incredible creative talent — from crochet and painting to beautiful handmade crafts. But like many women, family responsibilities and life’s demands slowly pushed her creativity into the background.
               </p>
               <p style={{ color: '#9E7B6C', lineHeight: 1.9, marginBottom: '16px', fontSize: '0.9375rem' }}>
-                One day, I saw her crocheting again, creating simply for joy, and I was amazed. That moment inspired Softtoi — a platform to showcase not only her creativity, but also the hidden talents of many women who have set aside their passions while caring for others.
+                One day, I saw her crocheting again, creating simply for joy, and I was amazed. That moment inspired Softoi — a platform to showcase not only her creativity, but also the hidden talents of many women who have set aside their passions while caring for others.
               </p>
               <p style={{ color: '#9E7B6C', lineHeight: 1.9, marginBottom: '16px', fontSize: '0.9375rem' }}>
                 Every keychain, soft toy, flower bouquet, and handmade piece in our store is made with love, patience, and attention to detail. These are more than products — they are little pieces of joy, crafted to hold memories.
               </p>
               <p style={{ color: '#9E7B6C', lineHeight: 1.9, marginBottom: '16px', fontSize: '0.9375rem' }}>
-                At Softtoi, we celebrate handmade artistry, support women creators, and believe creativity should never be forgotten. When you shop with us, you’re not just buying something beautiful — you’re supporting a dream.
+                At Softoi, we celebrate handmade artistry, support women creators, and believe creativity should never be forgotten. When you shop with us, you’re not just buying something beautiful — you’re supporting a dream.
               </p>
               <p style={{ color: '#9E7B6C', lineHeight: 1.9, fontSize: '0.9375rem' }}>
-                Our Softtoi family welcomes you to discover unique handmade treasures and heartfelt creations made with love. ✨
+                Our Softoi family welcomes you to discover unique handmade treasures and heartfelt creations made with love. ✨
               </p>
             </AnimatedSection>
           </div>
