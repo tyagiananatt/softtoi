@@ -800,14 +800,27 @@ export default function Home() {
 
                     {/* Review images */}
                     {r.images?.length > 0 && (
-                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '14px' }}>
-                        {r.images.map((img, idx) => (
-                          <img key={idx} src={img} alt=""
-                            style={{ width: '64px', height: '64px', borderRadius: '10px', objectFit: 'cover', border: '2px solid rgba(196,69,105,0.15)' }}
-                          />
-                        ))}
-                      </div>
-                    )}
+                        <div style={{
+                          display:'grid',
+                          gridTemplateColumns:'repeat(auto-fit,minmax(60px,1fr))',
+                          gap:'8px',
+                          marginBottom:'14px'
+                        }}>
+                          {r.images.map((img, idx) => (
+                            <img
+                              key={idx}
+                              src={img}
+                              alt=""
+                              style={{
+                                width:'100%',
+                                aspectRatio:'1/1',
+                                borderRadius:'10px',
+                                objectFit:'cover'
+                              }}
+                            />
+                          ))}
+                        </div>
+                      )}
 
                     {/* Author row */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingTop: '14px', borderTop: '1px solid rgba(238,214,196,0.5)' }}>
