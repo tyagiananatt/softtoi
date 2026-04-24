@@ -471,8 +471,25 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
-    api.get('/reviews/recent?limit=6').then(r => setRecentReviews(r.data)).catch(() => {})
-  }, [])
+  api.get('/products?limit=6').then(async res => {
+    const products = res.data
+    const allReviews = []
+    await Promise.all(
+      products.map(p =>
+        api.get(`/reviews/product/${p._id}`)
+          .then(r => {
+            r.data.forEach(review => {
+              allReviews.push({ ...review, productName: p.name })
+            })
+          })
+          .catch(() => {})
+      )
+    )
+    // Sort by newest, take 6
+    allReviews.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    setRecentReviews(allReviews.slice(0, 6))
+  }).catch(() => {})
+}, [])
 
   return (
     <div>
