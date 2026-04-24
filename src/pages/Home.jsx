@@ -68,11 +68,9 @@ function LogoShowcase() {
   const [hovered, setHovered] = useState(false)
   const [ripples, setRipples] = useState([])
 
-  // Smooth springs for mouse tracking
   const springX = useSpring(mouseX, { stiffness: 60, damping: 18 })
   const springY = useSpring(mouseY, { stiffness: 60, damping: 18 })
 
-  // Derived transforms for 3D tilt
   const rotateX = useTransform(springY, [-200, 200], [18, -18])
   const rotateY = useTransform(springX, [-200, 200], [-18, 18])
   const glowX = useTransform(springX, [-200, 200], [30, 70])
@@ -114,9 +112,13 @@ function LogoShowcase() {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={handleMouseLeave}
       onClick={handleClick}
-      style={{ position: 'relative', height: '540px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', perspective: '800px' }}
+      style={{
+        position: 'relative', height: '540px', display: 'flex',
+        alignItems: 'center', justifyContent: 'center',
+        cursor: 'pointer', perspective: '800px',
+      }}
     >
-      {/* ── Ambient background pulse ── */}
+      {/* Ambient background pulse */}
       <motion.div
         animate={{ scale: [1, 1.12, 1], opacity: [0.45, 0.7, 0.45] }}
         transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
@@ -141,7 +143,7 @@ function LogoShowcase() {
         }}
       />
 
-      {/* ── Rotating dashed ring 1 ── */}
+      {/* Rotating dashed ring 1 */}
       <motion.div
         animate={{ rotate: 360 }}
         transition={{ duration: 22, repeat: Infinity, ease: 'linear' }}
@@ -178,12 +180,15 @@ function LogoShowcase() {
         }}
       />
 
-      {/* ── Orbiting sparkle dots ── */}
-      {PARTICLES.slice(0, 8).map((p, i) => (
+      {/* Orbiting sparkle dots */}
+      {PARTICLES.slice(0, 8).map((p) => (
         <motion.div
           key={p.id}
           animate={{ rotate: 360 }}
-          transition={{ duration: Math.abs(p.orbitSpeed) * 4, repeat: Infinity, ease: 'linear', direction: p.orbitSpeed > 0 ? 'normal' : 'reverse' }}
+          transition={{
+            duration: Math.abs(p.orbitSpeed) * 4, repeat: Infinity,
+            ease: 'linear', direction: p.orbitSpeed > 0 ? 'normal' : 'reverse',
+          }}
           style={{
             position: 'absolute', top: '50%', left: '50%',
             width: `${p.orbitRadius * 2}px`, height: `${p.orbitRadius * 2}px`,
@@ -207,7 +212,7 @@ function LogoShowcase() {
         </motion.div>
       ))}
 
-      {/* ── Floating free-roam particles ── */}
+      {/* Floating free-roam particles */}
       {PARTICLES.slice(8).map(p => (
         <motion.div
           key={p.id}
@@ -228,7 +233,7 @@ function LogoShowcase() {
         />
       ))}
 
-      {/* ── Mouse-reactive glow that follows cursor ── */}
+      {/* Mouse-reactive glow */}
       <motion.div
         style={{
           position: 'absolute', top: '50%', left: '50%',
@@ -242,7 +247,7 @@ function LogoShowcase() {
         }}
       />
 
-      {/* ── Main logo with 3-D tilt ── */}
+      {/* Main logo with 3-D tilt */}
       <motion.div
         style={{
           position: 'relative', zIndex: 5,
@@ -254,7 +259,10 @@ function LogoShowcase() {
       >
         {/* Halo glow behind logo */}
         <motion.div
-          animate={{ opacity: hovered ? [0.7, 1, 0.7] : [0.4, 0.65, 0.4], scale: hovered ? [1, 1.08, 1] : [1, 1.04, 1] }}
+          animate={{
+            opacity: hovered ? [0.7, 1, 0.7] : [0.4, 0.65, 0.4],
+            scale: hovered ? [1, 1.08, 1] : [1, 1.04, 1],
+          }}
           transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
           style={{
             position: 'absolute', inset: '-24px', borderRadius: '50%',
@@ -279,7 +287,7 @@ function LogoShowcase() {
         />
       </motion.div>
 
-      {/* ── Click ripple waves ── */}
+      {/* Click ripple waves */}
       <AnimatePresence>
         {ripples.map(rp => (
           <motion.div
@@ -328,7 +336,8 @@ function NewArrivalsSlider({ products }) {
   const onDragMove = (clientX) => { if (dragging) setDragDelta(clientX - dragStart) }
   const onDragEnd = () => {
     if (Math.abs(dragDelta) > 60) goTo(dragDelta < 0 ? current + 1 : current - 1)
-    setDragging(false); setDragDelta(0)
+    setDragging(false)
+    setDragDelta(0)
   }
 
   if (!total) return null
@@ -337,7 +346,11 @@ function NewArrivalsSlider({ products }) {
     <div style={{ overflow: 'hidden' }}>
       {/* Slider track */}
       <div
-        style={{ position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', height: '460px', cursor: dragging ? 'grabbing' : 'grab', userSelect: 'none' }}
+        style={{
+          position: 'relative', display: 'flex', justifyContent: 'center',
+          alignItems: 'center', height: '460px',
+          cursor: dragging ? 'grabbing' : 'grab', userSelect: 'none',
+        }}
         onMouseDown={e => onDragStart(e.clientX)}
         onMouseMove={e => onDragMove(e.clientX)}
         onMouseUp={onDragEnd}
@@ -366,8 +379,12 @@ function NewArrivalsSlider({ products }) {
               style={{
                 position: 'absolute', width: SLIDE_WIDTH, zIndex,
                 borderRadius: '24px', overflow: 'hidden', background: '#fff',
-                boxShadow: isCenter ? '0 24px 64px rgba(196,69,105,0.22), 0 8px 24px rgba(61,35,20,0.1)' : '0 8px 24px rgba(61,35,20,0.08)',
-                border: isCenter ? '2px solid rgba(196,69,105,0.18)' : '1.5px solid rgba(196,69,105,0.07)',
+                boxShadow: isCenter
+                  ? '0 24px 64px rgba(196,69,105,0.22), 0 8px 24px rgba(61,35,20,0.1)'
+                  : '0 8px 24px rgba(61,35,20,0.08)',
+                border: isCenter
+                  ? '2px solid rgba(196,69,105,0.18)'
+                  : '1.5px solid rgba(196,69,105,0.07)',
                 cursor: isCenter ? 'default' : 'pointer',
               }}
               onClick={() => !isCenter && goTo(idx)}
@@ -382,31 +399,61 @@ function NewArrivalsSlider({ products }) {
                 />
                 <motion.div
                   animate={{ opacity: isCenter ? 1 : 0, scale: isCenter ? 1 : 0.7 }}
-                  style={{ position: 'absolute', top: 14, left: 14, background: 'linear-gradient(135deg, #C44569, #E8607B)', color: '#fff', fontSize: '0.65rem', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', padding: '5px 12px', borderRadius: '50px', boxShadow: '0 4px 12px rgba(196,69,105,0.4)' }}
+                  style={{
+                    position: 'absolute', top: 14, left: 14,
+                    background: 'linear-gradient(135deg, #C44569, #E8607B)',
+                    color: '#fff', fontSize: '0.65rem', fontWeight: 800,
+                    letterSpacing: '0.08em', textTransform: 'uppercase',
+                    padding: '5px 12px', borderRadius: '50px',
+                    boxShadow: '0 4px 12px rgba(196,69,105,0.4)',
+                  }}
                 >
                   ✦ New
                 </motion.div>
                 <motion.div
                   animate={{ opacity: isCenter ? 1 : 0 }}
-                  style={{ position: 'absolute', top: 14, right: 14, width: 36, height: 36, borderRadius: '50%', background: 'rgba(255,255,255,0.9)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 8px rgba(61,35,20,0.12)' }}
+                  style={{
+                    position: 'absolute', top: 14, right: 14,
+                    width: 36, height: 36, borderRadius: '50%',
+                    background: 'rgba(255,255,255,0.9)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    boxShadow: '0 2px 8px rgba(61,35,20,0.12)',
+                  }}
                 >
                   <Heart size={16} color="#C44569" />
                 </motion.div>
               </div>
               <div style={{ padding: '18px 20px 20px' }}>
-                <div style={{ fontSize: '0.72rem', color: '#C44569', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '6px' }}>
+                <div style={{
+                  fontSize: '0.72rem', color: '#C44569', fontWeight: 700,
+                  textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '6px',
+                }}>
                   {product.category?.name || 'Handmade'}
                 </div>
-                <div style={{ fontWeight: 700, color: '#1A0A05', fontSize: '1rem', marginBottom: '8px', lineHeight: 1.3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                <div style={{
+                  fontWeight: 700, color: '#1A0A05', fontSize: '1rem',
+                  marginBottom: '8px', lineHeight: 1.3,
+                  whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                }}>
                   {product.name}
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontSize: '1.15rem', fontWeight: 900, background: 'linear-gradient(135deg, #C44569, #D4956B)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+                  <span style={{
+                    fontSize: '1.15rem', fontWeight: 900,
+                    background: 'linear-gradient(135deg, #C44569, #D4956B)',
+                    WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+                  }}>
                     ₹{product.price}
                   </span>
                   <motion.div whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.95 }} style={{ display: 'inline-block' }}>
                     <Link to={`/products/${product._id}`} style={{ textDecoration: 'none' }}>
-                      <button style={{ background: 'linear-gradient(135deg, #C44569, #E8607B)', color: '#fff', border: 'none', borderRadius: '50px', padding: '8px 18px', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px', boxShadow: '0 4px 14px rgba(196,69,105,0.35)' }}>
+                      <button style={{
+                        background: 'linear-gradient(135deg, #C44569, #E8607B)',
+                        color: '#fff', border: 'none', borderRadius: '50px',
+                        padding: '8px 18px', fontSize: '0.78rem', fontWeight: 700,
+                        cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px',
+                        boxShadow: '0 4px 14px rgba(196,69,105,0.35)',
+                      }}>
                         <ShoppingBag size={13} /> View
                       </button>
                     </Link>
@@ -424,7 +471,10 @@ function NewArrivalsSlider({ products }) {
           <motion.button
             key={idx}
             onClick={() => goTo(idx)}
-            animate={{ width: idx === current ? 28 : 8, background: idx === current ? '#C44569' : 'rgba(196,69,105,0.25)' }}
+            animate={{
+              width: idx === current ? 28 : 8,
+              background: idx === current ? '#C44569' : 'rgba(196,69,105,0.25)',
+            }}
             transition={{ type: 'spring', stiffness: 400, damping: 28 }}
             style={{ height: 8, borderRadius: 50, border: 'none', cursor: 'pointer', padding: 0 }}
           />
@@ -439,7 +489,14 @@ function NewArrivalsSlider({ products }) {
             whileHover={{ scale: 1.1, background: 'linear-gradient(135deg, #C44569, #E8607B)', color: '#fff' }}
             whileTap={{ scale: 0.95 }}
             onClick={() => goTo(current + dir)}
-            style={{ width: 44, height: 44, borderRadius: '50%', border: '2px solid rgba(196,69,105,0.3)', background: '#fff', color: '#C44569', fontSize: '1.1rem', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 14px rgba(196,69,105,0.1)' }}
+            style={{
+              width: 44, height: 44, borderRadius: '50%',
+              border: '2px solid rgba(196,69,105,0.3)',
+              background: '#fff', color: '#C44569',
+              fontSize: '1.1rem', fontWeight: 700, cursor: 'pointer',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 4px 14px rgba(196,69,105,0.1)',
+            }}
           >
             {arrow}
           </motion.button>
@@ -467,7 +524,8 @@ export default function Home() {
       setCategories(c.data)
       setNewArrivals(n.data)
       setApiError(null)
-    }).catch(err => setApiError(err.response?.data?.message || err.message || 'Failed to load data')).finally(() => setLoading(false))
+    }).catch(err => setApiError(err.response?.data?.message || err.message || 'Failed to load data'))
+      .finally(() => setLoading(false))
   }, [])
 
   useEffect(() => {
@@ -532,13 +590,13 @@ export default function Home() {
               >
                 Discover cutest and affordable handmade products crafted with love.
                 <div>
-                <h2 style={{ fontSize: '1.3rem', fontWeight: 700, color: '#1A0A05',marginTop: '20px', marginBottom: '8px' }}>
-                  Why Choose Handmade Gifts?
-                </h2>
-                <p>
+                  <h2 style={{ fontSize: '1.3rem', fontWeight: 700, color: '#1A0A05', marginTop: '20px', marginBottom: '8px' }}>
+                    Why Choose Handmade Gifts?
+                  </h2>
+                  <p>
                     Handmade gifts are unique, personal, and crafted with care. At Softoi, we offer handmade keychains, soft toys, and gifts perfect for every occasion in India.
-                </p>
-              </div>
+                  </p>
+                </div>
               </motion.p>
 
               <motion.div
@@ -634,8 +692,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ═══ CATEGORIES ═══ */}
-
       {/* ═══ FEATURED PRODUCTS ═══ */}
       <section style={{ background: '#fff', padding: '96px 0 48px', overflow: 'hidden' }}>
         <div className="page-container">
@@ -647,7 +703,7 @@ export default function Home() {
                   Featured Products
                 </h2>
                 <p style={{ color: '#8B6655', fontSize: '1rem', maxWidth: '440px', margin: '3px auto 0', lineHeight: 1.7 }}>
-                    Explore our <a href="/products">handmade Unique </a> products right now.
+                  Explore our <a href="/products">handmade Unique</a> products right now.
                 </p>
               </div>
               <Link to="/products" style={{ textDecoration: 'none' }}>
@@ -671,7 +727,7 @@ export default function Home() {
           <NewArrivalsSlider products={newArrivals.length > 0 ? newArrivals : featured} />
         )}
       </section>
-      
+
       {/* ═══ CATEGORIES ═══ */}
       <section style={{ background: 'linear-gradient(180deg, #fff5f8 0%, #fffaf5 100%)', padding: '96px 0' }}>
         <div className="page-container">
@@ -691,7 +747,9 @@ export default function Home() {
               ? [0, 1, 2].map(i => <div key={i} className="skeleton" style={{ aspectRatio: '4/5', borderRadius: '24px' }} />)
               : apiError
                 ? <p style={{ color: '#C44569', gridColumn: '1/-1', textAlign: 'center', padding: '40px 0' }}>{apiError}</p>
-                : categories.filter(cat => ['keychains','soft-toys','flowers'].includes(cat.slug)).map((cat, i) => <CategoryCard key={cat._id} category={cat} index={i} />)
+                : categories
+                    .filter(cat => ['keychains', 'soft-toys', 'flowers'].includes(cat.slug))
+                    .map((cat, i) => <CategoryCard key={cat._id} category={cat} index={i} />)
             }
           </div>
         </div>
@@ -741,114 +799,121 @@ export default function Home() {
               </div>
             </AnimatedSection>
 
-            <div style={{
-                  display:'inline-block',
-                  width:'100%',
-                  marginBottom:'22px',
-
-                  background:'linear-gradient(145deg,#fff 0%,#fff9f5 100%)',
-                  borderRadius:'24px',
-                  padding:'24px',
-                  border:'1px solid rgba(196,69,105,.1)',
-                  boxShadow:'0 8px 30px rgba(196,69,105,.08)',
-                  position:'relative',
-                  overflow:'hidden',
-
-                  breakInside:'avoid',
-                  WebkitColumnBreakInside:'avoid',
-                  pageBreakInside:'avoid',
-
-                  transition:'all .25s ease'
-                  }}
-                    onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 12px 36px rgba(196,69,105,0.14)' }}
-                    onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 24px rgba(196,69,105,0.08)' }}
+            {/* Review grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px' }}>
+              {recentReviews.map((r, i) => (
+                <AnimatedSection key={r._id} delay={i * 0.08}>
+                  <div
+                    style={{
+                      background: 'linear-gradient(145deg, #fff 0%, #fff9f5 100%)',
+                      borderRadius: '24px', padding: '24px',
+                      border: '1px solid rgba(196,69,105,.1)',
+                      boxShadow: '0 8px 30px rgba(196,69,105,.08)',
+                      height: '620px', display: 'flex', flexDirection: 'column',
+                      overflow: 'hidden', transition: 'all .25s ease', position: 'relative',
+                    }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.transform = 'translateY(-4px)'
+                      e.currentTarget.style.boxShadow = '0 16px 42px rgba(196,69,105,.14)'
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.transform = 'translateY(0)'
+                      e.currentTarget.style.boxShadow = '0 8px 30px rgba(196,69,105,.08)'
+                    }}
                   >
                     {/* Top accent bar */}
-                    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: 'linear-gradient(90deg, #C44569, #E8607B, #D4956B)' }} />
+                    <div style={{
+                      position: 'absolute', top: 0, left: 0, right: 0, height: '4px',
+                      background: 'linear-gradient(90deg, #C44569, #E8607B, #D4956B)',
+                    }} />
 
                     {/* Stars */}
-                    <div style={{ display: 'flex', gap: '3px', marginBottom: '10px', marginTop: '4px' }}>
-                      {[1,2,3,4,5].map(s => (
-                        <Star key={s} size={15}
-                          fill={s <= r.rating ? '#F59E0B' : 'rgba(245,158,11,0.15)'}
-                          stroke={s <= r.rating ? '#F59E0B' : 'rgba(245,158,11,0.3)'}
+                    <div style={{ display: 'flex', gap: '4px', marginBottom: '12px', marginTop: '6px' }}>
+                      {[1, 2, 3, 4, 5].map(s => (
+                        <Star
+                          key={s}
+                          size={15}
+                          fill={s <= r.rating ? '#F59E0B' : 'rgba(245,158,11,.15)'}
+                          stroke={s <= r.rating ? '#F59E0B' : 'rgba(245,158,11,.25)'}
                         />
                       ))}
-                      <span style={{ marginLeft: '6px', fontSize: '0.75rem', fontWeight: 700, color: '#F59E0B' }}>{r.rating}.0</span>
+                      <span style={{ marginLeft: '8px', fontWeight: 700, fontSize: '0.8rem', color: '#F59E0B' }}>
+                        {r.rating}.0
+                      </span>
                     </div>
 
-                    {/* Product name pill */}
+                    {/* Product tag */}
                     {r.productName && (
-                      <div style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: '#FDE8F0', color: '#C44569', fontSize: '0.72rem', fontWeight: 700, padding: '3px 10px', borderRadius: '50px', marginBottom: '10px' }}>
+                      <div style={{
+                        display: 'inline-flex', alignItems: 'center',
+                        background: '#FDE8F0', color: '#C44569',
+                        fontSize: '.72rem', fontWeight: 700,
+                        padding: '5px 12px', borderRadius: '50px', marginBottom: '14px',
+                      }}>
                         ✦ {r.productName}
                       </div>
                     )}
 
-                    {/* Comment */}
-                    <p
-                      style={{
-                      color:'#4A2E20',
-                      lineHeight:1.75,
-                      fontSize:'0.92rem',
-                      margin:'0 0 12px',
-                      fontStyle:'italic',
-
-                      display:'-webkit-box',
-                      WebkitLineClamp:1,
-                      WebkitBoxOrient:'vertical',
-                      overflow:'hidden'
-                      }}
-                      >
+                    {/* Review text */}
+                    <p style={{
+                      color: '#4A2E20', lineHeight: 1.75, fontSize: '0.92rem',
+                      margin: '0 0 16px', fontStyle: 'italic',
+                      display: '-webkit-box', WebkitLineClamp: 4,
+                      WebkitBoxOrient: 'vertical', overflow: 'hidden',
+                      minHeight: '105px',
+                    }}>
                       "{r.comment}"
-                      </p>
+                    </p>
 
-                      {r.comment?.length > 180 && (
-                      <button
-                      style={{
-                      border:'none',
-                      background:'none',
-                      padding:0,
-                      cursor:'pointer',
-                      fontWeight:700,
-                      fontSize:'0.8rem',
-                      color:'#C44569',
-                      marginBottom:'14px'
-                      }}
-                      >
-                      Read More
-                      </button>
-                      )}
-
-                    {/* Review images */}
-                    {r.images?.length > 0 && (
-                      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(60px,1fr))', gap:'8px', marginBottom: '14px' }}>
-                        {r.images.map((img, idx) => (
-                          <img key={idx} src={img} alt=""
-                            style={{ width: '100%', aspectRatio: '1/1', borderRadius: '10px', objectFit: 'cover', border: '2px solid rgba(196,69,105,0.15)' }}
-                          />
-                        ))}
-                      </div>
-                    )}
-
-                    {/* Author row */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingTop: '14px', borderTop: '1px solid rgba(238,214,196,0.5)' }}>
-                      <div style={{
-                        width: 36, height: 36, borderRadius: '50%', flexShrink: 0,
-                        background: 'linear-gradient(135deg, #C44569, #E8607B)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontWeight: 900, color: '#fff', fontSize: '0.9rem',
-                        boxShadow: '0 4px 10px rgba(196,69,105,0.3)',
-                      }}>
-                        {(r.userName || 'C').charAt(0).toUpperCase()}
-                      </div>
-                      <div>
-                        <div style={{ fontWeight: 700, color: '#1A0A05', fontSize: '0.85rem' }}>{r.userName || 'Customer'}</div>
-                        <div style={{ fontSize: '0.68rem', color: '#9E7B6C' }}>
-                          {new Date(r.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    {/* Image area */}
+                    <div style={{
+                      height: '270px', marginBottom: '18px', borderRadius: '14px',
+                      overflow: 'hidden', background: '#faf4f6',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      {r.images?.length > 0 ? (
+                        <img
+                          src={r.images[0]}
+                          alt=""
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
+                      ) : (
+                        <div style={{ color: '#d4a2b2', fontWeight: 700, fontSize: '0.95rem' }}>
+                          Customer Review
                         </div>
-                      </div>
-                      <div style={{ marginLeft: 'auto', background: '#DCFCE7', borderRadius: '50px', padding: '3px 10px', fontSize: '0.65rem', fontWeight: 800, color: '#16a34a', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                        Verified
+                      )}
+                    </div>
+
+                    {/* Footer */}
+                    <div style={{ marginTop: 'auto' }}>
+                      <div style={{
+                        display: 'flex', alignItems: 'center', gap: '10px',
+                        paddingTop: '14px', borderTop: '1px solid rgba(238,214,196,.6)',
+                      }}>
+                        <div style={{
+                          width: 40, height: 40, borderRadius: '50%',
+                          background: 'linear-gradient(135deg, #C44569, #E8607B)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontWeight: 900, color: '#fff',
+                          boxShadow: '0 4px 12px rgba(196,69,105,.28)',
+                        }}>
+                          {(r.userName || 'C').charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                          <div style={{ fontWeight: 700, color: '#1A0A05', fontSize: '0.88rem' }}>
+                            {r.userName || 'Customer'}
+                          </div>
+                          <div style={{ fontSize: '0.7rem', color: '#9E7B6C' }}>
+                            {new Date(r.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                          </div>
+                        </div>
+                        <div style={{
+                          marginLeft: 'auto', background: '#DCFCE7',
+                          padding: '4px 12px', borderRadius: '50px',
+                          fontSize: '.65rem', fontWeight: 800, color: '#16a34a', letterSpacing: '.05em',
+                        }}>
+                          VERIFIED
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -857,7 +922,7 @@ export default function Home() {
             </div>
 
             <AnimatedSection>
-              <div style={{ textAlign: 'center', marginTop: '40px' }}>
+              <div style={{ textAlign: 'center', marginTop: '44px' }}>
                 <Link to="/products" style={{ textDecoration: 'none' }}>
                   <button className="btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
                     Shop & Leave a Review <ArrowRight size={16} />
@@ -883,12 +948,13 @@ export default function Home() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px' }}>
             {TESTIMONIALS.map((t, i) => (
               <AnimatedSection key={t.name} delay={i * 0.12}>
-                <div style={{
-                  background: '#fff', borderRadius: '24px', padding: '32px 28px',
-                  border: '1px solid rgba(196,69,105,0.1)',
-                  boxShadow: '0 4px 24px rgba(61,35,20,0.06)',
-                  transition: 'all 0.3s ease', cursor: 'default',
-                }}
+                <div
+                  style={{
+                    background: '#fff', borderRadius: '24px', padding: '32px 28px',
+                    border: '1px solid rgba(196,69,105,0.1)',
+                    boxShadow: '0 4px 24px rgba(61,35,20,0.06)',
+                    transition: 'all 0.3s ease', cursor: 'default',
+                  }}
                   onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 16px 48px rgba(196,69,105,0.12)' }}
                   onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 24px rgba(61,35,20,0.06)' }}
                 >
@@ -902,7 +968,13 @@ export default function Home() {
                   </p>
                   {/* Author */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{ width: '46px', height: '46px', borderRadius: '50%', background: 'linear-gradient(135deg, #F8C8DC, #EED6C4)', border: '2px solid rgba(196,69,105,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontWeight: 800, fontSize: '1rem', color: '#C44569' }}>
+                    <div style={{
+                      width: '46px', height: '46px', borderRadius: '50%',
+                      background: 'linear-gradient(135deg, #F8C8DC, #EED6C4)',
+                      border: '2px solid rgba(196,69,105,0.2)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      flexShrink: 0, fontWeight: 800, fontSize: '1rem', color: '#C44569',
+                    }}>
                       {t.name.charAt(0)}
                     </div>
                     <div>
@@ -927,14 +999,16 @@ export default function Home() {
               padding: 'clamp(48px, 7vw, 80px)', textAlign: 'center',
               position: 'relative', overflow: 'hidden',
             }}>
-              {/* decorative circles */}
+              {/* Decorative circles */}
               <div style={{ position: 'absolute', top: '-60px', right: '-60px', width: '280px', height: '280px', borderRadius: '50%', background: 'rgba(196,69,105,0.12)', pointerEvents: 'none' }} />
               <div style={{ position: 'absolute', bottom: '-80px', left: '-40px', width: '320px', height: '320px', borderRadius: '50%', background: 'rgba(248,200,220,0.07)', pointerEvents: 'none' }} />
               <div style={{ position: 'absolute', top: '30px', left: '20%', width: '8px', height: '8px', borderRadius: '50%', background: 'rgba(248,200,220,0.5)', pointerEvents: 'none' }} />
               <div style={{ position: 'absolute', bottom: '40px', right: '25%', width: '6px', height: '6px', borderRadius: '50%', background: 'rgba(196,69,105,0.6)', pointerEvents: 'none' }} />
 
               <div style={{ position: 'relative', zIndex: 1 }}>
-                <div style={{ fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#E8A0B8', marginBottom: '16px' }}>Start Your Journey</div>
+                <div style={{ fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#E8A0B8', marginBottom: '16px' }}>
+                  Start Your Journey
+                </div>
                 <h2 style={{ fontSize: 'clamp(1.75rem, 4.5vw, 3rem)', fontWeight: 900, color: '#fff', marginBottom: '16px', letterSpacing: '-0.025em', lineHeight: 1.1 }}>
                   Every Piece Has<br />a Story to Tell
                 </h2>
@@ -943,13 +1017,14 @@ export default function Home() {
                 </p>
                 <div style={{ display: 'flex', gap: '14px', justifyContent: 'center', flexWrap: 'wrap' }}>
                   <Link to="/products" style={{ textDecoration: 'none' }}>
-                    <button style={{
-                      background: 'linear-gradient(135deg, #C44569, #E8607B)',
-                      color: '#fff', padding: '15px 36px', borderRadius: '50px',
-                      fontWeight: 700, fontSize: '0.9375rem', border: 'none', cursor: 'pointer',
-                      boxShadow: '0 8px 28px rgba(196,69,105,0.45)',
-                      transition: 'all 0.25s', display: 'inline-flex', alignItems: 'center', gap: '8px',
-                    }}
+                    <button
+                      style={{
+                        background: 'linear-gradient(135deg, #C44569, #E8607B)',
+                        color: '#fff', padding: '15px 36px', borderRadius: '50px',
+                        fontWeight: 700, fontSize: '0.9375rem', border: 'none', cursor: 'pointer',
+                        boxShadow: '0 8px 28px rgba(196,69,105,0.45)',
+                        transition: 'all 0.25s', display: 'inline-flex', alignItems: 'center', gap: '8px',
+                      }}
                       onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 14px 36px rgba(196,69,105,0.55)' }}
                       onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 8px 28px rgba(196,69,105,0.45)' }}
                     >
@@ -957,13 +1032,15 @@ export default function Home() {
                     </button>
                   </Link>
                   <Link to="/contact" style={{ textDecoration: 'none' }}>
-                    <button style={{
-                      background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.9)',
-                      padding: '15px 32px', borderRadius: '50px',
-                      fontWeight: 600, fontSize: '0.9375rem', border: '1.5px solid rgba(255,255,255,0.25)',
-                      cursor: 'pointer', transition: 'all 0.25s',
-                      display: 'inline-flex', alignItems: 'center', gap: '8px',
-                    }}
+                    <button
+                      style={{
+                        background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.9)',
+                        padding: '15px 32px', borderRadius: '50px',
+                        fontWeight: 600, fontSize: '0.9375rem',
+                        border: '1.5px solid rgba(255,255,255,0.25)',
+                        cursor: 'pointer', transition: 'all 0.25s',
+                        display: 'inline-flex', alignItems: 'center', gap: '8px',
+                      }}
                       onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.18)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.4)' }}
                       onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.1)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.25)' }}
                     >
