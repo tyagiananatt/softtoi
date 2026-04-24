@@ -457,6 +457,9 @@ export default function Home() {
   const [apiError, setApiError] = useState(null)
   const [recentReviews, setRecentReviews] = useState([])
 
+  /*added by lakshya*/
+  const [expandedReviews, setExpandedReviews] = useState({})
+
   useEffect(() => {
     Promise.all([
       api.get('/products?featured=true'),
@@ -762,13 +765,20 @@ export default function Home() {
               {recentReviews.map((r, i) => (
                 <AnimatedSection key={r._id} delay={i * 0.08}>
                   <div style={{
-                    background: 'linear-gradient(145deg, #fff 0%, #fff9f5 100%)',
-                    borderRadius: '22px', padding: '22px',
-                    border: '1px solid rgba(196,69,105,0.1)',
-                    boxShadow: '0 4px 24px rgba(196,69,105,0.08), 0 1px 4px rgba(122,92,78,0.06)',
-                    transition: 'transform 0.2s, box-shadow 0.2s',
-                    position: 'relative', overflow: 'hidden',
-                  }}
+                      background: 'linear-gradient(145deg, #fff 0%, #fff9f5 100%)',
+                      borderRadius: '22px',
+                      padding: '22px',
+                      border: '1px solid rgba(196,69,105,0.1)',
+                      boxShadow: '0 4px 24px rgba(196,69,105,0.08), 0 1px 4px rgba(122,92,78,0.06)',
+                      transition: 'transform 0.2s, box-shadow 0.2s',
+                      position: 'relative',
+                      overflow: 'hidden',
+                    
+                      minHeight:'430px',
+                      display:'flex',
+                      flexDirection:'column',
+                      justifyContent:'space-between'
+                    }}
                     onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 12px 36px rgba(196,69,105,0.14)' }}
                     onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 24px rgba(196,69,105,0.08)' }}
                   >
@@ -794,10 +804,46 @@ export default function Home() {
                     )}
 
                     {/* Comment */}
-                    <p style={{ color: '#4A2E20', lineHeight: 1.75, fontSize: '0.9rem', margin: '0 0 14px 0', fontStyle: 'italic' }}>
-                      "{r.comment}"
-                    </p>
-
+                    <p
+                          style={{
+                          color:'#4A2E20',
+                          lineHeight:1.75,
+                          fontSize:'0.9rem',
+                          margin:'0 0 8px 0',
+                          fontStyle:'italic'
+                          }}
+                          >
+                          "
+                          {expandedReviews[r._id]
+                          ? r.comment
+                          : r.comment.length > 120
+                          ? r.comment.slice(0,120)+'...'
+                          : r.comment}
+                          "
+                          </p>
+                          
+                          {r.comment.length > 120 && (
+                          <button
+                          onClick={()=>setExpandedReviews(prev=>({
+                          ...prev,
+                          [r._id]:!prev[r._id]
+                          }))}
+                          style={{
+                          background:'none',
+                          border:'none',
+                          padding:0,
+                          cursor:'pointer',
+                          fontWeight:700,
+                          color:'#C44569',
+                          fontSize:'0.8rem',
+                          marginBottom:'14px'
+                          }}
+                          >
+                          {expandedReviews[r._id]
+                          ? 'Read Less'
+                          : 'Read More'}
+                          </button>
+                          )}
                     {/* Review images */}
                     {r.images?.length > 0 && (
                         <div style={{
