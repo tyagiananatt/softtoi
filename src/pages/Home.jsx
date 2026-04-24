@@ -455,6 +455,7 @@ export default function Home() {
   const [newArrivals, setNewArrivals] = useState([])
   const [loading, setLoading] = useState(true)
   const [apiError, setApiError] = useState(null)
+  const [recentReviews, setRecentReviews] = useState([])
 
   useEffect(() => {
     Promise.all([
@@ -467,6 +468,10 @@ export default function Home() {
       setNewArrivals(n.data)
       setApiError(null)
     }).catch(err => setApiError(err.response?.data?.message || err.message || 'Failed to load data')).finally(() => setLoading(false))
+  }, [])
+
+  useEffect(() => {
+    api.get('/reviews/recent?limit=6').then(r => setRecentReviews(r.data)).catch(() => {})
   }, [])
 
   return (
@@ -535,8 +540,6 @@ export default function Home() {
                 </p>
               </div>
               </motion.p>
-              
-              
 
               <motion.div
                 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.3 }}
@@ -693,7 +696,8 @@ export default function Home() {
           </div>
         </div>
       </section>
-            {/* ═══ FEATURE STRIP ═══ */}
+
+      {/* ═══ FEATURE STRIP ═══ */}
       <section style={{ background: '#fff', borderTop: '1px solid rgba(196,69,105,0.08)', borderBottom: '1px solid rgba(196,69,105,0.08)', padding: '0' }}>
         <div className="page-container">
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0' }}>
@@ -721,7 +725,111 @@ export default function Home() {
         </div>
       </section>
 
-    
+      {/* ═══ CUSTOMER REVIEWS ═══ */}
+      {recentReviews.length > 0 && (
+        <section style={{ padding: '96px 0', background: 'linear-gradient(180deg, #fff 0%, #fff5f8 100%)' }}>
+          <div className="page-container">
+            <AnimatedSection>
+              <div style={{ textAlign: 'center', marginBottom: '56px' }}>
+                <div className="section-label">Happy Customers</div>
+                <h2 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.75rem)', fontWeight: 900, color: '#1A0A05', letterSpacing: '-0.025em' }}>
+                  What People Are Saying
+                </h2>
+                <p style={{ color: '#8B6655', marginTop: '14px', fontSize: '1rem', maxWidth: '440px', margin: '14px auto 0', lineHeight: 1.7 }}>
+                  Real reviews from verified buyers across our collection.
+                </p>
+              </div>
+            </AnimatedSection>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
+              {recentReviews.map((r, i) => (
+                <AnimatedSection key={r._id} delay={i * 0.08}>
+                  <div style={{
+                    background: 'linear-gradient(145deg, #fff 0%, #fff9f5 100%)',
+                    borderRadius: '22px', padding: '22px',
+                    border: '1px solid rgba(196,69,105,0.1)',
+                    boxShadow: '0 4px 24px rgba(196,69,105,0.08), 0 1px 4px rgba(122,92,78,0.06)',
+                    transition: 'transform 0.2s, box-shadow 0.2s',
+                    position: 'relative', overflow: 'hidden',
+                  }}
+                    onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 12px 36px rgba(196,69,105,0.14)' }}
+                    onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 24px rgba(196,69,105,0.08)' }}
+                  >
+                    {/* Top accent bar */}
+                    <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: 'linear-gradient(90deg, #C44569, #E8607B, #D4956B)' }} />
+
+                    {/* Stars */}
+                    <div style={{ display: 'flex', gap: '3px', marginBottom: '10px', marginTop: '4px' }}>
+                      {[1,2,3,4,5].map(s => (
+                        <Star key={s} size={15}
+                          fill={s <= r.rating ? '#F59E0B' : 'rgba(245,158,11,0.15)'}
+                          stroke={s <= r.rating ? '#F59E0B' : 'rgba(245,158,11,0.3)'}
+                        />
+                      ))}
+                      <span style={{ marginLeft: '6px', fontSize: '0.75rem', fontWeight: 700, color: '#F59E0B' }}>{r.rating}.0</span>
+                    </div>
+
+                    {/* Product name pill */}
+                    {r.productName && (
+                      <div style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: '#FDE8F0', color: '#C44569', fontSize: '0.72rem', fontWeight: 700, padding: '3px 10px', borderRadius: '50px', marginBottom: '10px' }}>
+                        ✦ {r.productName}
+                      </div>
+                    )}
+
+                    {/* Comment */}
+                    <p style={{ color: '#4A2E20', lineHeight: 1.75, fontSize: '0.9rem', margin: '0 0 14px 0', fontStyle: 'italic' }}>
+                      "{r.comment}"
+                    </p>
+
+                    {/* Review images */}
+                    {r.images?.length > 0 && (
+                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '14px' }}>
+                        {r.images.map((img, idx) => (
+                          <img key={idx} src={img} alt=""
+                            style={{ width: '64px', height: '64px', borderRadius: '10px', objectFit: 'cover', border: '2px solid rgba(196,69,105,0.15)' }}
+                          />
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Author row */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingTop: '14px', borderTop: '1px solid rgba(238,214,196,0.5)' }}>
+                      <div style={{
+                        width: 36, height: 36, borderRadius: '50%', flexShrink: 0,
+                        background: 'linear-gradient(135deg, #C44569, #E8607B)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontWeight: 900, color: '#fff', fontSize: '0.9rem',
+                        boxShadow: '0 4px 10px rgba(196,69,105,0.3)',
+                      }}>
+                        {(r.userName || 'C').charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <div style={{ fontWeight: 700, color: '#1A0A05', fontSize: '0.85rem' }}>{r.userName || 'Customer'}</div>
+                        <div style={{ fontSize: '0.68rem', color: '#9E7B6C' }}>
+                          {new Date(r.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        </div>
+                      </div>
+                      <div style={{ marginLeft: 'auto', background: '#DCFCE7', borderRadius: '50px', padding: '3px 10px', fontSize: '0.65rem', fontWeight: 800, color: '#16a34a', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                        Verified
+                      </div>
+                    </div>
+                  </div>
+                </AnimatedSection>
+              ))}
+            </div>
+
+            <AnimatedSection>
+              <div style={{ textAlign: 'center', marginTop: '40px' }}>
+                <Link to="/products" style={{ textDecoration: 'none' }}>
+                  <button className="btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                    Shop & Leave a Review <ArrowRight size={16} />
+                  </button>
+                </Link>
+              </div>
+            </AnimatedSection>
+          </div>
+        </section>
+      )}
 
       {/* ═══ TESTIMONIALS ═══ */}
       <section style={{ padding: '96px 0', background: 'linear-gradient(180deg, #fffaf5 0%, #fff5f8 100%)' }}>
@@ -764,7 +872,6 @@ export default function Home() {
                       <div style={{ fontSize: '0.75rem', color: '#C44569', fontWeight: 600 }}>{t.role}</div>
                     </div>
                   </div>
-                  
                 </div>
               </AnimatedSection>
             ))}
