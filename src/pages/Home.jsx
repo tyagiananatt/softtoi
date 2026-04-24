@@ -529,7 +529,15 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
-    api.get('/reviews/recent?limit=6').then(r => setRecentReviews(r.data)).catch(() => {})
+    api.get('/reviews?limit=6&sort=newest')
+      .then(r => {
+        // handle both plain array and wrapped { data: [...] } or { reviews: [...] }
+        const list = Array.isArray(r.data)
+          ? r.data
+          : r.data?.reviews ?? r.data?.data ?? []
+        setRecentReviews(list.slice(0, 6))
+      })
+      .catch(() => {})
   }, [])
 
   return (
@@ -785,31 +793,37 @@ export default function Home() {
 
       {/* ═══ CUSTOMER REVIEWS ═══ */}
       {recentReviews.length > 0 && (
-        <section style={{ padding: '96px 0', background: 'linear-gradient(180deg, #fff 0%, #fff5f8 100%)' }}>
+        <section style={{ padding: 'clamp(48px, 8vw, 96px) 0', background: 'linear-gradient(180deg, #fff 0%, #fff5f8 100%)' }}>
           <div className="page-container">
             <AnimatedSection>
-              <div style={{ textAlign: 'center', marginBottom: '56px' }}>
+              <div style={{ textAlign: 'center', marginBottom: 'clamp(32px, 5vw, 56px)' }}>
                 <div className="section-label">Happy Customers</div>
-                <h2 style={{ fontSize: 'clamp(2rem, 3.5vw, 2.75rem)', fontWeight: 900, color: '#1A0A05', letterSpacing: '-0.025em' }}>
+                <h2 style={{ fontSize: 'clamp(1.6rem, 3.5vw, 2.75rem)', fontWeight: 900, color: '#1A0A05', letterSpacing: '-0.025em' }}>
                   What People Are Saying
                 </h2>
-                <p style={{ color: '#8B6655', marginTop: '14px', fontSize: '1rem', maxWidth: '440px', margin: '14px auto 0', lineHeight: 1.7 }}>
+                <p style={{ color: '#8B6655', fontSize: 'clamp(0.875rem, 2vw, 1rem)', maxWidth: '440px', margin: '14px auto 0', lineHeight: 1.7 }}>
                   Real reviews from verified buyers across our collection.
                 </p>
               </div>
             </AnimatedSection>
 
-            {/* Review grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '24px' }}>
+            {/* Review grid — 1 col mobile, 2 col tablet, 3 col desktop */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))',
+              gap: 'clamp(16px, 3vw, 24px)',
+              alignItems: 'start',
+            }}>
               {recentReviews.map((r, i) => (
                 <AnimatedSection key={r._id} delay={i * 0.08}>
                   <div
                     style={{
                       background: 'linear-gradient(145deg, #fff 0%, #fff9f5 100%)',
-                      borderRadius: '24px', padding: '24px',
+                      borderRadius: '20px',
+                      padding: 'clamp(16px, 3vw, 24px)',
                       border: '1px solid rgba(196,69,105,.1)',
                       boxShadow: '0 8px 30px rgba(196,69,105,.08)',
-                      height: '620px', display: 'flex', flexDirection: 'column',
+                      display: 'flex', flexDirection: 'column',
                       overflow: 'hidden', transition: 'all .25s ease', position: 'relative',
                     }}
                     onMouseEnter={e => {
@@ -828,7 +842,7 @@ export default function Home() {
                     }} />
 
                     {/* Stars */}
-                    <div style={{ display: 'flex', gap: '4px', marginBottom: '12px', marginTop: '6px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '12px', marginTop: '6px' }}>
                       {[1, 2, 3, 4, 5].map(s => (
                         <Star
                           key={s}
@@ -849,71 +863,68 @@ export default function Home() {
                         background: '#FDE8F0', color: '#C44569',
                         fontSize: '.72rem', fontWeight: 700,
                         padding: '5px 12px', borderRadius: '50px', marginBottom: '14px',
+                        maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                       }}>
                         ✦ {r.productName}
                       </div>
                     )}
 
-                    {/* Review text */}
+                    {/* Review text — no fixed minHeight, clamps naturally */}
                     <p style={{
-                      color: '#4A2E20', lineHeight: 1.75, fontSize: '0.92rem',
+                      color: '#4A2E20', lineHeight: 1.75,
+                      fontSize: 'clamp(0.85rem, 2vw, 0.92rem)',
                       margin: '0 0 16px', fontStyle: 'italic',
                       display: '-webkit-box', WebkitLineClamp: 4,
                       WebkitBoxOrient: 'vertical', overflow: 'hidden',
-                      minHeight: '105px',
                     }}>
                       "{r.comment}"
                     </p>
 
-                    {/* Image area */}
-                    <div style={{
-                      height: '270px', marginBottom: '18px', borderRadius: '14px',
-                      overflow: 'hidden', background: '#faf4f6',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    }}>
-                      {r.images?.length > 0 ? (
+                    {/* Image — aspect-ratio so it scales on all screens */}
+                    {r.images?.length > 0 && (
+                      <div style={{
+                        width: '100%',
+                        aspectRatio: '4 / 3',
+                        marginBottom: '18px', borderRadius: '14px',
+                        overflow: 'hidden', background: '#faf4f6',
+                      }}>
                         <img
                           src={r.images[0]}
                           alt=""
-                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                         />
-                      ) : (
-                        <div style={{ color: '#d4a2b2', fontWeight: 700, fontSize: '0.95rem' }}>
-                          Customer Review
-                        </div>
-                      )}
-                    </div>
+                      </div>
+                    )}
 
                     {/* Footer */}
-                    <div style={{ marginTop: 'auto' }}>
+                    <div style={{
+                      display: 'flex', alignItems: 'center', gap: '10px',
+                      paddingTop: '14px', marginTop: '8px',
+                      borderTop: '1px solid rgba(238,214,196,.6)',
+                    }}>
                       <div style={{
-                        display: 'flex', alignItems: 'center', gap: '10px',
-                        paddingTop: '14px', borderTop: '1px solid rgba(238,214,196,.6)',
+                        width: 40, height: 40, flexShrink: 0, borderRadius: '50%',
+                        background: 'linear-gradient(135deg, #C44569, #E8607B)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontWeight: 900, color: '#fff',
+                        boxShadow: '0 4px 12px rgba(196,69,105,.28)',
                       }}>
-                        <div style={{
-                          width: 40, height: 40, borderRadius: '50%',
-                          background: 'linear-gradient(135deg, #C44569, #E8607B)',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          fontWeight: 900, color: '#fff',
-                          boxShadow: '0 4px 12px rgba(196,69,105,.28)',
-                        }}>
-                          {(r.userName || 'C').charAt(0).toUpperCase()}
+                        {(r.userName || 'C').charAt(0).toUpperCase()}
+                      </div>
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{ fontWeight: 700, color: '#1A0A05', fontSize: '0.88rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                          {r.userName || 'Customer'}
                         </div>
-                        <div>
-                          <div style={{ fontWeight: 700, color: '#1A0A05', fontSize: '0.88rem' }}>
-                            {r.userName || 'Customer'}
-                          </div>
-                          <div style={{ fontSize: '0.7rem', color: '#9E7B6C' }}>
-                            {new Date(r.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-                          </div>
+                        <div style={{ fontSize: '0.7rem', color: '#9E7B6C' }}>
+                          {new Date(r.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                         </div>
-                        <div style={{
-                          marginLeft: 'auto', background: '#DCFCE7',
-                          padding: '4px 12px', borderRadius: '50px',
-                          fontSize: '.65rem', fontWeight: 800, color: '#16a34a', letterSpacing: '.05em',
-                        }}>
-                          VERIFIED
-                        </div>
+                      </div>
+                      <div style={{
+                        marginLeft: 'auto', flexShrink: 0,
+                        background: '#DCFCE7', padding: '4px 10px', borderRadius: '50px',
+                        fontSize: '.65rem', fontWeight: 800, color: '#16a34a', letterSpacing: '.05em',
+                      }}>
+                        VERIFIED
                       </div>
                     </div>
                   </div>
