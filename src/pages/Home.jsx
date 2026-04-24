@@ -487,7 +487,7 @@ function NewArrivalsSlider({ products }) {
 
 // ─── Review Card — unchanged ─────────────────────────────────────────────────
 function ReviewCard({ review: r }) {
-  const [expanded, setExpanded] = useState(false)
+  const [expanded, setExpanded] = useState(false);
 
   return (
     <div
@@ -497,163 +497,127 @@ function ReviewCard({ review: r }) {
         border: '1px solid rgba(196,69,105,.1)',
         boxShadow: '0 4px 20px rgba(196,69,105,.08)',
         overflow: 'hidden',
-
-        height: '430px', // increased for bigger images
+        height: '500px',
         display: 'flex',
         flexDirection: 'column',
-        position: 'relative',
-
         transition: 'transform .2s ease, box-shadow .2s ease',
-        cursor: 'default',
-      }}
-      onMouseEnter={e => {
-        e.currentTarget.style.transform = 'translateY(-3px)'
-        e.currentTarget.style.boxShadow =
-          '0 12px 36px rgba(196,69,105,.14)'
-      }}
-      onMouseLeave={e => {
-        e.currentTarget.style.transform = 'translateY(0)'
-        e.currentTarget.style.boxShadow =
-          '0 4px 20px rgba(196,69,105,.08)'
       }}
     >
-
-      {/* Top accent */}
-      <div style={{
-        height:'3px',
-        flexShrink:0,
-        background:
-          'linear-gradient(90deg,#C44569,#E8607B,#D4956B)'
-      }}/>
-
+      {/* top accent */}
+      <div
+        style={{
+          height: '3px',
+          background:
+            'linear-gradient(90deg,#C44569,#E8607B,#D4956B)',
+        }}
+      />
 
       <div
         style={{
-          padding:'14px 16px',
-          display:'flex',
-          flexDirection:'column',
-          flex:1,
-          minHeight:0
+          padding: '14px 16px',
+          display: 'flex',
+          flexDirection: 'column',
+          flex: 1,
         }}
       >
-
-        {/* Stars */}
+        {/* stars */}
         <div
           style={{
-            display:'flex',
-            alignItems:'center',
-            gap:'2px',
-            marginBottom:'8px',
-            flexShrink:0
+            display: 'flex',
+            gap: '2px',
+            marginBottom: '8px',
           }}
         >
-          {[1,2,3,4,5].map(s=>(
+          {[1, 2, 3, 4, 5].map((s) => (
             <Star
               key={s}
               size={13}
               fill={
-                s<=r.rating
-                ?'#F59E0B'
-                :'rgba(245,158,11,.15)'
+                s <= r.rating
+                  ? '#F59E0B'
+                  : 'rgba(245,158,11,.15)'
               }
               stroke={
-                s<=r.rating
-                ?'#F59E0B'
-                :'rgba(245,158,11,.25)'
+                s <= r.rating
+                  ? '#F59E0B'
+                  : 'rgba(245,158,11,.25)'
               }
             />
           ))}
 
           <span
             style={{
-              marginLeft:'5px',
-              fontWeight:700,
-              fontSize:'0.75rem',
-              color:'#F59E0B'
+              marginLeft: '5px',
+              fontWeight: 700,
+              fontSize: '0.75rem',
+              color: '#F59E0B',
             }}
           >
             {r.rating}.0
           </span>
         </div>
 
-
-        {/* Product tag */}
+        {/* product tag */}
         {r.productName && (
           <div
             style={{
-              display:'inline-flex',
-              alignItems:'center',
-              background:'#FDE8F0',
-              color:'#C44569',
-              fontSize:'0.68rem',
-              fontWeight:700,
-              padding:'3px 10px',
-              borderRadius:'50px',
-              marginBottom:'8px',
-              maxWidth:'100%',
-              overflow:'hidden',
-              textOverflow:'ellipsis',
-              whiteSpace:'nowrap',
-              flexShrink:0
+              display: 'inline-flex',
+              background: '#FDE8F0',
+              color: '#C44569',
+              fontSize: '0.68rem',
+              fontWeight: 700,
+              padding: '3px 10px',
+              borderRadius: '50px',
+              marginBottom: '8px',
             }}
           >
             ✦ {r.productName}
           </div>
         )}
 
-
-        {/* Review text (unchanged) */}
-        <div style={{marginBottom:'10px', flexShrink:0}}>
+        {/* review text */}
+        <div style={{ marginBottom: '10px' }}>
           <p
             style={{
-              color:'#4A2E20',
-              lineHeight:1.6,
-              fontSize:'0.88rem',
-              margin:0,
-              fontStyle:'italic',
-              display:'-webkit-box',
-              WebkitBoxOrient:'vertical',
-              overflow:'hidden',
+              color: '#4A2E20',
+              lineHeight: 1.6,
+              fontSize: '0.88rem',
+              margin: 0,
+              fontStyle: 'italic',
+              display: '-webkit-box',
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
               WebkitLineClamp: expanded ? 'unset' : 1,
-              maxHeight: expanded ? '80px' : 'none',
-              overflowY: expanded ? 'auto' : 'hidden'
             }}
           >
             "{r.comment}"
           </p>
 
           <button
-            onClick={()=>setExpanded(v=>!v)}
+            onClick={() => setExpanded((v) => !v)}
             style={{
-              background:'none',
-              border:'none',
-              padding:'2px 0 0',
-              cursor:'pointer',
-              fontSize:'0.72rem',
-              fontWeight:700,
-              color:'#C44569',
-              display:'block',
-              lineHeight:1
+              background: 'none',
+              border: 'none',
+              padding: '2px 0 0',
+              cursor: 'pointer',
+              fontSize: '0.72rem',
+              fontWeight: 700,
+              color: '#C44569',
             }}
           >
-            {expanded
-              ? 'Show less'
-              : 'Read more'}
+            {expanded ? 'Show less' : 'Read more'}
           </button>
         </div>
 
-
-        {/* FULL SIZE REVIEW IMAGE */}
+        {/* 1:1 square review image */}
         <div
           style={{
-            borderRadius:'14px',
-            overflow:'hidden',
-            background:'#faf4f6',
-
-            height:'220px',
-            marginBottom:'12px',
-
-            flexShrink:0
+            width: '100%',
+            aspectRatio: '1 / 1',
+            borderRadius: '14px',
+            overflow: 'hidden',
+            background: '#faf4f6',
+            marginBottom: '12px',
           }}
         >
           {r.images?.length > 0 ? (
@@ -661,21 +625,21 @@ function ReviewCard({ review: r }) {
               src={r.images[0]}
               alt=""
               style={{
-                width:'100%',
-                height:'100%',
-                objectFit:'contain', // full image visible
-                display:'block'
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover', // use contain if you don't want cropping
+                display: 'block',
               }}
             />
           ) : (
             <div
               style={{
-                height:'100%',
-                display:'flex',
-                alignItems:'center',
-                justifyContent:'center',
-                color:'#d4a2b2',
-                fontWeight:700
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: '#d4a2b2',
+                fontWeight: 700,
               }}
             >
               No customer image
@@ -683,72 +647,59 @@ function ReviewCard({ review: r }) {
           )}
         </div>
 
-
-        {/* Footer */}
+        {/* footer */}
         <div
           style={{
-            display:'flex',
-            alignItems:'center',
-            gap:'8px',
-            paddingTop:'10px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            paddingTop: '10px',
             borderTop:
-             '1px solid rgba(238,214,196,.6)',
-            flexShrink:0,
-            marginTop:'auto'
+              '1px solid rgba(238,214,196,.6)',
+            marginTop: 'auto',
           }}
         >
-
           <div
             style={{
-              width:32,
-              height:32,
-              flexShrink:0,
-              borderRadius:'50%',
+              width: 32,
+              height: 32,
+              borderRadius: '50%',
               background:
                 'linear-gradient(135deg,#C44569,#E8607B)',
-              display:'flex',
-              alignItems:'center',
-              justifyContent:'center',
-              fontWeight:900,
-              color:'#fff',
-              fontSize:'0.82rem',
-              boxShadow:
-               '0 3px 10px rgba(196,69,105,.28)'
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontWeight: 900,
+              color: '#fff',
             }}
           >
-            {(r.userName||'C')
+            {(r.userName || 'C')
               .charAt(0)
               .toUpperCase()}
           </div>
 
-          <div style={{minWidth:0}}>
+          <div>
             <div
               style={{
-                fontWeight:700,
-                color:'#1A0A05',
-                fontSize:'0.82rem',
-                whiteSpace:'nowrap',
-                overflow:'hidden',
-                textOverflow:'ellipsis'
+                fontWeight: 700,
+                fontSize: '0.82rem',
               }}
             >
-              {r.userName||'Customer'}
+              {r.userName || 'Customer'}
             </div>
 
             <div
               style={{
-                fontSize:'0.68rem',
-                color:'#9E7B6C'
+                fontSize: '0.68rem',
+                color: '#9E7B6C',
               }}
             >
-              {new Date(
-                r.createdAt
-              ).toLocaleDateString(
+              {new Date(r.createdAt).toLocaleDateString(
                 'en-IN',
                 {
-                  day:'numeric',
-                  month:'short',
-                  year:'numeric'
+                  day: 'numeric',
+                  month: 'short',
+                  year: 'numeric',
                 }
               )}
             </div>
@@ -756,25 +707,21 @@ function ReviewCard({ review: r }) {
 
           <div
             style={{
-              marginLeft:'auto',
-              flexShrink:0,
-              background:'#DCFCE7',
-              padding:'3px 8px',
-              borderRadius:'50px',
-              fontSize:'0.6rem',
-              fontWeight:800,
-              color:'#16a34a',
-              letterSpacing:'.05em'
+              marginLeft: 'auto',
+              background: '#DCFCE7',
+              padding: '3px 8px',
+              borderRadius: '50px',
+              fontSize: '0.6rem',
+              fontWeight: 800,
+              color: '#16a34a',
             }}
           >
             VERIFIED
           </div>
-
         </div>
-
       </div>
     </div>
-  )
+  );
 }
 export default function Home() {
   const [featured, setFeatured] = useState([])
