@@ -118,7 +118,6 @@ function LogoShowcase() {
         cursor: 'pointer', perspective: '800px',
       }}
     >
-      {/* Ambient background pulse */}
       <motion.div
         animate={{ scale: [1, 1.12, 1], opacity: [0.45, 0.7, 0.45] }}
         transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
@@ -130,7 +129,6 @@ function LogoShowcase() {
           pointerEvents: 'none',
         }}
       />
-      {/* Secondary slower pulse */}
       <motion.div
         animate={{ scale: [1.05, 0.95, 1.05], opacity: [0.3, 0.55, 0.3] }}
         transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
@@ -142,8 +140,6 @@ function LogoShowcase() {
           pointerEvents: 'none',
         }}
       />
-
-      {/* Rotating dashed ring 1 */}
       <motion.div
         animate={{ rotate: 360 }}
         transition={{ duration: 22, repeat: Infinity, ease: 'linear' }}
@@ -155,7 +151,6 @@ function LogoShowcase() {
           pointerEvents: 'none',
         }}
       />
-      {/* Rotating ring 2 — opposite */}
       <motion.div
         animate={{ rotate: -360 }}
         transition={{ duration: 34, repeat: Infinity, ease: 'linear' }}
@@ -167,7 +162,6 @@ function LogoShowcase() {
           pointerEvents: 'none',
         }}
       />
-      {/* Outer slow ring */}
       <motion.div
         animate={{ rotate: 360 }}
         transition={{ duration: 55, repeat: Infinity, ease: 'linear' }}
@@ -179,8 +173,6 @@ function LogoShowcase() {
           pointerEvents: 'none',
         }}
       />
-
-      {/* Orbiting sparkle dots */}
       {PARTICLES.slice(0, 8).map((p) => (
         <motion.div
           key={p.id}
@@ -211,8 +203,6 @@ function LogoShowcase() {
           />
         </motion.div>
       ))}
-
-      {/* Floating free-roam particles */}
       {PARTICLES.slice(8).map(p => (
         <motion.div
           key={p.id}
@@ -232,8 +222,6 @@ function LogoShowcase() {
           }}
         />
       ))}
-
-      {/* Mouse-reactive glow */}
       <motion.div
         style={{
           position: 'absolute', top: '50%', left: '50%',
@@ -246,8 +234,6 @@ function LogoShowcase() {
           pointerEvents: 'none', zIndex: 3,
         }}
       />
-
-      {/* Main logo with 3-D tilt */}
       <motion.div
         style={{
           position: 'relative', zIndex: 5,
@@ -257,7 +243,6 @@ function LogoShowcase() {
         whileHover={{ scale: 1.06 }}
         transition={{ type: 'spring', stiffness: 260, damping: 22 }}
       >
-        {/* Halo glow behind logo */}
         <motion.div
           animate={{
             opacity: hovered ? [0.7, 1, 0.7] : [0.4, 0.65, 0.4],
@@ -286,8 +271,6 @@ function LogoShowcase() {
           }}
         />
       </motion.div>
-
-      {/* Click ripple waves */}
       <AnimatePresence>
         {ripples.map(rp => (
           <motion.div
@@ -308,7 +291,6 @@ function LogoShowcase() {
   )
 }
 
-// ─── New Arrivals Slider ───────────────────────────────────────────────────
 const SLIDE_WIDTH = 280
 const SLIDE_GAP = 20
 
@@ -344,7 +326,6 @@ function NewArrivalsSlider({ products }) {
 
   return (
     <div style={{ overflow: 'hidden' }}>
-      {/* Slider track */}
       <div
         style={{
           position: 'relative', display: 'flex', justifyContent: 'center',
@@ -465,7 +446,6 @@ function NewArrivalsSlider({ products }) {
         })}
       </div>
 
-      {/* Dot indicators */}
       <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '28px' }}>
         {products.map((_, idx) => (
           <motion.button
@@ -481,7 +461,6 @@ function NewArrivalsSlider({ products }) {
         ))}
       </div>
 
-      {/* Prev / Next arrows */}
       <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginTop: '20px' }}>
         {[['←', -1], ['→', 1]].map(([arrow, dir]) => (
           <motion.button
@@ -503,6 +482,164 @@ function NewArrivalsSlider({ products }) {
         ))}
       </div>
     </div>
+  )
+}
+
+// ─── Review Card — equal-size tiles, 1-line clamp with read more ───────────
+function ReviewCard({ review: r, index: i }) {
+  const [expanded, setExpanded] = useState(false)
+
+  return (
+    <AnimatedSection delay={i * 0.08}>
+      <div
+        style={{
+          background: 'linear-gradient(145deg, #fff 0%, #fff9f5 100%)',
+          borderRadius: '20px',
+          border: '1px solid rgba(196,69,105,.1)',
+          boxShadow: '0 8px 30px rgba(196,69,105,.08)',
+          overflow: 'hidden',
+          /* Fixed height so every tile is identical */
+          height: '280px',
+          display: 'flex',
+          flexDirection: 'column',
+          position: 'relative',
+          transition: 'transform .25s ease, box-shadow .25s ease',
+        }}
+        onMouseEnter={e => {
+          e.currentTarget.style.transform = 'translateY(-4px)'
+          e.currentTarget.style.boxShadow = '0 16px 42px rgba(196,69,105,.14)'
+        }}
+        onMouseLeave={e => {
+          e.currentTarget.style.transform = 'translateY(0)'
+          e.currentTarget.style.boxShadow = '0 8px 30px rgba(196,69,105,.08)'
+        }}
+      >
+        {/* Top accent bar */}
+        <div style={{
+          height: '3px', flexShrink: 0,
+          background: 'linear-gradient(90deg, #C44569, #E8607B, #D4956B)',
+        }} />
+
+        <div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
+
+          {/* Stars row */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '2px', marginBottom: '8px', flexShrink: 0 }}>
+            {[1, 2, 3, 4, 5].map(s => (
+              <Star
+                key={s}
+                size={13}
+                fill={s <= r.rating ? '#F59E0B' : 'rgba(245,158,11,.15)'}
+                stroke={s <= r.rating ? '#F59E0B' : 'rgba(245,158,11,.25)'}
+              />
+            ))}
+            <span style={{ marginLeft: '5px', fontWeight: 700, fontSize: '0.75rem', color: '#F59E0B' }}>
+              {r.rating}.0
+            </span>
+          </div>
+
+          {/* Product tag */}
+          {r.productName && (
+            <div style={{
+              display: 'inline-flex', alignItems: 'center',
+              background: '#FDE8F0', color: '#C44569',
+              fontSize: '0.68rem', fontWeight: 700,
+              padding: '3px 10px', borderRadius: '50px', marginBottom: '8px',
+              maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+              flexShrink: 0,
+            }}>
+              ✦ {r.productName}
+            </div>
+          )}
+
+          {/* Comment — strictly 1 line clamped, expand on read more */}
+          <div style={{ marginBottom: '8px', flexShrink: 0 }}>
+            <p style={{
+              color: '#4A2E20',
+              lineHeight: 1.6,
+              fontSize: '0.88rem',
+              margin: 0,
+              fontStyle: 'italic',
+              /* Always clamp to 1 line unless expanded */
+              display: '-webkit-box',
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+              WebkitLineClamp: expanded ? 'unset' : 1,
+              /* When expanded, allow wrapping but cap height so card doesn't break layout */
+              maxHeight: expanded ? '80px' : 'none',
+              overflowY: expanded ? 'auto' : 'hidden',
+            }}>
+              "{r.comment}"
+            </p>
+            <button
+              onClick={() => setExpanded(v => !v)}
+              style={{
+                background: 'none', border: 'none', padding: '2px 0 0',
+                cursor: 'pointer', fontSize: '0.72rem', fontWeight: 700,
+                color: '#C44569', display: 'block', lineHeight: 1,
+              }}
+            >
+              {expanded ? 'Show less' : 'Read more'}
+            </button>
+          </div>
+
+          {/* Image — only if available, fixed height so it never shifts layout */}
+          <div style={{
+            flex: 1,
+            borderRadius: '10px',
+            overflow: 'hidden',
+            background: r.images?.length > 0 ? '#faf4f6' : 'transparent',
+            flexShrink: 0,
+            /* Reserve a fixed slot whether image exists or not */
+            height: '68px',
+            marginBottom: '10px',
+          }}>
+            {r.images?.length > 0 && (
+              <img
+                src={r.images[0]}
+                alt=""
+                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+              />
+            )}
+          </div>
+
+          {/* Footer — always pinned at bottom */}
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: '8px',
+            paddingTop: '10px',
+            borderTop: '1px solid rgba(238,214,196,.6)',
+            flexShrink: 0,
+          }}>
+            <div style={{
+              width: 32, height: 32, flexShrink: 0, borderRadius: '50%',
+              background: 'linear-gradient(135deg, #C44569, #E8607B)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontWeight: 900, color: '#fff', fontSize: '0.82rem',
+              boxShadow: '0 3px 10px rgba(196,69,105,.28)',
+            }}>
+              {(r.userName || 'C').charAt(0).toUpperCase()}
+            </div>
+            <div style={{ minWidth: 0 }}>
+              <div style={{
+                fontWeight: 700, color: '#1A0A05', fontSize: '0.82rem',
+                whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+              }}>
+                {r.userName || 'Customer'}
+              </div>
+              <div style={{ fontSize: '0.68rem', color: '#9E7B6C' }}>
+                {new Date(r.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+              </div>
+            </div>
+            <div style={{
+              marginLeft: 'auto', flexShrink: 0,
+              background: '#DCFCE7', padding: '3px 8px', borderRadius: '50px',
+              fontSize: '0.6rem', fontWeight: 800, color: '#16a34a', letterSpacing: '.05em',
+            }}>
+              VERIFIED
+            </div>
+          </div>
+        </div>
+      </div>
+    </AnimatedSection>
   )
 }
 
@@ -531,7 +668,6 @@ export default function Home() {
   useEffect(() => {
     api.get('/reviews?limit=6&sort=newest')
       .then(r => {
-        // handle both plain array and wrapped { data: [...] } or { reviews: [...] }
         const list = Array.isArray(r.data)
           ? r.data
           : r.data?.reviews ?? r.data?.data ?? []
@@ -549,16 +685,12 @@ export default function Home() {
         position: 'relative', overflow: 'hidden', paddingTop: '80px',
         display: 'flex', alignItems: 'center',
       }}>
-        {/* dot pattern */}
         <div className="dot-pattern" style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }} />
-        {/* glow blobs */}
         <div style={{ position: 'absolute', top: '-8%', right: '-8%', width: '600px', height: '600px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(196,69,105,0.12) 0%, transparent 70%)', pointerEvents: 'none' }} />
         <div style={{ position: 'absolute', bottom: '-15%', left: '-8%', width: '500px', height: '500px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(238,214,196,0.28) 0%, transparent 70%)', pointerEvents: 'none' }} />
 
         <div className="page-container" style={{ width: '100%', padding: '48px 1.5rem' }}>
           <div className="hero-grid">
-
-            {/* LEFT — copy */}
             <div>
               <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
                 <div style={{
@@ -623,7 +755,6 @@ export default function Home() {
                 </Link>
               </motion.div>
 
-              {/* Stats */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.4 }}
                 style={{ display: 'flex', paddingTop: '24px', borderTop: '1px solid rgba(196,69,105,0.12)' }}
@@ -640,10 +771,8 @@ export default function Home() {
               </motion.div>
             </div>
 
-            {/* RIGHT — Logo showcase (desktop) */}
             <LogoShowcase />
 
-            {/* Mobile logo — simple floating version */}
             <motion.div
               className="show-mobile"
               initial={{ opacity: 0, scale: 0.88 }}
@@ -664,7 +793,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ═══ BRAND STRIP — logo marquee ═══ */}
+      {/* ═══ BRAND STRIP ═══ */}
       <section style={{
         background: '#fff8f9',
         borderTop: '1px solid rgba(196,69,105,0.1)',
@@ -807,128 +936,15 @@ export default function Home() {
               </div>
             </AnimatedSection>
 
-            {/* Review grid — 1 col mobile, 2 col tablet, 3 col desktop */}
+            {/* grid — equal columns, tiles pinned to fixed height */}
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))',
               gap: 'clamp(16px, 3vw, 24px)',
               alignItems: 'start',
             }}>
               {recentReviews.map((r, i) => (
-                <AnimatedSection key={r._id} delay={i * 0.08}>
-                  <div
-                    style={{
-                      background: 'linear-gradient(145deg, #fff 0%, #fff9f5 100%)',
-                      borderRadius: '20px',
-                      padding: 'clamp(16px, 3vw, 24px)',
-                      border: '1px solid rgba(196,69,105,.1)',
-                      boxShadow: '0 8px 30px rgba(196,69,105,.08)',
-                      display: 'flex', flexDirection: 'column',
-                      overflow: 'hidden', transition: 'all .25s ease', position: 'relative',
-                    }}
-                    onMouseEnter={e => {
-                      e.currentTarget.style.transform = 'translateY(-4px)'
-                      e.currentTarget.style.boxShadow = '0 16px 42px rgba(196,69,105,.14)'
-                    }}
-                    onMouseLeave={e => {
-                      e.currentTarget.style.transform = 'translateY(0)'
-                      e.currentTarget.style.boxShadow = '0 8px 30px rgba(196,69,105,.08)'
-                    }}
-                  >
-                    {/* Top accent bar */}
-                    <div style={{
-                      position: 'absolute', top: 0, left: 0, right: 0, height: '4px',
-                      background: 'linear-gradient(90deg, #C44569, #E8607B, #D4956B)',
-                    }} />
-
-                    {/* Stars */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '12px', marginTop: '6px' }}>
-                      {[1, 2, 3, 4, 5].map(s => (
-                        <Star
-                          key={s}
-                          size={15}
-                          fill={s <= r.rating ? '#F59E0B' : 'rgba(245,158,11,.15)'}
-                          stroke={s <= r.rating ? '#F59E0B' : 'rgba(245,158,11,.25)'}
-                        />
-                      ))}
-                      <span style={{ marginLeft: '8px', fontWeight: 700, fontSize: '0.8rem', color: '#F59E0B' }}>
-                        {r.rating}.0
-                      </span>
-                    </div>
-
-                    {/* Product tag */}
-                    {r.productName && (
-                      <div style={{
-                        display: 'inline-flex', alignItems: 'center',
-                        background: '#FDE8F0', color: '#C44569',
-                        fontSize: '.72rem', fontWeight: 700,
-                        padding: '5px 12px', borderRadius: '50px', marginBottom: '14px',
-                        maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                      }}>
-                        ✦ {r.productName}
-                      </div>
-                    )}
-
-                    {/* Review text — no fixed minHeight, clamps naturally */}
-                    <p style={{
-                      color: '#4A2E20', lineHeight: 1.75,
-                      fontSize: 'clamp(0.85rem, 2vw, 0.92rem)',
-                      margin: '0 0 16px', fontStyle: 'italic',
-                      display: '-webkit-box', WebkitLineClamp: 4,
-                      WebkitBoxOrient: 'vertical', overflow: 'hidden',
-                    }}>
-                      "{r.comment}"
-                    </p>
-
-                    {/* Image — aspect-ratio so it scales on all screens */}
-                    {r.images?.length > 0 && (
-                      <div style={{
-                        width: '100%',
-                        aspectRatio: '4 / 3',
-                        marginBottom: '18px', borderRadius: '14px',
-                        overflow: 'hidden', background: '#faf4f6',
-                      }}>
-                        <img
-                          src={r.images[0]}
-                          alt=""
-                          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-                        />
-                      </div>
-                    )}
-
-                    {/* Footer */}
-                    <div style={{
-                      display: 'flex', alignItems: 'center', gap: '10px',
-                      paddingTop: '14px', marginTop: '8px',
-                      borderTop: '1px solid rgba(238,214,196,.6)',
-                    }}>
-                      <div style={{
-                        width: 40, height: 40, flexShrink: 0, borderRadius: '50%',
-                        background: 'linear-gradient(135deg, #C44569, #E8607B)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontWeight: 900, color: '#fff',
-                        boxShadow: '0 4px 12px rgba(196,69,105,.28)',
-                      }}>
-                        {(r.userName || 'C').charAt(0).toUpperCase()}
-                      </div>
-                      <div style={{ minWidth: 0 }}>
-                        <div style={{ fontWeight: 700, color: '#1A0A05', fontSize: '0.88rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                          {r.userName || 'Customer'}
-                        </div>
-                        <div style={{ fontSize: '0.7rem', color: '#9E7B6C' }}>
-                          {new Date(r.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-                        </div>
-                      </div>
-                      <div style={{
-                        marginLeft: 'auto', flexShrink: 0,
-                        background: '#DCFCE7', padding: '4px 10px', borderRadius: '50px',
-                        fontSize: '.65rem', fontWeight: 800, color: '#16a34a', letterSpacing: '.05em',
-                      }}>
-                        VERIFIED
-                      </div>
-                    </div>
-                  </div>
-                </AnimatedSection>
+                <ReviewCard key={r._id} review={r} index={i} />
               ))}
             </div>
 
@@ -969,15 +985,12 @@ export default function Home() {
                   onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 16px 48px rgba(196,69,105,0.12)' }}
                   onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 24px rgba(61,35,20,0.06)' }}
                 >
-                  {/* Stars */}
                   <div style={{ display: 'flex', gap: '3px', marginBottom: '20px' }}>
                     {[...Array(t.stars)].map((_, j) => <Star key={j} size={14} fill="#F59E0B" color="#F59E0B" />)}
                   </div>
-                  {/* Quote */}
                   <p style={{ fontSize: '0.9375rem', color: '#4A2E20', lineHeight: 1.75, marginBottom: '24px', fontStyle: 'italic', fontWeight: 400 }}>
                     "{t.text}"
                   </p>
-                  {/* Author */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <div style={{
                       width: '46px', height: '46px', borderRadius: '50%',
@@ -1010,7 +1023,6 @@ export default function Home() {
               padding: 'clamp(48px, 7vw, 80px)', textAlign: 'center',
               position: 'relative', overflow: 'hidden',
             }}>
-              {/* Decorative circles */}
               <div style={{ position: 'absolute', top: '-60px', right: '-60px', width: '280px', height: '280px', borderRadius: '50%', background: 'rgba(196,69,105,0.12)', pointerEvents: 'none' }} />
               <div style={{ position: 'absolute', bottom: '-80px', left: '-40px', width: '320px', height: '320px', borderRadius: '50%', background: 'rgba(248,200,220,0.07)', pointerEvents: 'none' }} />
               <div style={{ position: 'absolute', top: '30px', left: '20%', width: '8px', height: '8px', borderRadius: '50%', background: 'rgba(248,200,220,0.5)', pointerEvents: 'none' }} />
