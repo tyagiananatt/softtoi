@@ -650,6 +650,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true)
   const [apiError, setApiError] = useState(null)
   const [recentReviews, setRecentReviews] = useState([])
+  const [reviewsLoading, setReviewsLoading] = useState(true)
 
   useEffect(() => {
     Promise.all([
@@ -665,16 +666,39 @@ export default function Home() {
       .finally(() => setLoading(false))
   }, [])
 
+  // GET /reviews requires admin auth — use public per-product endpoint instead
   useEffect(() => {
-    api.get('/reviews?limit=6&sort=newest')
-      .then(r => {
-        const list = Array.isArray(r.data)
-          ? r.data
-          : r.data?.reviews ?? r.data?.data ?? []
-        setRecentReviews(list.slice(0, 6))
-      })
-      .catch(() => {})
-  }, [])
+    if (loading) return
+    const products = [...newArrivals, ...featured].filter(Boolean)
+    if (products.length === 0) { setReviewsLoading(false); return }
+
+    const seen = new Set()
+    const unique = products
+      .filter(p => { if (seen.has(p._id)) return false; seen.add(p._id); return true })
+      .slice(0, 6)
+
+    Promise.all(
+      unique.map(p =>
+        api.get(`/reviews/product/${p._id}`)
+          .then(r => {
+            const list = Array.isArray(r.data) ? r.data : []
+            return list.map(rev => ({
+              ...rev,
+              productName: p.name,
+              userName: rev.userName || 'Customer',
+            }))
+          })
+          .catch(() => [])
+      )
+    ).then(results => {
+      const all = results
+        .flat()
+        .filter(r => r.comment)
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .slice(0, 6)
+      setRecentReviews(all)
+    }).finally(() => setReviewsLoading(false))
+  }, [loading, newArrivals, featured])
 
   return (
     <div>
@@ -921,45 +945,52 @@ export default function Home() {
       </section>
 
       {/* ═══ CUSTOMER REVIEWS ═══ */}
-      {recentReviews.length > 0 && (
-        <section style={{ padding: 'clamp(48px, 8vw, 96px) 0', background: 'linear-gradient(180deg, #fff 0%, #fff5f8 100%)' }}>
-          <div className="page-container">
-            <AnimatedSection>
-              <div style={{ textAlign: 'center', marginBottom: 'clamp(32px, 5vw, 56px)' }}>
-                <div className="section-label">Happy Customers</div>
-                <h2 style={{ fontSize: 'clamp(1.6rem, 3.5vw, 2.75rem)', fontWeight: 900, color: '#1A0A05', letterSpacing: '-0.025em' }}>
-                  What People Are Saying
-                </h2>
-                <p style={{ color: '#8B6655', fontSize: 'clamp(0.875rem, 2vw, 1rem)', maxWidth: '440px', margin: '14px auto 0', lineHeight: 1.7 }}>
-                  Real reviews from verified buyers across our collection.
-                </p>
-              </div>
-            </AnimatedSection>
+      <section style={{ padding: 'clamp(48px, 8vw, 96px) 0', background: 'linear-gradient(180deg, #fff 0%, #fff5f8 100%)' }}>
+        <div className="page-container">
+          <AnimatedSection>
+            <div style={{ textAlign: 'center', marginBottom: 'clamp(32px, 5vw, 56px)' }}>
+              <div className="section-label">Happy Customers</div>
+              <h2 style={{ fontSize: 'clamp(1.6rem, 3.5vw, 2.75rem)', fontWeight: 900, color: '#1A0A05', letterSpacing: '-0.025em' }}>
+                What People Are Saying
+              </h2>
+              <p style={{ color: '#8B6655', fontSize: 'clamp(0.875rem, 2vw, 1rem)', maxWidth: '440px', margin: '14px auto 0', lineHeight: 1.7 }}>
+                Real reviews from verified buyers across our collection.
+              </p>
+            </div>
+          </AnimatedSection>
 
-            {/* grid — equal columns, tiles pinned to fixed height */}
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))',
-              gap: 'clamp(16px, 3vw, 24px)',
-              alignItems: 'start',
-            }}>
-              {recentReviews.map((r, i) => (
-                <ReviewCard key={r._id} review={r} index={i} />
+          {reviewsLoading ? (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: 'clamp(16px, 3vw, 24px)' }}>
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="skeleton" style={{ height: '280px', borderRadius: '20px' }} />
               ))}
             </div>
-
-            <AnimatedSection>
-              <div style={{ textAlign: 'center', marginTop: '44px' }}>
-                <Link to="/products" style={{ textDecoration: 'none' }}>
-                  <button className="btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-                    Shop & Leave a Review <ArrowRight size={16} />
-                  </button>
-                </Link>
+          ) : recentReviews.length === 0 ? null : (
+            <>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))',
+                gap: 'clamp(16px, 3vw, 24px)',
+                alignItems: 'start',
+              }}>
+                {recentReviews.map((r, i) => (
+                  <ReviewCard key={r._id} review={r} index={i} />
+                ))}
               </div>
-            </AnimatedSection>
-          </div>
-        </section>
-      )}
+
+              <AnimatedSection>
+                <div style={{ textAlign: 'center', marginTop: '44px' }}>
+                  <Link to="/products" style={{ textDecoration: 'none' }}>
+                    <button className="btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                      Shop & Leave a Review <ArrowRight size={16} />
+                    </button>
+                  </Link>
+                </div>
+              </AnimatedSection>
+            </>
+          )}
+        </div>
+      </section>
 
       {/* ═══ TESTIMONIALS ═══ */}
       <section style={{ padding: '96px 0', background: 'linear-gradient(180deg, #fffaf5 0%, #fff5f8 100%)' }}>
