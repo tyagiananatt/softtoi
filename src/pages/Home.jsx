@@ -457,9 +457,6 @@ export default function Home() {
   const [apiError, setApiError] = useState(null)
   const [recentReviews, setRecentReviews] = useState([])
 
-  /*added by lakshya*/
-  const [expandedReviews, setExpandedReviews] = useState({})
-
   useEffect(() => {
     Promise.all([
       api.get('/products?featured=true'),
@@ -474,25 +471,8 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
-  api.get('/products?limit=6').then(async res => {
-    const products = res.data
-    const allReviews = []
-    await Promise.all(
-      products.map(p =>
-        api.get(`/reviews/product/${p._id}`)
-          .then(r => {
-            r.data.forEach(review => {
-              allReviews.push({ ...review, productName: p.name })
-            })
-          })
-          .catch(() => {})
-      )
-    )
-    // Sort by newest, take 6
-    allReviews.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-    setRecentReviews(allReviews.slice(0, 6))
-  }).catch(() => {})
-}, [])
+    api.get('/reviews/recent?limit=6').then(r => setRecentReviews(r.data)).catch(() => {})
+  }, [])
 
   return (
     <div>
@@ -761,24 +741,25 @@ export default function Home() {
               </div>
             </AnimatedSection>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
-              {recentReviews.map((r, i) => (
-                <AnimatedSection key={r._id} delay={i * 0.08}>
-                  <div style={{
-                      background: 'linear-gradient(145deg, #fff 0%, #fff9f5 100%)',
-                      borderRadius: '22px',
-                      padding: '22px',
-                      border: '1px solid rgba(196,69,105,0.1)',
-                      boxShadow: '0 4px 24px rgba(196,69,105,0.08), 0 1px 4px rgba(122,92,78,0.06)',
-                      transition: 'transform 0.2s, box-shadow 0.2s',
-                      position: 'relative',
-                      overflow: 'hidden',
-                    
-                      minHeight:'430px',
-                      display:'flex',
-                      flexDirection:'column',
-                      justifyContent:'space-between'
-                    }}
+            <div style={{
+                  display:'inline-block',
+                  width:'100%',
+                  marginBottom:'22px',
+
+                  background:'linear-gradient(145deg,#fff 0%,#fff9f5 100%)',
+                  borderRadius:'24px',
+                  padding:'24px',
+                  border:'1px solid rgba(196,69,105,.1)',
+                  boxShadow:'0 8px 30px rgba(196,69,105,.08)',
+                  position:'relative',
+                  overflow:'hidden',
+
+                  breakInside:'avoid',
+                  WebkitColumnBreakInside:'avoid',
+                  pageBreakInside:'avoid',
+
+                  transition:'all .25s ease'
+                  }}
                     onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 12px 36px rgba(196,69,105,0.14)' }}
                     onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 24px rgba(196,69,105,0.08)' }}
                   >
@@ -805,68 +786,49 @@ export default function Home() {
 
                     {/* Comment */}
                     <p
-                          style={{
-                          color:'#4A2E20',
-                          lineHeight:1.75,
-                          fontSize:'0.9rem',
-                          margin:'0 0 8px 0',
-                          fontStyle:'italic'
-                          }}
-                          >
-                          "
-                          {expandedReviews[r._id]
-                          ? r.comment
-                          : r.comment.length > 120
-                          ? r.comment.slice(0,120)+'...'
-                          : r.comment}
-                          "
-                          </p>
-                          
-                          {r.comment.length > 120 && (
-                          <button
-                          onClick={()=>setExpandedReviews(prev=>({
-                          ...prev,
-                          [r._id]:!prev[r._id]
-                          }))}
-                          style={{
-                          background:'none',
-                          border:'none',
-                          padding:0,
-                          cursor:'pointer',
-                          fontWeight:700,
-                          color:'#C44569',
-                          fontSize:'0.8rem',
-                          marginBottom:'14px'
-                          }}
-                          >
-                          {expandedReviews[r._id]
-                          ? 'Read Less'
-                          : 'Read More'}
-                          </button>
-                          )}
+                      style={{
+                      color:'#4A2E20',
+                      lineHeight:1.75,
+                      fontSize:'0.92rem',
+                      margin:'0 0 12px',
+                      fontStyle:'italic',
+
+                      display:'-webkit-box',
+                      WebkitLineClamp:4,
+                      WebkitBoxOrient:'vertical',
+                      overflow:'hidden'
+                      }}
+                      >
+                      "{r.comment}"
+                      </p>
+
+                      {r.comment?.length > 180 && (
+                      <button
+                      style={{
+                      border:'none',
+                      background:'none',
+                      padding:0,
+                      cursor:'pointer',
+                      fontWeight:700,
+                      fontSize:'0.8rem',
+                      color:'#C44569',
+                      marginBottom:'14px'
+                      }}
+                      >
+                      Read More
+                      </button>
+                      )}
+
                     {/* Review images */}
                     {r.images?.length > 0 && (
-                        <div style={{
-                          display:'grid',
-                          gridTemplateColumns:'repeat(auto-fit,minmax(60px,1fr))',
-                          gap:'8px',
-                          marginBottom:'14px'
-                        }}>
-                          {r.images.map((img, idx) => (
-                            <img
-                              key={idx}
-                              src={img}
-                              alt=""
-                              style={{
-                                width:'100%',
-                                aspectRatio:'1/1',
-                                borderRadius:'10px',
-                                objectFit:'cover'
-                              }}
-                            />
-                          ))}
-                        </div>
-                      )}
+                      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(60px,1fr))', gap:'8px', marginBottom: '14px' }}>
+                        {r.images.map((img, idx) => (
+                          <img key={idx} src={img} alt=""
+                            style={{ width: '100%', aspectRatio: '1/1', borderRadius: '10px', objectFit: 'cover', border: '2px solid rgba(196,69,105,0.15)' }}
+                          />
+                        ))}
+                      </div>
+                    )}
 
                     {/* Author row */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingTop: '14px', borderTop: '1px solid rgba(238,214,196,0.5)' }}>
