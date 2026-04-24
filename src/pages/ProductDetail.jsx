@@ -313,7 +313,7 @@ export default function ProductDetail() {
                 {[
                   [Truck, 'LPU Campus', 'Free delivery'],
                   [Shield, 'Secure Payment', 'Guaranteed'],
-                  [RotateCcw, 'Easy Returns', '7 days'],
+                  [RotateCcw, 'Delivery in 48 Hours', 'in & out LPU campus'],
                 ].map(([Icon, title, sub]) => (
                   <div key={title} style={{ textAlign: 'center', background: 'rgba(248,200,220,0.1)', borderRadius: '12px', padding: '14px 8px', border: '1px solid rgba(248,200,220,0.2)' }}>
                     <Icon size={18} color="#E8A0B8" style={{ marginBottom: '6px' }} />
