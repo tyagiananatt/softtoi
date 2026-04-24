@@ -485,7 +485,7 @@ function NewArrivalsSlider({ products }) {
   )
 }
 
-// ─── Review Card — equal-size tiles, 1-line clamp with read more ───────────
+// ─── Review Card — unchanged ─────────────────────────────────────────────────
 function ReviewCard({ review: r }) {
   const [expanded, setExpanded] = useState(false)
 
@@ -513,7 +513,6 @@ function ReviewCard({ review: r }) {
           e.currentTarget.style.boxShadow = '0 4px 20px rgba(196,69,105,.08)'
         }}
       >
-        {/* Top accent bar */}
         <div style={{
           height: '3px', flexShrink: 0,
           background: 'linear-gradient(90deg, #C44569, #E8607B, #D4956B)',
@@ -521,7 +520,6 @@ function ReviewCard({ review: r }) {
 
         <div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
 
-          {/* Stars row */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '2px', marginBottom: '8px', flexShrink: 0 }}>
             {[1, 2, 3, 4, 5].map(s => (
               <Star
@@ -536,7 +534,6 @@ function ReviewCard({ review: r }) {
             </span>
           </div>
 
-          {/* Product tag */}
           {r.productName && (
             <div style={{
               display: 'inline-flex', alignItems: 'center',
@@ -550,7 +547,6 @@ function ReviewCard({ review: r }) {
             </div>
           )}
 
-          {/* Comment — strictly 1 line clamped, expand on read more */}
           <div style={{ marginBottom: '8px', flexShrink: 0 }}>
             <p style={{
               color: '#4A2E20',
@@ -558,12 +554,10 @@ function ReviewCard({ review: r }) {
               fontSize: '0.88rem',
               margin: 0,
               fontStyle: 'italic',
-              /* Always clamp to 1 line unless expanded */
               display: '-webkit-box',
               WebkitBoxOrient: 'vertical',
               overflow: 'hidden',
               WebkitLineClamp: expanded ? 'unset' : 1,
-              /* When expanded, allow wrapping but cap height so card doesn't break layout */
               maxHeight: expanded ? '80px' : 'none',
               overflowY: expanded ? 'auto' : 'hidden',
             }}>
@@ -581,14 +575,12 @@ function ReviewCard({ review: r }) {
             </button>
           </div>
 
-          {/* Image — only if available, fixed height so it never shifts layout */}
           <div style={{
             flex: 1,
             borderRadius: '10px',
             overflow: 'hidden',
             background: r.images?.length > 0 ? '#faf4f6' : 'transparent',
             flexShrink: 0,
-            /* Reserve a fixed slot whether image exists or not */
             height: '68px',
             marginBottom: '10px',
           }}>
@@ -601,7 +593,6 @@ function ReviewCard({ review: r }) {
             )}
           </div>
 
-          {/* Footer — always pinned at bottom */}
           <div style={{
             display: 'flex', alignItems: 'center', gap: '8px',
             paddingTop: '10px',
@@ -664,22 +655,33 @@ export default function Home() {
       .finally(() => setLoading(false))
   }, [])
 
-  // GET /reviews requires admin auth — use public per-product endpoint instead
+  // ─── ONLY CHANGE: fetch reviews for ALL products (newArrivals + featured, deduped) ───
   useEffect(() => {
     if (loading) return
-    const products = newArrivals.length > 0 ? newArrivals : featured
-    if (products.length === 0) { setReviewsLoading(false); return }
 
-    // Use same endpoint as ProductDetail — already proven to work
-    const targets = products.slice(0, 4)
+    const seen = new Set()
+    const allProducts = [...newArrivals, ...featured].filter(p => {
+      if (seen.has(p._id)) return false
+      seen.add(p._id)
+      return true
+    })
+
+    if (allProducts.length === 0) {
+      setReviewsLoading(false)
+      return
+    }
+
     Promise.all(
-      targets.map(p =>
+      allProducts.map(p =>
         api.get(`/reviews/product/${p._id}`)
           .then(r => (Array.isArray(r.data) ? r.data : []).map(rev => ({ ...rev, productName: p.name })))
           .catch(() => [])
       )
     ).then(results => {
-      const all = results.flat().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 6)
+      const all = results
+        .flat()
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .slice(0, 6)
       setRecentReviews(all)
     }).finally(() => setReviewsLoading(false))
   }, [loading, newArrivals, featured])
