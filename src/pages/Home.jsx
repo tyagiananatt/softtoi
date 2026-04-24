@@ -486,32 +486,31 @@ function NewArrivalsSlider({ products }) {
 }
 
 // ─── Review Card — equal-size tiles, 1-line clamp with read more ───────────
-function ReviewCard({ review: r, index: i }) {
+function ReviewCard({ review: r }) {
   const [expanded, setExpanded] = useState(false)
 
   return (
-    <AnimatedSection delay={i * 0.08}>
       <div
         style={{
-          background: 'linear-gradient(145deg, #fff 0%, #fff9f5 100%)',
+          background: '#fff',
           borderRadius: '20px',
           border: '1px solid rgba(196,69,105,.1)',
-          boxShadow: '0 8px 30px rgba(196,69,105,.08)',
+          boxShadow: '0 4px 20px rgba(196,69,105,.08)',
           overflow: 'hidden',
-          /* Fixed height so every tile is identical */
-          height: '280px',
+          height: '260px',
           display: 'flex',
           flexDirection: 'column',
           position: 'relative',
-          transition: 'transform .25s ease, box-shadow .25s ease',
+          transition: 'transform .2s ease, box-shadow .2s ease',
+          cursor: 'default',
         }}
         onMouseEnter={e => {
-          e.currentTarget.style.transform = 'translateY(-4px)'
-          e.currentTarget.style.boxShadow = '0 16px 42px rgba(196,69,105,.14)'
+          e.currentTarget.style.transform = 'translateY(-3px)'
+          e.currentTarget.style.boxShadow = '0 12px 36px rgba(196,69,105,.14)'
         }}
         onMouseLeave={e => {
           e.currentTarget.style.transform = 'translateY(0)'
-          e.currentTarget.style.boxShadow = '0 8px 30px rgba(196,69,105,.08)'
+          e.currentTarget.style.boxShadow = '0 4px 20px rgba(196,69,105,.08)'
         }}
       >
         {/* Top accent bar */}
@@ -639,7 +638,6 @@ function ReviewCard({ review: r, index: i }) {
           </div>
         </div>
       </div>
-    </AnimatedSection>
   )
 }
 
@@ -969,12 +967,11 @@ export default function Home() {
             <>
               <div style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))',
-                gap: 'clamp(16px, 3vw, 24px)',
-                alignItems: 'start',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+                gap: '20px',
               }}>
                 {recentReviews.map((r, i) => (
-                  <ReviewCard key={r._id} review={r} index={i} />
+                  <ReviewCard key={r._id || i} review={r} />
                 ))}
               </div>
 
