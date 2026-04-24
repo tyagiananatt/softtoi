@@ -794,7 +794,7 @@ export default function Home() {
                       fontStyle:'italic',
 
                       display:'-webkit-box',
-                      WebkitLineClamp:4,
+                      WebkitLineClamp:1,
                       WebkitBoxOrient:'vertical',
                       overflow:'hidden'
                       }}
