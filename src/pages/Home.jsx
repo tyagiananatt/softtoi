@@ -667,33 +667,19 @@ export default function Home() {
   // GET /reviews requires admin auth — use public per-product endpoint instead
   useEffect(() => {
     if (loading) return
-    const products = [...newArrivals, ...featured].filter(Boolean)
+    const products = newArrivals.length > 0 ? newArrivals : featured
     if (products.length === 0) { setReviewsLoading(false); return }
 
-    const seen = new Set()
-    const unique = products
-      .filter(p => { if (seen.has(p._id)) return false; seen.add(p._id); return true })
-      .slice(0, 6)
-
+    // Use same endpoint as ProductDetail — already proven to work
+    const targets = products.slice(0, 4)
     Promise.all(
-      unique.map(p =>
+      targets.map(p =>
         api.get(`/reviews/product/${p._id}`)
-          .then(r => {
-            const list = Array.isArray(r.data) ? r.data : []
-            return list.map(rev => ({
-              ...rev,
-              productName: p.name,
-              userName: rev.userName || 'Customer',
-            }))
-          })
+          .then(r => (Array.isArray(r.data) ? r.data : []).map(rev => ({ ...rev, productName: p.name })))
           .catch(() => [])
       )
     ).then(results => {
-      const all = results
-        .flat()
-        .filter(r => r.comment)
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        .slice(0, 6)
+      const all = results.flat().sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 6)
       setRecentReviews(all)
     }).finally(() => setReviewsLoading(false))
   }, [loading, newArrivals, featured])
