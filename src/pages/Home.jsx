@@ -485,244 +485,116 @@ function NewArrivalsSlider({ products }) {
   )
 }
 
-// ─── Review Card — unchanged ─────────────────────────────────────────────────
-function ReviewCard({ review: r }) {
-  const [expanded, setExpanded] = useState(false);
+// ─── Review Card — Neumorphic + Animated ─────────────────────────────────────
+function ReviewCard({ review: r, index = 0 }) {
+  const [expanded, setExpanded] = useState(false)
+  const [hovered, setHovered] = useState(false)
 
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: index * 0.08 }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       style={{
-        background: '#fff',
-        borderRadius: '20px',
-        border: '1px solid rgba(196,69,105,.1)',
-        boxShadow: '0 4px 20px rgba(196,69,105,.08)',
+        background: 'linear-gradient(145deg, #fdf0f4, #fff5f8)',
+        borderRadius: '24px',
+        boxShadow: hovered
+          ? '8px 8px 20px rgba(196,69,105,0.18), -4px -4px 14px rgba(255,255,255,0.95), inset 0 0 0 1px rgba(196,69,105,0.12)'
+          : '6px 6px 16px rgba(196,69,105,0.12), -4px -4px 12px rgba(255,255,255,0.9)',
         overflow: 'hidden',
-        height: '500px',
         display: 'flex',
         flexDirection: 'column',
-        transition: 'transform .2s ease, box-shadow .2s ease',
+        transition: 'box-shadow 0.35s ease, transform 0.35s ease',
+        transform: hovered ? 'translateY(-6px) scale(1.01)' : 'translateY(0) scale(1)',
+        cursor: 'default',
+        flexShrink: 0,
+        width: '260px',
       }}
     >
-      {/* top accent */}
-      <div
+      {/* Animated gradient top bar */}
+      <motion.div
+        animate={{ backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] }}
+        transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
         style={{
-          height: '3px',
-          background:
-            'linear-gradient(90deg,#C44569,#E8607B,#D4956B)',
+          height: '4px',
+          background: 'linear-gradient(90deg, #C44569, #E8607B, #D4956B, #F8C8DC, #C44569)',
+          backgroundSize: '200% 100%',
         }}
       />
 
-      <div
-        style={{
-          padding: '14px 16px',
-          display: 'flex',
-          flexDirection: 'column',
-          flex: 1,
-        }}
-      >
-        {/* stars */}
-        <div
-          style={{
-            display: 'flex',
-            gap: '2px',
-            marginBottom: '8px',
-          }}
-        >
-          {[1, 2, 3, 4, 5].map((s) => (
-            <Star
-              key={s}
-              size={13}
-              fill={
-                s <= r.rating
-                  ? '#F59E0B'
-                  : 'rgba(245,158,11,.15)'
-              }
-              stroke={
-                s <= r.rating
-                  ? '#F59E0B'
-                  : 'rgba(245,158,11,.25)'
-              }
-            />
+      <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+        {/* Stars + rating */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '10px' }}>
+          {[1,2,3,4,5].map(s => (
+            <motion.div key={s} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: index * 0.08 + s * 0.05, type: 'spring', stiffness: 400 }}>
+              <Star size={14} fill={s <= r.rating ? '#F59E0B' : 'rgba(245,158,11,0.15)'} stroke={s <= r.rating ? '#F59E0B' : 'rgba(245,158,11,0.25)'} />
+            </motion.div>
           ))}
-
-          <span
-            style={{
-              marginLeft: '5px',
-              fontWeight: 700,
-              fontSize: '0.75rem',
-              color: '#F59E0B',
-            }}
-          >
-            {r.rating}.0
-          </span>
+          <span style={{ marginLeft: '4px', fontWeight: 800, fontSize: '0.72rem', color: '#F59E0B', background: 'rgba(245,158,11,0.1)', padding: '1px 7px', borderRadius: '50px' }}>{r.rating}.0</span>
         </div>
 
-        {/* product tag */}
+        {/* Product tag */}
         {r.productName && (
-          <div
-            style={{
-              display: 'inline-flex',
-              background: '#FDE8F0',
-              color: '#C44569',
-              fontSize: '0.68rem',
-              fontWeight: 700,
-              padding: '3px 10px',
-              borderRadius: '50px',
-              marginBottom: '8px',
-            }}
-          >
+          <motion.div whileHover={{ scale: 1.04 }} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'linear-gradient(135deg,rgba(196,69,105,0.12),rgba(232,96,123,0.08))', color: '#C44569', fontSize: '0.65rem', fontWeight: 800, padding: '4px 10px', borderRadius: '50px', marginBottom: '10px', width: 'fit-content', boxShadow: 'inset 1px 1px 3px rgba(255,255,255,0.8), inset -1px -1px 3px rgba(196,69,105,0.1)' }}>
             ✦ {r.productName}
-          </div>
+          </motion.div>
         )}
 
-        {/* review text */}
-        <div style={{ marginBottom: '10px' }}>
-          <p
-            style={{
-              color: '#4A2E20',
-              lineHeight: 1.6,
-              fontSize: '0.88rem',
-              margin: 0,
-              fontStyle: 'italic',
-              display: '-webkit-box',
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
-              WebkitLineClamp: expanded ? 'unset' : 1,
-            }}
-          >
+        {/* Comment */}
+        <div style={{ marginBottom: '12px', flex: 1 }}>
+          <p style={{ color: '#4A2E20', lineHeight: 1.65, fontSize: '0.85rem', margin: 0, fontStyle: 'italic', display: '-webkit-box', WebkitBoxOrient: 'vertical', overflow: 'hidden', WebkitLineClamp: expanded ? 'unset' : 2 }}>
             "{r.comment}"
           </p>
-
-          <button
-            onClick={() => setExpanded((v) => !v)}
-            style={{
-              background: 'none',
-              border: 'none',
-              padding: '2px 0 0',
-              cursor: 'pointer',
-              fontSize: '0.72rem',
-              fontWeight: 700,
-              color: '#C44569',
-            }}
-          >
-            {expanded ? 'Show less' : 'Read more'}
-          </button>
+          {r.comment?.length > 80 && (
+            <button onClick={() => setExpanded(v => !v)} style={{ background: 'none', border: 'none', padding: '3px 0 0', cursor: 'pointer', fontSize: '0.7rem', fontWeight: 700, color: '#C44569' }}>
+              {expanded ? 'Show less' : 'Read more'}
+            </button>
+          )}
         </div>
 
-        {/* 1:1 square review image */}
-        <div
-          style={{
-            width: '100%',
-            aspectRatio: '1 / 1',
-            borderRadius: '14px',
-            overflow: 'hidden',
-            background: '#faf4f6',
-            marginBottom: '12px',
-          }}
-        >
+        {/* Review image — neumorphic inset frame */}
+        <div style={{
+          width: '100%', aspectRatio: '1/1', borderRadius: '16px', overflow: 'hidden', marginBottom: '12px',
+          boxShadow: 'inset 3px 3px 8px rgba(196,69,105,0.15), inset -2px -2px 6px rgba(255,255,255,0.9)',
+          background: 'linear-gradient(145deg,#fde8f0,#fff0f4)',
+        }}>
           {r.images?.length > 0 ? (
-            <img
-              src={r.images[0]}
-              alt=""
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover', // use contain if you don't want cropping
-                display: 'block',
-              }}
-            />
+            <motion.img src={r.images[0]} alt="" whileHover={{ scale: 1.06 }} transition={{ duration: 0.4 }}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
           ) : (
-            <div
-              style={{
-                height: '100%',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: '#d4a2b2',
-                fontWeight: 700,
-              }}
-            >
-              No customer image
+            <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#E8A0B8', gap: '6px' }}>
+              <span style={{ fontSize: '1.8rem' }}>📷</span>
+              <span style={{ fontSize: '0.65rem', fontWeight: 600 }}>No photo</span>
             </div>
           )}
         </div>
 
-        {/* footer */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            paddingTop: '10px',
-            borderTop:
-              '1px solid rgba(238,214,196,.6)',
-            marginTop: 'auto',
-          }}
-        >
-          <div
-            style={{
-              width: 32,
-              height: 32,
-              borderRadius: '50%',
-              background:
-                'linear-gradient(135deg,#C44569,#E8607B)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: 900,
-              color: '#fff',
-            }}
-          >
-            {(r.userName || 'C')
-              .charAt(0)
-              .toUpperCase()}
+        {/* Footer */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingTop: '10px', borderTop: '1px solid rgba(238,214,196,0.5)', marginTop: 'auto' }}>
+          <div style={{
+            width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
+            background: 'linear-gradient(135deg,#C44569,#E8607B)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontWeight: 900, color: '#fff', fontSize: '0.85rem',
+            boxShadow: '3px 3px 8px rgba(196,69,105,0.3), -2px -2px 6px rgba(255,255,255,0.8)',
+          }}>
+            {(r.userName || 'C').charAt(0).toUpperCase()}
           </div>
-
-          <div>
-            <div
-              style={{
-                fontWeight: 700,
-                fontSize: '0.82rem',
-              }}
-            >
-              {r.userName || 'Customer'}
-            </div>
-
-            <div
-              style={{
-                fontSize: '0.68rem',
-                color: '#9E7B6C',
-              }}
-            >
-              {new Date(r.createdAt).toLocaleDateString(
-                'en-IN',
-                {
-                  day: 'numeric',
-                  month: 'short',
-                  year: 'numeric',
-                }
-              )}
-            </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontWeight: 700, fontSize: '0.8rem', color: '#1A0A05', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.userName || 'Customer'}</div>
+            <div style={{ fontSize: '0.65rem', color: '#9E7B6C' }}>{new Date(r.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
           </div>
-
-          <div
-            style={{
-              marginLeft: 'auto',
-              background: '#DCFCE7',
-              padding: '3px 8px',
-              borderRadius: '50px',
-              fontSize: '0.6rem',
-              fontWeight: 800,
-              color: '#16a34a',
-            }}
-          >
-            VERIFIED
+          <div style={{ background: 'linear-gradient(135deg,#DCFCE7,#bbf7d0)', padding: '3px 8px', borderRadius: '50px', fontSize: '0.58rem', fontWeight: 800, color: '#16a34a', boxShadow: '2px 2px 5px rgba(22,163,74,0.15), -1px -1px 4px rgba(255,255,255,0.9)', flexShrink: 0 }}>
+            ✓ VERIFIED
           </div>
         </div>
       </div>
-    </div>
-  );
+    </motion.div>
+  )
 }
+
 export default function Home() {
   const [featured, setFeatured] = useState([])
   const [categories, setCategories] = useState([])
@@ -746,36 +618,13 @@ export default function Home() {
       .finally(() => setLoading(false))
   }, [])
 
-  // ─── ONLY CHANGE: fetch reviews for ALL products (newArrivals + featured, deduped) ───
+  // Fetch recent reviews directly — all products, latest first
   useEffect(() => {
-    if (loading) return
-
-    const seen = new Set()
-    const allProducts = [...newArrivals, ...featured].filter(p => {
-      if (seen.has(p._id)) return false
-      seen.add(p._id)
-      return true
-    })
-
-    if (allProducts.length === 0) {
-      setReviewsLoading(false)
-      return
-    }
-
-    Promise.all(
-      allProducts.map(p =>
-        api.get(`/reviews/product/${p._id}`)
-          .then(r => (Array.isArray(r.data) ? r.data : []).map(rev => ({ ...rev, productName: p.name })))
-          .catch(() => [])
-      )
-    ).then(results => {
-      const all = results
-        .flat()
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
-        .slice(0, 6)
-      setRecentReviews(all)
-    }).finally(() => setReviewsLoading(false))
-  }, [loading, newArrivals, featured])
+    api.get('/reviews/recent')
+      .then(r => setRecentReviews(r.data))
+      .catch(() => {})
+      .finally(() => setReviewsLoading(false))
+  }, [])
 
   return (
     <div>
@@ -1037,21 +886,20 @@ export default function Home() {
           </AnimatedSection>
 
           {reviewsLoading ? (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: 'clamp(16px, 3vw, 24px)' }}>
+            <div style={{ display: 'flex', gap: '20px', overflow: 'hidden' }}>
               {[...Array(3)].map((_, i) => (
-                <div key={i} className="skeleton" style={{ height: '280px', borderRadius: '20px' }} />
+                <div key={i} className="skeleton" style={{ height: '380px', borderRadius: '24px', minWidth: '260px' }} />
               ))}
             </div>
           ) : recentReviews.length === 0 ? null : (
             <>
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
-                gap: '20px',
-              }}>
-                {recentReviews.map((r, i) => (
-                  <ReviewCard key={r._id || i} review={r} />
-                ))}
+              {/* Infinite marquee of review cards */}
+              <div className="marquee-outer" style={{ paddingBottom: '8px' }}>
+                <div className="marquee-track" style={{ gap: '20px', alignItems: 'stretch', animationDuration: `${Math.max(20, recentReviews.length * 6)}s` }}>
+                  {[...recentReviews, ...recentReviews, ...recentReviews, ...recentReviews].map((r, i) => (
+                    <ReviewCard key={`${r._id}-${i}`} review={r} index={i % recentReviews.length} />
+                  ))}
+                </div>
               </div>
 
               <AnimatedSection>
