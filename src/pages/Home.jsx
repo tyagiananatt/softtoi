@@ -916,54 +916,96 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ═══ VIDEO SHOWCASE ═══ */}
-<section style={{ padding: 'clamp(48px, 8vw, 96px) 0', background: '#fff' }}>
-  <div className="page-container">
-    <AnimatedSection>
-      <div style={{ textAlign: 'center', marginBottom: 'clamp(32px, 5vw, 56px)' }}>
-        <div className="section-label">Behind the Magic</div>
-        <h2 style={{ fontSize: 'clamp(1.6rem, 3.5vw, 2.75rem)', fontWeight: 900, color: '#1A0A05', letterSpacing: '-0.025em' }}>
-          Watch Us Create
-        </h2>
-        <p style={{ color: '#8B6655', fontSize: 'clamp(0.875rem, 2vw, 1rem)', maxWidth: '440px', margin: '14px auto 0', lineHeight: 1.7 }}>
-          Every product is crafted by hand — watch the love and care that goes into each piece.
-        </p>
-      </div>
-    </AnimatedSection>
+{/* ═══ VIDEO SHOWCASE ═══ */}
+<section style={{ padding: '0', background: '#1A0A05', position: 'relative', overflow: 'hidden' }}>
+  {/* Video fills full width */}
+  <video
+    src="https://res.cloudinary.com/dpt4zxb6j/video/upload/v1777208689/crochet_video_ceptwa.mp4"
+    autoPlay
+    muted
+    loop
+    playsInline
+    style={{
+      width: '100%',
+      display: 'block',
+      maxHeight: '100vh',
+      minHeight: '420px',
+      objectFit: 'cover',
+    }}
+  />
 
-    <AnimatedSection delay={0.1}>
+  {/* Dark overlay for text legibility */}
+  <div style={{
+    position: 'absolute', inset: 0,
+    background: 'linear-gradient(to bottom, rgba(26,10,5,0.18) 0%, rgba(26,10,5,0.55) 60%, rgba(26,10,5,0.82) 100%)',
+    pointerEvents: 'none',
+  }} />
+
+  {/* Text overlay */}
+  <div style={{
+    position: 'absolute', bottom: 0, left: 0, right: 0,
+    padding: 'clamp(28px, 6vw, 72px) clamp(20px, 5vw, 80px)',
+    zIndex: 2,
+  }}>
+    <div style={{
+      maxWidth: '680px',
+    }}>
       <div style={{
-        position: 'relative',
-        borderRadius: '28px',
-        overflow: 'hidden',
-        maxWidth: '900px',
-        margin: '0 auto',
-        background: '#1A0A05',
-        boxShadow: '0 32px 80px rgba(196,69,105,0.22), 0 8px 24px rgba(61,35,20,0.14)',
-        border: '2px solid rgba(196,69,105,0.15)',
+        display: 'inline-flex', alignItems: 'center', gap: '7px',
+        padding: '6px 14px', borderRadius: '50px', marginBottom: 'clamp(10px, 2vw, 18px)',
+        background: 'rgba(196,69,105,0.28)',
+        border: '1px solid rgba(248,200,220,0.3)',
       }}>
-        {/* Gradient overlay at bottom for branding feel */}
-        <div style={{
-          position: 'absolute', bottom: 0, left: 0, right: 0, height: '80px',
-          background: 'linear-gradient(to top, rgba(26,10,5,0.4), transparent)',
-          pointerEvents: 'none', zIndex: 1,
-        }} />
-
-        <video
-          src="https://res.cloudinary.com/dpt4zxb6j/video/upload/v1777208689/crochet_video_ceptwa.mp4"
-          autoPlay
-          muted
-          loop
-          playsInline
-          style={{
-            width: '100%',
-            display: 'block',
-            maxHeight: '520px',
-            objectFit: 'cover',
-          }}
-        />
+        <Sparkles size={12} color="#F8C8DC" />
+        <span style={{ fontSize: '0.68rem', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#F8C8DC' }}>
+          Behind the Magic
+        </span>
       </div>
-    </AnimatedSection>
+
+      <h2 style={{
+        fontSize: 'clamp(1.75rem, 5vw, 3.25rem)',
+        fontWeight: 900, color: '#fff',
+        letterSpacing: '-0.028em', lineHeight: 1.08,
+        marginBottom: 'clamp(10px, 2vw, 18px)',
+      }}>
+        Watch Us{' '}
+        <span style={{
+          background: 'linear-gradient(135deg, #F8C8DC 10%, #E8607B 60%, #D4956B 100%)',
+          WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+        }}>
+          Create
+        </span>
+      </h2>
+
+      <p style={{
+        fontSize: 'clamp(0.85rem, 2vw, 1.05rem)',
+        color: 'rgba(248,200,220,0.8)',
+        lineHeight: 1.72, maxWidth: '480px',
+        marginBottom: 'clamp(18px, 3vw, 32px)',
+        fontWeight: 400,
+      }}>
+        Every product is handcrafted with love — watch the care and detail that goes into each piece we make.
+      </p>
+
+      <Link to="/products" style={{ textDecoration: 'none' }}>
+        <button
+          style={{
+            background: 'linear-gradient(135deg, #C44569, #E8607B)',
+            color: '#fff', padding: 'clamp(11px, 2vw, 15px) clamp(22px, 3vw, 32px)',
+            borderRadius: '50px', fontWeight: 700,
+            fontSize: 'clamp(0.8rem, 1.8vw, 0.9375rem)',
+            border: 'none', cursor: 'pointer',
+            display: 'inline-flex', alignItems: 'center', gap: '8px',
+            boxShadow: '0 8px 28px rgba(196,69,105,0.5)',
+            transition: 'all 0.25s',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 14px 36px rgba(196,69,105,0.6)' }}
+          onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 8px 28px rgba(196,69,105,0.5)' }}
+        >
+          <ShoppingBag size={16} /> Shop Handmade
+        </button>
+      </Link>
+    </div>
   </div>
 </section>
 
