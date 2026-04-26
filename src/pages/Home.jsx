@@ -835,7 +835,7 @@ export default function Home() {
               : apiError
                 ? <p style={{ color: '#C44569', gridColumn: '1/-1', textAlign: 'center', padding: '40px 0' }}>{apiError}</p>
                 : categories
-                    .filter(cat => ['keychains', 'soft-toys', 'flowers'].includes(cat.slug))
+                    .filter(cat => ['keychains', 'soft-toys', 'flowers','cute-vault-1775019784062'].includes(cat.slug))
                     .map((cat, i) => <CategoryCard key={cat._id} category={cat} index={i} />)
             }
           </div>
