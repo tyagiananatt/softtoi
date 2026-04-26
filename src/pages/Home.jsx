@@ -916,6 +916,57 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ═══ VIDEO SHOWCASE ═══ */}
+<section style={{ padding: 'clamp(48px, 8vw, 96px) 0', background: '#fff' }}>
+  <div className="page-container">
+    <AnimatedSection>
+      <div style={{ textAlign: 'center', marginBottom: 'clamp(32px, 5vw, 56px)' }}>
+        <div className="section-label">Behind the Magic</div>
+        <h2 style={{ fontSize: 'clamp(1.6rem, 3.5vw, 2.75rem)', fontWeight: 900, color: '#1A0A05', letterSpacing: '-0.025em' }}>
+          Watch Us Create
+        </h2>
+        <p style={{ color: '#8B6655', fontSize: 'clamp(0.875rem, 2vw, 1rem)', maxWidth: '440px', margin: '14px auto 0', lineHeight: 1.7 }}>
+          Every product is crafted by hand — watch the love and care that goes into each piece.
+        </p>
+      </div>
+    </AnimatedSection>
+
+    <AnimatedSection delay={0.1}>
+      <div style={{
+        position: 'relative',
+        borderRadius: '28px',
+        overflow: 'hidden',
+        maxWidth: '900px',
+        margin: '0 auto',
+        background: '#1A0A05',
+        boxShadow: '0 32px 80px rgba(196,69,105,0.22), 0 8px 24px rgba(61,35,20,0.14)',
+        border: '2px solid rgba(196,69,105,0.15)',
+      }}>
+        {/* Gradient overlay at bottom for branding feel */}
+        <div style={{
+          position: 'absolute', bottom: 0, left: 0, right: 0, height: '80px',
+          background: 'linear-gradient(to top, rgba(26,10,5,0.4), transparent)',
+          pointerEvents: 'none', zIndex: 1,
+        }} />
+
+        <video
+          src="https://res.cloudinary.com/dpt4zxb6j/video/upload/v1777208689/crochet_video_ceptwa.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+          style={{
+            width: '100%',
+            display: 'block',
+            maxHeight: '520px',
+            objectFit: 'cover',
+          }}
+        />
+      </div>
+    </AnimatedSection>
+  </div>
+</section>
+
       {/* ═══ TESTIMONIALS ═══ */}
       <section style={{ padding: '96px 0', background: 'linear-gradient(180deg, #fffaf5 0%, #fff5f8 100%)' }}>
         <div className="page-container">
