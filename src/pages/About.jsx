@@ -1,4 +1,5 @@
-import { Heart, Palette, Award, Users } from 'lucide-react'
+import { Heart, Palette, Award, Users, Sparkles, ShoppingBag } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import AnimatedSection from '../components/AnimatedSection'
 
 const VALUES = [
@@ -49,7 +50,7 @@ export default function About() {
               <div className="section-label">Who We Are</div>
               <h2 style={{ fontSize: 'clamp(1.5rem, 3vw, 2rem)', fontWeight: 800, color: '#7A5C4E', marginBottom: '20px' }}>A Story Woven with Love</h2>
               <p style={{ color: '#9E7B6C', lineHeight: 1.9, marginBottom: '16px', fontSize: '0.9375rem' }}>
-                Softoi began with a mother’s forgotten passion and a dream to bring it back to life. My mom has always had incredible creative talent — from crochet and painting to beautiful handmade crafts. But like many women, family responsibilities and life’s demands slowly pushed her creativity into the background.
+                Softoi began with a mother's forgotten passion and a dream to bring it back to life. My mom has always had incredible creative talent — from crochet and painting to beautiful handmade crafts. But like many women, family responsibilities and life's demands slowly pushed her creativity into the background.
               </p>
               <p style={{ color: '#9E7B6C', lineHeight: 1.9, marginBottom: '16px', fontSize: '0.9375rem' }}>
                 One day, I saw her crocheting again, creating simply for joy, and I was amazed. That moment inspired Softoi — a platform to showcase not only her creativity, but also the hidden talents of many women who have set aside their passions while caring for others.
@@ -58,7 +59,7 @@ export default function About() {
                 Every keychain, soft toy, flower bouquet, and handmade piece in our store is made with love, patience, and attention to detail. These are more than products — they are little pieces of joy, crafted to hold memories.
               </p>
               <p style={{ color: '#9E7B6C', lineHeight: 1.9, marginBottom: '16px', fontSize: '0.9375rem' }}>
-                At Softoi, we celebrate handmade artistry, support women creators, and believe creativity should never be forgotten. When you shop with us, you’re not just buying something beautiful — you’re supporting a dream.
+                At Softoi, we celebrate handmade artistry, support women creators, and believe creativity should never be forgotten. When you shop with us, you're not just buying something beautiful — you're supporting a dream.
               </p>
               <p style={{ color: '#9E7B6C', lineHeight: 1.9, fontSize: '0.9375rem' }}>
                 Our Softoi family welcomes you to discover unique handmade treasures and heartfelt creations made with love. ✨
@@ -67,98 +68,151 @@ export default function About() {
           </div>
         </div>
       </div>
+
       {/* ═══ VIDEO SHOWCASE ═══ */}
-<section style={{ padding: '0', background: '#1A0A05', position: 'relative', overflow: 'hidden' }}>
-  {/* Video fills full width */}
-  <video
-    src="https://res.cloudinary.com/dpt4zxb6j/video/upload/v1777208689/crochet_video_ceptwa.mp4"
-    autoPlay
-    muted
-    loop
-    playsInline
-    style={{
-      width: '100%',
-      display: 'block',
-      maxHeight: '100vh',
-      minHeight: '420px',
-      objectFit: 'cover',
-    }}
-  />
+      {/* SEO: aria-label + semantic <section> with structured heading hierarchy */}
+      <section
+        aria-label="Watch Softoi artisans create handmade crochet products"
+        itemScope
+        itemType="https://schema.org/VideoObject"
+        style={{ padding: '0', background: '#1A0A05', position: 'relative', overflow: 'hidden' }}
+      >
+        {/* SEO: VideoObject structured data hints for crawlers */}
+        <meta itemProp="name" content="Softoi Handmade Crochet Creation Process" />
+        <meta itemProp="description" content="Watch Softoi artisans handcraft crochet keychains, soft toys and gifts with love in India." />
+        <meta itemProp="uploadDate" content="2025-01-01" />
+        <meta itemProp="contentUrl" content="https://res.cloudinary.com/dpt4zxb6j/video/upload/v1777208689/crochet_video_ceptwa.mp4" />
 
-  {/* Dark overlay for text legibility */}
-  <div style={{
-    position: 'absolute', inset: 0,
-    background: 'linear-gradient(to bottom, rgba(26,10,5,0.18) 0%, rgba(26,10,5,0.55) 60%, rgba(26,10,5,0.82) 100%)',
-    pointerEvents: 'none',
-  }} />
-
-  {/* Text overlay */}
-  <div style={{
-    position: 'absolute', bottom: 0, left: 0, right: 0,
-    padding: 'clamp(28px, 6vw, 72px) clamp(20px, 5vw, 80px)',
-    zIndex: 2,
-  }}>
-    <div style={{
-      maxWidth: '680px',
-    }}>
-      <div style={{
-        display: 'inline-flex', alignItems: 'center', gap: '7px',
-        padding: '6px 14px', borderRadius: '50px', marginBottom: 'clamp(10px, 2vw, 18px)',
-        background: 'rgba(196,69,105,0.28)',
-        border: '1px solid rgba(248,200,220,0.3)',
-      }}>
-        <Sparkles size={12} color="#F8C8DC" />
-        <span style={{ fontSize: '0.68rem', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#F8C8DC' }}>
-          Behind the Magic
-        </span>
-      </div>
-
-      <h2 style={{
-        fontSize: 'clamp(1.75rem, 5vw, 3.25rem)',
-        fontWeight: 900, color: '#fff',
-        letterSpacing: '-0.028em', lineHeight: 1.08,
-        marginBottom: 'clamp(10px, 2vw, 18px)',
-      }}>
-        Watch Us{' '}
-        <span style={{
-          background: 'linear-gradient(135deg, #F8C8DC 10%, #E8607B 60%, #D4956B 100%)',
-          WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
-        }}>
-          Create
-        </span>
-      </h2>
-
-      <p style={{
-        fontSize: 'clamp(0.85rem, 2vw, 1.05rem)',
-        color: 'rgba(248,200,220,0.8)',
-        lineHeight: 1.72, maxWidth: '480px',
-        marginBottom: 'clamp(18px, 3vw, 32px)',
-        fontWeight: 400,
-      }}>
-        Every product is handcrafted with love — watch the care and detail that goes into each piece we make.
-      </p>
-
-      <Link to="/products" style={{ textDecoration: 'none' }}>
-        <button
+        <video
+          src="https://res.cloudinary.com/dpt4zxb6j/video/upload/v1777208689/crochet_video_ceptwa.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+          aria-label="Softoi artisan handcrafting a crochet product"
           style={{
-            background: 'linear-gradient(135deg, #C44569, #E8607B)',
-            color: '#fff', padding: 'clamp(11px, 2vw, 15px) clamp(22px, 3vw, 32px)',
-            borderRadius: '50px', fontWeight: 700,
-            fontSize: 'clamp(0.8rem, 1.8vw, 0.9375rem)',
-            border: 'none', cursor: 'pointer',
-            display: 'inline-flex', alignItems: 'center', gap: '8px',
-            boxShadow: '0 8px 28px rgba(196,69,105,0.5)',
-            transition: 'all 0.25s',
+            width: '100%',
+            display: 'block',
+            height: 'clamp(380px, 75vw, 100vh)',
+            objectFit: 'cover',
+            objectPosition: 'center',
           }}
-          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 14px 36px rgba(196,69,105,0.6)' }}
-          onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 8px 28px rgba(196,69,105,0.5)' }}
-        >
-          <ShoppingBag size={16} /> Shop Handmade
-        </button>
-      </Link>
-    </div>
-  </div>
-</section>
+        />
+
+        {/* Gradient overlay — stronger on mobile for text legibility */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: 'linear-gradient(to bottom, rgba(26,10,5,0.1) 0%, rgba(26,10,5,0.45) 45%, rgba(26,10,5,0.88) 100%)',
+          pointerEvents: 'none',
+        }} />
+
+        {/* Text overlay */}
+        <div style={{
+          position: 'absolute', bottom: 0, left: 0, right: 0,
+          padding: 'clamp(24px, 5vw, 72px) clamp(18px, 5vw, 80px) clamp(28px, 5vw, 64px)',
+          zIndex: 2,
+        }}>
+          {/* SEO: max-width keeps line lengths readable and prevents text sprawl on ultrawide */}
+          <div style={{ maxWidth: 'min(680px, 90vw)' }}>
+
+            {/* Label pill */}
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: '7px',
+              padding: 'clamp(5px, 1vw, 7px) clamp(11px, 2vw, 16px)',
+              borderRadius: '50px',
+              marginBottom: 'clamp(10px, 2vw, 18px)',
+              background: 'rgba(196,69,105,0.28)',
+              border: '1px solid rgba(248,200,220,0.3)',
+            }}>
+              <Sparkles size={12} color="#F8C8DC" />
+              {/* SEO: keyword-rich label text */}
+              <span style={{
+                fontSize: 'clamp(0.6rem, 1.5vw, 0.7rem)',
+                fontWeight: 800, letterSpacing: '0.12em',
+                textTransform: 'uppercase', color: '#F8C8DC',
+              }}>
+                Handmade in India
+              </span>
+            </div>
+
+            {/* SEO: h2 with primary keyword phrase */}
+            <h2 style={{
+              fontSize: 'clamp(1.6rem, 5vw, 3.25rem)',
+              fontWeight: 900, color: '#fff',
+              letterSpacing: '-0.028em', lineHeight: 1.08,
+              marginBottom: 'clamp(10px, 2vw, 18px)',
+              margin: '0 0 clamp(10px, 2vw, 18px)',
+            }}>
+              Watch Our Artisans{' '}
+              <span style={{
+                background: 'linear-gradient(135deg, #F8C8DC 10%, #E8607B 60%, #D4956B 100%)',
+                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+                display: 'inline-block',
+              }}>
+                Craft with Love
+              </span>
+            </h2>
+
+            {/* SEO: descriptive paragraph with natural keywords */}
+            <p style={{
+              fontSize: 'clamp(0.8rem, 2vw, 1.05rem)',
+              color: 'rgba(248,200,220,0.82)',
+              lineHeight: 1.72,
+              maxWidth: 'min(480px, 100%)',
+              margin: '0 0 clamp(18px, 3vw, 32px)',
+              fontWeight: 400,
+            }}>
+              From crochet keychains to soft toys and handmade flower bouquets — every Softoi piece is made by hand in India with care, creativity, and love.
+            </p>
+
+            {/* CTA row — stacks on mobile */}
+            <div style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: 'clamp(10px, 2vw, 14px)',
+              alignItems: 'center',
+            }}>
+              <Link to="/products" style={{ textDecoration: 'none' }}>
+                <button
+                  style={{
+                    background: 'linear-gradient(135deg, #C44569, #E8607B)',
+                    color: '#fff',
+                    padding: 'clamp(10px, 2vw, 15px) clamp(20px, 3vw, 32px)',
+                    borderRadius: '50px', fontWeight: 700,
+                    fontSize: 'clamp(0.78rem, 1.8vw, 0.9375rem)',
+                    border: 'none', cursor: 'pointer',
+                    display: 'inline-flex', alignItems: 'center', gap: '8px',
+                    boxShadow: '0 8px 28px rgba(196,69,105,0.5)',
+                    transition: 'all 0.25s',
+                    whiteSpace: 'nowrap',
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 14px 36px rgba(196,69,105,0.6)' }}
+                  onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 8px 28px rgba(196,69,105,0.5)' }}
+                >
+                  <ShoppingBag size={15} /> Shop Handmade Gifts
+                </button>
+              </Link>
+
+              {/* SEO: secondary anchor-text link for internal linking */}
+              <Link
+                to="/products"
+                style={{
+                  color: 'rgba(248,200,220,0.75)',
+                  fontSize: 'clamp(0.75rem, 1.6vw, 0.875rem)',
+                  fontWeight: 600,
+                  textDecoration: 'underline',
+                  textDecorationColor: 'rgba(248,200,220,0.3)',
+                  textUnderlineOffset: '3px',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                View all collections →
+              </Link>
+            </div>
+
+          </div>
+        </div>
+      </section>
 
       {/* Values */}
       <div style={{ padding: '80px 0', background: '#fff' }}>
@@ -214,6 +268,7 @@ export default function About() {
           </div>
         </div>
       </div>
+
     </div>
   )
 }
