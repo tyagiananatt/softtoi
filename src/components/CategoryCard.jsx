@@ -7,10 +7,11 @@ const SLUG_IMAGES = {
   keychains:   '/category_card/keychain.png',
   'soft-toys': '/category_card/softtoy.png',
   flowers:     '/category_card/flowers.png',
+  'cute-vault-1775019784062':'/category_card/softtoy.png',
 }
 
 export default function CategoryCard({ category, index = 0 }) {
-  const slugMap = { keychains: 'keychains', 'soft-toys': 'soft-toys', flowers: 'flowers' }
+  const slugMap = { keychains: 'keychains', 'soft-toys': 'soft-toys', flowers: 'flowers', 'cute-vault-1775019784062':'cute-vault-1775019784062'  }
   const href = `/products?category=${slugMap[category.slug] || category.slug}`
   const bannerImage = SLUG_IMAGES[category.slug] || category.image
 
