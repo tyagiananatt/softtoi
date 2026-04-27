@@ -606,87 +606,88 @@ function ReviewCard({ review: r, index = 0 }) {
 }
 
 // ─── Instagram Embed Card ─────────────────────────────────────────────────────
-function InstagramEmbed({ url, index }) {
-  const ref       = useRef(null)
-  const [ready, setReady] = useState(false)
-
-  useEffect(() => {
-    const process = () => { window.instgrm?.Embeds?.process(); setReady(true) }
-
-    if (window.instgrm) {
-      process()
-      return
-    }
-
-    if (document.getElementById('insta-embed-script')) {
-      // Script injected but not yet loaded — wait
-      const existing = document.getElementById('insta-embed-script')
-      existing.addEventListener('load', process, { once: true })
-      return () => existing.removeEventListener('load', process)
-    }
-
-    const script    = document.createElement('script')
-    script.id       = 'insta-embed-script'
-    script.src      = 'https://www.instagram.com/embed.js'
-    script.async    = true
-    script.defer    = true
-    script.onload   = process
-    document.body.appendChild(script)
-  }, [url])
+// ─── Instagram Post Card ──────────────────────────────────────────────────────
+function InstagramCard({ url, index }) {
+  const [hovered, setHovered] = useState(false)
 
   return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 24 }}
+    <motion.a
+      href={url}
+      target="_blank"
+      rel="noreferrer noopener"
+      aria-label="View post on Instagram"
+      initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.55, delay: index * 0.09 }}
+      transition={{ duration: 0.5, delay: index * 0.08 }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
       style={{
-        borderRadius: '20px',
-        overflow: 'hidden',
-        border: '1px solid rgba(196,69,105,0.1)',
-        boxShadow: '0 4px 20px rgba(61,35,20,0.06)',
-        background: '#fff',
-        minHeight: '540px',
         display: 'flex',
         flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '220px',
+        height: '220px',
+        borderRadius: '20px',
+        background: 'linear-gradient(145deg, #fdf0f4, #fff5f8)',
+        border: '1px solid rgba(196,69,105,0.13)',
+        boxShadow: hovered
+          ? '8px 8px 20px rgba(196,69,105,0.18), -4px -4px 14px rgba(255,255,255,0.95)'
+          : '6px 6px 16px rgba(196,69,105,0.1), -4px -4px 12px rgba(255,255,255,0.9)',
+        transform: hovered ? 'translateY(-6px) scale(1.03)' : 'translateY(0) scale(1)',
+        transition: 'box-shadow 0.35s ease, transform 0.35s ease',
+        textDecoration: 'none',
+        flexShrink: 0,
+        cursor: 'pointer',
+        overflow: 'hidden',
+        position: 'relative',
       }}
     >
-      {/* Skeleton shown until embed loads */}
-      {!ready && (
-        <div style={{ flex: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '14px 16px' }}>
-            <div className="skeleton" style={{ width: 36, height: 36, borderRadius: '50%', flexShrink: 0 }} />
-            <div style={{ flex: 1 }}>
-              <div className="skeleton" style={{ height: 10, width: '55%', borderRadius: 6, marginBottom: 6 }} />
-              <div className="skeleton" style={{ height: 8,  width: '35%', borderRadius: 6 }} />
-            </div>
-          </div>
-          <div className="skeleton" style={{ width: '100%', aspectRatio: '1/1' }} />
-          <div style={{ padding: '14px 16px' }}>
-            <div className="skeleton" style={{ height: 9, width: '80%', borderRadius: 6, marginBottom: 7 }} />
-            <div className="skeleton" style={{ height: 9, width: '60%', borderRadius: 6 }} />
-          </div>
-        </div>
-      )}
-
-      <blockquote
-        className="instagram-media"
-        data-instgrm-captioned
-        data-instgrm-permalink={url}
-        data-instgrm-version="14"
+      {/* animated gradient bar at top — matches ReviewCard */}
+      <motion.div
+        animate={{ backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] }}
+        transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
         style={{
-          background: '#fff',
-          border: 0,
-          borderRadius: '20px',
-          margin: 0,
-          maxWidth: '100%',
-          minWidth: '280px',
-          padding: 0,
-          width: '100%',
-          display: ready ? 'block' : 'none',
+          position: 'absolute',
+          top: 0, left: 0, right: 0,
+          height: '4px',
+          background: 'linear-gradient(90deg, #C44569, #E8607B, #D4956B, #F8C8DC, #C44569)',
+          backgroundSize: '200% 100%',
         }}
       />
-    </motion.div>
+
+      {/* Instagram gradient icon */}
+      <div style={{
+        width: 56, height: 56, borderRadius: '16px',
+        background: 'linear-gradient(135deg, #f9ce34, #ee2a7b, #6228d7)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        marginBottom: 14,
+        boxShadow: '0 6px 20px rgba(238,42,123,0.35)',
+      }}>
+        <Instagram size={28} color="#fff" />
+      </div>
+
+      <div style={{
+        fontWeight: 700,
+        fontSize: '0.85rem',
+        color: '#1A0A05',
+        marginBottom: 4,
+      }}>
+        @softoi.store
+      </div>
+
+      <div style={{
+        fontSize: '0.7rem',
+        color: '#C44569',
+        fontWeight: 600,
+        letterSpacing: '0.04em',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 4,
+      }}>
+        View on Instagram <ArrowRight size={11} />
+      </div>
+    </motion.a>
   )
 }
 
@@ -1044,59 +1045,66 @@ export default function Home() {
       </section>
 
       {/* ═══ INSTAGRAM FEED ═══ */}
-      <section aria-label="Softoi on Instagram" style={{ padding: 'clamp(48px, 8vw, 96px) 0', background: 'linear-gradient(180deg, #fffaf5 0%, #fff5f8 100%)' }}>
-        <div className="page-container">
-          <AnimatedSection>
-            <div style={{ textAlign: 'center', marginBottom: 'clamp(32px, 5vw, 56px)' }}>
-              <div className="section-label" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-                <Instagram size={12} color="#C44569" aria-hidden="true" /> As Seen On Instagram
-              </div>
-              <h2 style={{ fontSize: 'clamp(1.6rem, 3.5vw, 2.75rem)', fontWeight: 900, color: '#1A0A05', letterSpacing: '-0.025em' }}>
-                Follow the Love
-              </h2>
-              <p style={{ color: '#8B6655', fontSize: 'clamp(0.875rem, 2vw, 1rem)', maxWidth: '440px', margin: '14px auto 0', lineHeight: 1.7 }}>
-                Real posts from our feed. Tag us{' '}
-                <a
-                  href="https://instagram.com/softoi.store"
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  style={{ color: '#C44569', fontWeight: 700, textDecoration: 'none' }}
-                >
-                  @softoi.store
-                </a>
-              </p>
-            </div>
-          </AnimatedSection>
-
-          {/* Responsive grid — 1 col on mobile, 2 on tablet, 3 on desktop */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))',
-            gap: 'clamp(14px, 3vw, 24px)',
-          }}>
-            {INSTA_POST_URLS.map((url, i) => (
-              <InstagramEmbed key={url} url={url} index={i} />
-            ))}
-          </div>
-
-          <AnimatedSection>
-            <div style={{ textAlign: 'center', marginTop: 'clamp(28px, 5vw, 44px)' }}>
-              <a
-                href="https://instagram.com/softoi.store"
-                target="_blank"
-                rel="noreferrer noopener"
-                style={{ textDecoration: 'none' }}
-                aria-label="Follow Softoi on Instagram"
-              >
-                <button className="btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-                  <Instagram size={15} aria-hidden="true" /> Follow on Instagram
-                </button>
-              </a>
-            </div>
-          </AnimatedSection>
+      {/* ═══ INSTAGRAM FEED ═══ */}
+<section aria-label="Softoi on Instagram" style={{ padding: 'clamp(48px, 8vw, 96px) 0', background: 'linear-gradient(180deg, #fffaf5 0%, #fff5f8 100%)' }}>
+  <div className="page-container">
+    <AnimatedSection>
+      <div style={{ textAlign: 'center', marginBottom: 'clamp(32px, 5vw, 56px)' }}>
+        <div className="section-label" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+          <Instagram size={12} color="#C44569" aria-hidden="true" /> As Seen On Instagram
         </div>
-      </section>
+        <h2 style={{ fontSize: 'clamp(1.6rem, 3.5vw, 2.75rem)', fontWeight: 900, color: '#1A0A05', letterSpacing: '-0.025em' }}>
+          Follow the Love
+        </h2>
+        <p style={{ color: '#8B6655', fontSize: 'clamp(0.875rem, 2vw, 1rem)', maxWidth: '440px', margin: '14px auto 0', lineHeight: 1.7 }}>
+          Real posts from our feed. Tag us{' '}
+          
+            href="https://instagram.com/softoi.store"
+            target="_blank"
+            rel="noreferrer noopener"
+            style={{ color: '#C44569', fontWeight: 700, textDecoration: 'none' }}
+          >
+            @softoi.store
+          </a>
+        </p>
+      </div>
+    </AnimatedSection>
 
+    {/* Marquee — identical structure to reviews section */}
+    <div className="marquee-outer">
+      <div
+        className="marquee-track"
+        style={{
+          gap: '20px',
+          alignItems: 'stretch',
+          // Speed scales with number of posts — same formula as reviews
+          animationDuration: `${Math.max(20, INSTA_POST_URLS.length * 6)}s`,
+        }}
+      >
+        {/* Quadruple-duplicate for seamless loop — same as reviews */}
+        {[...INSTA_POST_URLS, ...INSTA_POST_URLS, ...INSTA_POST_URLS, ...INSTA_POST_URLS].map((url, i) => (
+          <InstagramCard key={`${url}-${i}`} url={url} index={i % INSTA_POST_URLS.length} />
+        ))}
+      </div>
+    </div>
+
+    <AnimatedSection>
+      <div style={{ textAlign: 'center', marginTop: 'clamp(28px, 5vw, 44px)' }}>
+        
+          href="https://instagram.com/softoi.store"
+          target="_blank"
+          rel="noreferrer noopener"
+          style={{ textDecoration: 'none' }}
+          aria-label="Follow Softoi on Instagram"
+        >
+          <button className="btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+            <Instagram size={15} aria-hidden="true" /> Follow on Instagram
+          </button>
+        </a>
+      </div>
+    </AnimatedSection>
+  </div>
+</section>
       {/* ═══ CTA BANNER ═══ */}
       <section aria-label="Shop handmade gifts" style={{ padding: '96px 0', background: '#fff' }}>
         <div className="page-container">
