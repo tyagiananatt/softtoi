@@ -604,178 +604,61 @@ function ReviewCard({ review: r, index = 0 }) {
 // ─── Instagram Card ───────────────────────────────────────────────────────────
 // ─── Instagram Card ───────────────────────────────────────────────────────────
 function InstagramCard({ url, index }) {
-  const [hovered, setHovered] = useState(false)
-  const [postData, setPostData] = useState(null)
-  const [loading, setLoading] = useState(true)
-
   useEffect(() => {
-    // Instagram oEmbed — no API key needed, works publicly
-    const oEmbedUrl = `https://graph.facebook.com/v18.0/instagram_oembed?url=${encodeURIComponent(url)}&fields=thumbnail_url,author_name,title&access_token=YOUR_TOKEN`
-    
-    // Since oEmbed requires a token, we use a CORS proxy approach with the public endpoint
-    // Use noembed.com as a free proxy for Instagram oEmbed data
-    fetch(`https://noembed.com/embed?url=${encodeURIComponent(url)}`)
-      .then(r => r.json())
-      .then(data => {
-        setPostData({
-          thumbnail: data.thumbnail_url,
-          author: data.author_name || 'softoi.store',
-          title: data.title || '',
-        })
-      })
-      .catch(() => {
-        // Fallback to a clean branded card if fetch fails
-        setPostData({ author: 'softoi.store', thumbnail: null, title: '' })
-      })
-      .finally(() => setLoading(false))
-  }, [url])
+    if (window.instgrm) {
+      window.instgrm.Embeds.process()
+      return
+    }
+
+    const existing = document.getElementById('instagram-embed-script')
+
+    if (!existing) {
+      const script = document.createElement('script')
+      script.id = 'instagram-embed-script'
+      script.src = 'https://www.instagram.com/embed.js'
+      script.async = true
+      script.onload = () => {
+        if (window.instgrm) {
+          window.instgrm.Embeds.process()
+        }
+      }
+
+      document.body.appendChild(script)
+    }
+  }, [])
 
   return (
-    <motion.a
-      href={url}
-      target="_blank"
-      rel="noreferrer noopener"
-      aria-label="View post on Instagram"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: index * 0.08 }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+    <motion.div
+      initial={{ opacity:0, y:20 }}
+      animate={{ opacity:1, y:0 }}
+      transition={{
+        duration:.5,
+        delay:index*.08
+      }}
       style={{
-        display: 'flex',
-        flexDirection: 'column',
-        width: '220px',
-        borderRadius: '20px',
-        background: '#fff',
-        border: '1px solid rgba(196,69,105,0.13)',
-        boxShadow: hovered
-          ? '8px 8px 20px rgba(196,69,105,0.18), -4px -4px 14px rgba(255,255,255,0.95)'
-          : '6px 6px 16px rgba(196,69,105,0.1), -4px -4px 12px rgba(255,255,255,0.9)',
-        transform: hovered ? 'translateY(-6px) scale(1.03)' : 'translateY(0) scale(1)',
-        transition: 'box-shadow 0.35s ease, transform 0.35s ease',
-        textDecoration: 'none',
-        flexShrink: 0,
-        cursor: 'pointer',
-        overflow: 'hidden',
+        width:'360px',
+        flexShrink:0,
+        background:'#fff',
+        borderRadius:'24px',
+        padding:'12px',
+        overflow:'hidden',
+        border:'1px solid rgba(196,69,105,.08)',
+        boxShadow:'0 8px 28px rgba(196,69,105,.12)'
       }}
     >
-      {/* Animated gradient top bar */}
-      <motion.div
-        animate={{ backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] }}
-        transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
+      <blockquote
+        className="instagram-media"
+        data-instgrm-permalink={url}
+        data-instgrm-version="14"
         style={{
-          height: '4px',
-          background: 'linear-gradient(90deg, #C44569, #E8607B, #D4956B, #F8C8DC, #C44569)',
-          backgroundSize: '200% 100%',
-          flexShrink: 0,
+          margin:0,
+          maxWidth:'100%',
+          minWidth:'100%'
         }}
       />
-
-      {/* Header: profile pic + username + IG icon */}
-      <div style={{
-        padding: '10px 14px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '8px',
-        borderBottom: '1px solid rgba(196,69,105,0.08)',
-        flexShrink: 0,
-      }}>
-        {/* Profile picture — uses Instagram's public profile pic CDN */}
-        <div style={{
-          width: 32, height: 32, borderRadius: '50%',
-          background: 'linear-gradient(135deg, #f9ce34, #ee2a7b, #6228d7)',
-          padding: '2px', flexShrink: 0,
-        }}>
-          <img
-            src="/logo.jpeg"
-            alt="softoi.store"
-            style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover', display: 'block', background: '#fff' }}
-          />
-        </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontWeight: 700, fontSize: '0.75rem', color: '#1A0A05', lineHeight: 1.2 }}>
-            {loading ? 'softoi.store' : (postData?.author || 'softoi.store')}
-          </div>
-          <div style={{ fontSize: '0.6rem', color: '#C44569', fontWeight: 600 }}>@softoi.store</div>
-        </div>
-        {/* Instagram gradient icon */}
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-          <defs>
-            <linearGradient id={`ig-grad-${index}`} x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="#f9ce34" />
-              <stop offset="50%" stopColor="#ee2a7b" />
-              <stop offset="100%" stopColor="#6228d7" />
-            </linearGradient>
-          </defs>
-          <rect x="2" y="2" width="20" height="20" rx="5" ry="5" stroke={`url(#ig-grad-${index})`} />
-          <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" stroke={`url(#ig-grad-${index})`} />
-          <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" stroke={`url(#ig-grad-${index})`} />
-        </svg>
-      </div>
-
-      {/* Post image */}
-      <div style={{ width: '100%', aspectRatio: '1/1', overflow: 'hidden', background: '#fff5f8', position: 'relative', flexShrink: 0 }}>
-        {loading ? (
-          <div style={{ width: '100%', height: '100%', background: 'linear-gradient(135deg, #fde8f0, #fff0f4)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <motion.div
-              animate={{ opacity: [0.4, 1, 0.4] }}
-              transition={{ duration: 1.2, repeat: Infinity }}
-              style={{ width: 10, height: 10, borderRadius: '50%', background: 'rgba(196,69,105,0.4)' }}
-            />
-          </div>
-        ) : postData?.thumbnail ? (
-          <motion.img
-            src={postData.thumbnail}
-            alt="Instagram post"
-            whileHover={{ scale: 1.06 }}
-            transition={{ duration: 0.4 }}
-            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-          />
-        ) : (
-          /* Fallback when no thumbnail — show branded placeholder */
-          <div style={{
-            width: '100%', height: '100%',
-            background: 'linear-gradient(135deg, #fde8f0, #fff0f4)',
-            display: 'flex', flexDirection: 'column',
-            alignItems: 'center', justifyContent: 'center', gap: 8,
-          }}>
-            <Instagram size={32} color="rgba(196,69,105,0.4)" />
-            <span style={{ fontSize: '0.65rem', color: '#C44569', fontWeight: 600 }}>softoi.store</span>
-          </div>
-        )}
-        {/* subtle bottom fade */}
-        <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 36, background: 'linear-gradient(to top, rgba(26,10,5,0.38), transparent)', pointerEvents: 'none' }} />
-      </div>
-
-      {/* Caption + CTA */}
-      <div style={{ padding: '10px 14px 14px', flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 8 }}>
-        {postData?.title ? (
-          <p style={{
-            fontSize: '0.72rem', color: '#3D1A25', lineHeight: 1.55,
-            margin: 0,
-            display: '-webkit-box', WebkitBoxOrient: 'vertical',
-            WebkitLineClamp: 3, overflow: 'hidden',
-          }}>
-            {postData.title}
-          </p>
-        ) : (
-          <p style={{ fontSize: '0.72rem', color: '#9E7B6C', margin: 0, fontStyle: 'italic' }}>
-            Tap to view on Instagram ✨
-          </p>
-        )}
-        <div style={{
-          display: 'inline-flex', alignItems: 'center', gap: 4,
-          fontSize: '0.65rem', fontWeight: 700, color: '#C44569',
-          background: 'rgba(196,69,105,0.08)', padding: '4px 10px',
-          borderRadius: '50px', width: 'fit-content',
-        }}>
-          View post <ArrowRight size={10} />
-        </div>
-      </div>
-    </motion.a>
+    </motion.div>
   )
 }
-
 // ─── Home Page ────────────────────────────────────────────────────────────────
 export default function Home() {
   const [featured, setFeatured] = useState([])
@@ -1198,8 +1081,12 @@ export default function Home() {
                   animationDuration: `${Math.max(20, INSTA_POST_URLS.length * 6)}s`,
                 }}
               >
-                {[...INSTA_POST_URLS, ...INSTA_POST_URLS, ...INSTA_POST_URLS, ...INSTA_POST_URLS].map((url, i) => (
-                  <InstagramCard key={`${url}-${i}`} url={url} index={i % INSTA_POST_URLS.length} />
+                {INSTA_POST_URLS.map((url,i)=>(
+                  <InstagramCard
+                    key={i}
+                    url={url}
+                    index={i}
+                  />
                 ))}
               </div>
             </div>
