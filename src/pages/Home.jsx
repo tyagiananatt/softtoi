@@ -1046,6 +1046,7 @@ export default function Home() {
 
       {/* ═══ INSTAGRAM FEED ═══ */}
      {/* ═══ INSTAGRAM FEED ═══ */}
+{/* ═══ INSTAGRAM FEED ═══ */}
 <section aria-label="Softoi on Instagram" style={{ padding: 'clamp(48px, 8vw, 96px) 0', background: 'linear-gradient(180deg, #fffaf5 0%, #fff5f8 100%)' }}>
   <div className="page-container">
     <AnimatedSection>
