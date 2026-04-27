@@ -1045,7 +1045,7 @@ export default function Home() {
       </section>
 
       {/* ═══ INSTAGRAM FEED ═══ */}
-      {/* ═══ INSTAGRAM FEED ═══ */}
+     {/* ═══ INSTAGRAM FEED ═══ */}
 <section aria-label="Softoi on Instagram" style={{ padding: 'clamp(48px, 8vw, 96px) 0', background: 'linear-gradient(180deg, #fffaf5 0%, #fff5f8 100%)' }}>
   <div className="page-container">
     <AnimatedSection>
@@ -1070,39 +1070,40 @@ export default function Home() {
       </div>
     </AnimatedSection>
 
-    {/* Marquee — identical structure to reviews section */}
-    <div className="marquee-outer">
-      <div
-        className="marquee-track"
-        style={{
-          gap: '20px',
-          alignItems: 'stretch',
-          // Speed scales with number of posts — same formula as reviews
-          animationDuration: `${Math.max(20, INSTA_POST_URLS.length * 6)}s`,
-        }}
-      >
-        {/* Quadruple-duplicate for seamless loop — same as reviews */}
-        {[...INSTA_POST_URLS, ...INSTA_POST_URLS, ...INSTA_POST_URLS, ...INSTA_POST_URLS].map((url, i) => (
-          <InstagramCard key={`${url}-${i}`} url={url} index={i % INSTA_POST_URLS.length} />
-        ))}
-      </div>
-    </div>
+    {INSTA_POST_URLS.length > 0 && (
+      <>
+        <div className="marquee-outer">
+          <div
+            className="marquee-track"
+            style={{
+              gap: '20px',
+              alignItems: 'stretch',
+              animationDuration: `${Math.max(20, INSTA_POST_URLS.length * 6)}s`,
+            }}
+          >
+            {[...INSTA_POST_URLS, ...INSTA_POST_URLS, ...INSTA_POST_URLS, ...INSTA_POST_URLS].map((url, i) => (
+              <InstagramCard key={`${url}-${i}`} url={url} index={i % INSTA_POST_URLS.length} />
+            ))}
+          </div>
+        </div>
 
-    <AnimatedSection>
-      <div style={{ textAlign: 'center', marginTop: 'clamp(28px, 5vw, 44px)' }}>
-        
-          href="https://instagram.com/softoi.store"
-          target="_blank"
-          rel="noreferrer noopener"
-          style={{ textDecoration: 'none' }}
-          aria-label="Follow Softoi on Instagram"
-        >
-          <button className="btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-            <Instagram size={15} aria-hidden="true" /> Follow on Instagram
-          </button>
-        </a>
-      </div>
-    </AnimatedSection>
+        <AnimatedSection>
+          <div style={{ textAlign: 'center', marginTop: 'clamp(28px, 5vw, 44px)' }}>
+            
+              href="https://instagram.com/softoi.store"
+              target="_blank"
+              rel="noreferrer noopener"
+              style={{ textDecoration: 'none' }}
+              aria-label="Follow Softoi on Instagram"
+            >
+              <button className="btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                <Instagram size={15} aria-hidden="true" /> Follow on Instagram
+              </button>
+            </a>
+          </div>
+        </AnimatedSection>
+      </>
+    )}
   </div>
 </section>
       {/* ═══ CTA BANNER ═══ */}
