@@ -1,17 +1,12 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from 'framer-motion'
-import { Sparkles, ShoppingBag, BookOpen, Gift, Truck, Shield, Star, Quote, ArrowRight, Heart, Zap } from 'lucide-react'
+import { Sparkles, ShoppingBag, BookOpen, Gift, Truck, Shield, Star, ArrowRight, Heart, Zap, Instagram } from 'lucide-react'
 import AnimatedSection from '../components/AnimatedSection'
 import ProductCard from '../components/ProductCard'
 import CategoryCard from '../components/CategoryCard'
 import LoadingQuote from '../components/LoadingQuote'
 import api from '../utils/api'
-
-// Curated Unsplash images for hero
-const HERO_IMG_1 = 'https://images.unsplash.com/photo-1563396983906-b3795482a59a?auto=format&fit=crop&w=460&h=580&q=90'
-const HERO_IMG_2 = 'https://images.unsplash.com/photo-1490750967868-88df5691cc43?auto=format&fit=crop&w=380&h=380&q=90'
-const HERO_IMG_3 = 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&w=300&h=300&q=90'
 
 const FEATURES = [
   {
@@ -38,13 +33,23 @@ const TESTIMONIALS = [
     name: 'Priya Sharma', role: 'Verified Customer', stars: 5,
   },
   {
-    text: 'My daughter absolutely loves the teddy bear. The quality is incredible and it\'s so soft! Will definitely be ordering again for every occasion.',
+    text: "My daughter absolutely loves the teddy bear. The quality is incredible and it's so soft! Will definitely be ordering again for every occasion.",
     name: 'Neha Gupta', role: 'Verified Customer', stars: 5,
   },
   {
     text: 'Ordered the cherry blossom branch for my office and everyone keeps asking where I got it. So unique and beautifully made. Totally worth every rupee!',
     name: 'Anjali Patel', role: 'Verified Customer', stars: 5,
   },
+]
+
+// ─── Add / remove URLs here — everything else adapts automatically ────────────
+const INSTA_POST_URLS = [
+  'https://www.instagram.com/p/DXm13kbko2L/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==',
+  'https://www.instagram.com/p/DXm13kbko2L/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==',
+  'https://www.instagram.com/p/DXm13kbko2L/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==',
+  'https://www.instagram.com/p/DXm13kbko2L/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==',
+  'https://www.instagram.com/p/DXm13kbko2L/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==',
+  'https://www.instagram.com/p/DXm13kbko2L/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==',
 ]
 
 // Particle data — generated once
@@ -61,6 +66,7 @@ const PARTICLES = Array.from({ length: 18 }, (_, i) => ({
   orbitOffset: (Math.PI * 2 * i) / 18,
 }))
 
+// ─── Logo Showcase ────────────────────────────────────────────────────────────
 function LogoShowcase() {
   const containerRef = useRef(null)
   const mouseX = useMotionValue(0)
@@ -173,6 +179,7 @@ function LogoShowcase() {
           pointerEvents: 'none',
         }}
       />
+
       {PARTICLES.slice(0, 8).map((p) => (
         <motion.div
           key={p.id}
@@ -203,6 +210,7 @@ function LogoShowcase() {
           />
         </motion.div>
       ))}
+
       {PARTICLES.slice(8).map(p => (
         <motion.div
           key={p.id}
@@ -222,6 +230,7 @@ function LogoShowcase() {
           }}
         />
       ))}
+
       <motion.div
         style={{
           position: 'absolute', top: '50%', left: '50%',
@@ -234,6 +243,7 @@ function LogoShowcase() {
           pointerEvents: 'none', zIndex: 3,
         }}
       />
+
       <motion.div
         style={{
           position: 'relative', zIndex: 5,
@@ -271,6 +281,7 @@ function LogoShowcase() {
           }}
         />
       </motion.div>
+
       <AnimatePresence>
         {ripples.map(rp => (
           <motion.div
@@ -291,6 +302,7 @@ function LogoShowcase() {
   )
 }
 
+// ─── New Arrivals Slider ──────────────────────────────────────────────────────
 const SLIDE_WIDTH = 280
 const SLIDE_GAP = 20
 
@@ -485,7 +497,7 @@ function NewArrivalsSlider({ products }) {
   )
 }
 
-// ─── Review Card — Neumorphic + Animated ─────────────────────────────────────
+// ─── Review Card ──────────────────────────────────────────────────────────────
 function ReviewCard({ review: r, index = 0 }) {
   const [expanded, setExpanded] = useState(false)
   const [hovered, setHovered] = useState(false)
@@ -513,7 +525,6 @@ function ReviewCard({ review: r, index = 0 }) {
         width: '260px',
       }}
     >
-      {/* Animated gradient top bar */}
       <motion.div
         animate={{ backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] }}
         transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
@@ -525,7 +536,6 @@ function ReviewCard({ review: r, index = 0 }) {
       />
 
       <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', flex: 1 }}>
-        {/* Stars + rating */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '10px' }}>
           {[1,2,3,4,5].map(s => (
             <motion.div key={s} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: index * 0.08 + s * 0.05, type: 'spring', stiffness: 400 }}>
@@ -535,14 +545,12 @@ function ReviewCard({ review: r, index = 0 }) {
           <span style={{ marginLeft: '4px', fontWeight: 800, fontSize: '0.72rem', color: '#F59E0B', background: 'rgba(245,158,11,0.1)', padding: '1px 7px', borderRadius: '50px' }}>{r.rating}.0</span>
         </div>
 
-        {/* Product tag */}
         {r.productName && (
           <motion.div whileHover={{ scale: 1.04 }} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'linear-gradient(135deg,rgba(196,69,105,0.12),rgba(232,96,123,0.08))', color: '#C44569', fontSize: '0.65rem', fontWeight: 800, padding: '4px 10px', borderRadius: '50px', marginBottom: '10px', width: 'fit-content', boxShadow: 'inset 1px 1px 3px rgba(255,255,255,0.8), inset -1px -1px 3px rgba(196,69,105,0.1)' }}>
             ✦ {r.productName}
           </motion.div>
         )}
 
-        {/* Comment */}
         <div style={{ marginBottom: '12px', flex: 1 }}>
           <p style={{ color: '#4A2E20', lineHeight: 1.65, fontSize: '0.85rem', margin: 0, fontStyle: 'italic', display: '-webkit-box', WebkitBoxOrient: 'vertical', overflow: 'hidden', WebkitLineClamp: expanded ? 'unset' : 2 }}>
             "{r.comment}"
@@ -554,7 +562,6 @@ function ReviewCard({ review: r, index = 0 }) {
           )}
         </div>
 
-        {/* Review image — neumorphic inset frame */}
         <div style={{
           width: '100%', aspectRatio: '1/1', borderRadius: '16px', overflow: 'hidden', marginBottom: '12px',
           boxShadow: 'inset 3px 3px 8px rgba(196,69,105,0.15), inset -2px -2px 6px rgba(255,255,255,0.9)',
@@ -571,7 +578,6 @@ function ReviewCard({ review: r, index = 0 }) {
           )}
         </div>
 
-        {/* Footer */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingTop: '10px', borderTop: '1px solid rgba(238,214,196,0.5)', marginTop: 'auto' }}>
           <div style={{
             width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
@@ -595,6 +601,92 @@ function ReviewCard({ review: r, index = 0 }) {
   )
 }
 
+// ─── Instagram Card ───────────────────────────────────────────────────────────
+function InstagramCard({ url, index }) {
+  const [hovered, setHovered] = useState(false)
+
+  return (
+    <motion.a
+      href={url}
+      target="_blank"
+      rel="noreferrer noopener"
+      aria-label="View post on Instagram"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: index * 0.08 }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '220px',
+        height: '220px',
+        borderRadius: '20px',
+        background: 'linear-gradient(145deg, #fdf0f4, #fff5f8)',
+        border: '1px solid rgba(196,69,105,0.13)',
+        boxShadow: hovered
+          ? '8px 8px 20px rgba(196,69,105,0.18), -4px -4px 14px rgba(255,255,255,0.95)'
+          : '6px 6px 16px rgba(196,69,105,0.1), -4px -4px 12px rgba(255,255,255,0.9)',
+        transform: hovered ? 'translateY(-6px) scale(1.03)' : 'translateY(0) scale(1)',
+        transition: 'box-shadow 0.35s ease, transform 0.35s ease',
+        textDecoration: 'none',
+        flexShrink: 0,
+        cursor: 'pointer',
+        overflow: 'hidden',
+        position: 'relative',
+      }}
+    >
+      {/* Animated gradient top bar — matches ReviewCard */}
+      <motion.div
+        animate={{ backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] }}
+        transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
+        style={{
+          position: 'absolute',
+          top: 0, left: 0, right: 0,
+          height: '4px',
+          background: 'linear-gradient(90deg, #C44569, #E8607B, #D4956B, #F8C8DC, #C44569)',
+          backgroundSize: '200% 100%',
+        }}
+      />
+
+      {/* Instagram gradient icon */}
+      <div style={{
+        width: 56, height: 56, borderRadius: '16px',
+        background: 'linear-gradient(135deg, #f9ce34, #ee2a7b, #6228d7)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        marginBottom: 14,
+        boxShadow: '0 6px 20px rgba(238,42,123,0.35)',
+      }}>
+        <Instagram size={28} color="#fff" />
+      </div>
+
+      <div style={{
+        fontWeight: 700,
+        fontSize: '0.85rem',
+        color: '#1A0A05',
+        marginBottom: 4,
+      }}>
+        @softoi.store
+      </div>
+
+      <div style={{
+        fontSize: '0.7rem',
+        color: '#C44569',
+        fontWeight: 600,
+        letterSpacing: '0.04em',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 4,
+      }}>
+        View on Instagram <ArrowRight size={11} />
+      </div>
+    </motion.a>
+  )
+}
+
+// ─── Home Page ────────────────────────────────────────────────────────────────
 export default function Home() {
   const [featured, setFeatured] = useState([])
   const [categories, setCategories] = useState([])
@@ -618,7 +710,6 @@ export default function Home() {
       .finally(() => setLoading(false))
   }, [])
 
-  // Fetch recent reviews directly — all products, latest first
   useEffect(() => {
     api.get('/reviews/recent')
       .then(r => setRecentReviews(r.data))
@@ -628,6 +719,7 @@ export default function Home() {
 
   return (
     <div>
+
       {/* ═══ HERO ═══ */}
       <section style={{
         minHeight: '100vh',
@@ -762,15 +854,8 @@ export default function Home() {
                   '/strip_logos/sustainable.png',
                   '/strip_logos/image.png',
                 ].map((src) => (
-                  <div
-                    key={src + dupIdx}
-                    style={{ padding: '0 44px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
-                  >
-                    <img
-                      src={src}
-                      alt=""
-                      style={{ height: 70, width: 'auto', objectFit: 'contain', display: 'block' }}
-                    />
+                  <div key={src + dupIdx} style={{ padding: '0 44px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <img src={src} alt="" style={{ height: 70, width: 'auto', objectFit: 'contain', display: 'block' }} />
                   </div>
                 ))}
               </div>
@@ -790,7 +875,7 @@ export default function Home() {
                   Featured Products
                 </h2>
                 <p style={{ color: '#8B6655', fontSize: '1rem', maxWidth: '440px', margin: '3px auto 0', lineHeight: 1.7 }}>
-                  Explore our <a href="/products">handmade Unique</a> products right now.
+                  Explore our <a href="/products" style={{ color: '#C44569' }}>handmade unique</a> products right now.
                 </p>
               </div>
               <Link to="/products" style={{ textDecoration: 'none' }}>
@@ -835,7 +920,7 @@ export default function Home() {
               : apiError
                 ? <p style={{ color: '#C44569', gridColumn: '1/-1', textAlign: 'center', padding: '40px 0' }}>{apiError}</p>
                 : categories
-                    .filter(cat => ['keychains', 'soft-toys', 'flowers','cute-vault-1775019784062'].includes(cat.slug))
+                    .filter(cat => ['keychains', 'soft-toys', 'flowers', 'cute-vault-1775019784062'].includes(cat.slug))
                     .map((cat, i) => <CategoryCard key={cat._id} category={cat} index={i} />)
             }
           </div>
@@ -893,7 +978,6 @@ export default function Home() {
             </div>
           ) : recentReviews.length === 0 ? null : (
             <>
-              {/* Infinite marquee of review cards */}
               <div className="marquee-outer" style={{ paddingBottom: '8px' }}>
                 <div className="marquee-track" style={{ gap: '20px', alignItems: 'stretch', animationDuration: `${Math.max(20, recentReviews.length * 6)}s` }}>
                   {[...recentReviews, ...recentReviews, ...recentReviews, ...recentReviews].map((r, i) => (
@@ -901,12 +985,11 @@ export default function Home() {
                   ))}
                 </div>
               </div>
-
               <AnimatedSection>
                 <div style={{ textAlign: 'center', marginTop: '44px' }}>
                   <Link to="/products" style={{ textDecoration: 'none' }}>
                     <button className="btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-                      Shop & Leave a Review <ArrowRight size={16} />
+                      Shop &amp; Leave a Review <ArrowRight size={16} />
                     </button>
                   </Link>
                 </div>
@@ -916,98 +999,139 @@ export default function Home() {
         </div>
       </section>
 
-{/* ═══ VIDEO SHOWCASE ═══ */}
-<section style={{ padding: '0', background: '#1A0A05', position: 'relative', overflow: 'hidden' }}>
-  {/* Video fills full width */}
-  <video
-    src="https://res.cloudinary.com/dpt4zxb6j/video/upload/v1777208689/crochet_video_ceptwa.mp4"
-    autoPlay
-    muted
-    loop
-    playsInline
-    style={{
-      width: '100%',
-      display: 'block',
-      maxHeight: '100vh',
-      minHeight: '420px',
-      objectFit: 'cover',
-    }}
-  />
-
-  {/* Dark overlay for text legibility */}
-  <div style={{
-    position: 'absolute', inset: 0,
-    background: 'linear-gradient(to bottom, rgba(26,10,5,0.18) 0%, rgba(26,10,5,0.55) 60%, rgba(26,10,5,0.82) 100%)',
-    pointerEvents: 'none',
-  }} />
-
-  {/* Text overlay */}
-  <div style={{
-    position: 'absolute', bottom: 0, left: 0, right: 0,
-    padding: 'clamp(28px, 6vw, 72px) clamp(20px, 5vw, 80px)',
-    zIndex: 2,
-  }}>
-    <div style={{
-      maxWidth: '680px',
-    }}>
-      <div style={{
-        display: 'inline-flex', alignItems: 'center', gap: '7px',
-        padding: '6px 14px', borderRadius: '50px', marginBottom: 'clamp(10px, 2vw, 18px)',
-        background: 'rgba(196,69,105,0.28)',
-        border: '1px solid rgba(248,200,220,0.3)',
-      }}>
-        <Sparkles size={12} color="#F8C8DC" />
-        <span style={{ fontSize: '0.68rem', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#F8C8DC' }}>
-          Behind the Magic
-        </span>
-      </div>
-
-      <h2 style={{
-        fontSize: 'clamp(1.75rem, 5vw, 3.25rem)',
-        fontWeight: 900, color: '#fff',
-        letterSpacing: '-0.028em', lineHeight: 1.08,
-        marginBottom: 'clamp(10px, 2vw, 18px)',
-      }}>
-        Watch Us{' '}
-        <span style={{
-          background: 'linear-gradient(135deg, #F8C8DC 10%, #E8607B 60%, #D4956B 100%)',
-          WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+      {/* ═══ VIDEO SHOWCASE ═══ */}
+      <section style={{ padding: '0', background: '#1A0A05', position: 'relative', overflow: 'hidden' }}>
+        <video
+          src="https://res.cloudinary.com/dpt4zxb6j/video/upload/v1777208689/crochet_video_ceptwa.mp4"
+          autoPlay muted loop playsInline
+          style={{ width: '100%', display: 'block', maxHeight: '100vh', minHeight: '420px', objectFit: 'cover' }}
+        />
+        <div style={{
+          position: 'absolute', inset: 0,
+          background: 'linear-gradient(to bottom, rgba(26,10,5,0.18) 0%, rgba(26,10,5,0.55) 60%, rgba(26,10,5,0.82) 100%)',
+          pointerEvents: 'none',
+        }} />
+        <div style={{
+          position: 'absolute', bottom: 0, left: 0, right: 0,
+          padding: 'clamp(28px, 6vw, 72px) clamp(20px, 5vw, 80px)',
+          zIndex: 2,
         }}>
-          Create
-        </span>
-      </h2>
+          <div style={{ maxWidth: '680px' }}>
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: '7px',
+              padding: '6px 14px', borderRadius: '50px', marginBottom: 'clamp(10px, 2vw, 18px)',
+              background: 'rgba(196,69,105,0.28)',
+              border: '1px solid rgba(248,200,220,0.3)',
+            }}>
+              <Sparkles size={12} color="#F8C8DC" />
+              <span style={{ fontSize: '0.68rem', fontWeight: 800, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#F8C8DC' }}>
+                Behind the Magic
+              </span>
+            </div>
+            <h2 style={{
+              fontSize: 'clamp(1.75rem, 5vw, 3.25rem)',
+              fontWeight: 900, color: '#fff',
+              letterSpacing: '-0.028em', lineHeight: 1.08,
+              marginBottom: 'clamp(10px, 2vw, 18px)',
+            }}>
+              Watch Us{' '}
+              <span style={{
+                background: 'linear-gradient(135deg, #F8C8DC 10%, #E8607B 60%, #D4956B 100%)',
+                WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text',
+              }}>
+                Create
+              </span>
+            </h2>
+            <p style={{
+              fontSize: 'clamp(0.85rem, 2vw, 1.05rem)',
+              color: 'rgba(248,200,220,0.8)',
+              lineHeight: 1.72, maxWidth: '480px',
+              marginBottom: 'clamp(18px, 3vw, 32px)',
+              fontWeight: 400,
+            }}>
+              Every product is handcrafted with love — watch the care and detail that goes into each piece we make.
+            </p>
+            <Link to="/products" style={{ textDecoration: 'none' }}>
+              <button
+                style={{
+                  background: 'linear-gradient(135deg, #C44569, #E8607B)',
+                  color: '#fff', padding: 'clamp(11px, 2vw, 15px) clamp(22px, 3vw, 32px)',
+                  borderRadius: '50px', fontWeight: 700,
+                  fontSize: 'clamp(0.8rem, 1.8vw, 0.9375rem)',
+                  border: 'none', cursor: 'pointer',
+                  display: 'inline-flex', alignItems: 'center', gap: '8px',
+                  boxShadow: '0 8px 28px rgba(196,69,105,0.5)',
+                  transition: 'all 0.25s',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 14px 36px rgba(196,69,105,0.6)' }}
+                onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 8px 28px rgba(196,69,105,0.5)' }}
+              >
+                <ShoppingBag size={16} /> Shop Handmade
+              </button>
+            </Link>
+          </div>
+        </div>
+      </section>
 
-      <p style={{
-        fontSize: 'clamp(0.85rem, 2vw, 1.05rem)',
-        color: 'rgba(248,200,220,0.8)',
-        lineHeight: 1.72, maxWidth: '480px',
-        marginBottom: 'clamp(18px, 3vw, 32px)',
-        fontWeight: 400,
-      }}>
-        Every product is handcrafted with love — watch the care and detail that goes into each piece we make.
-      </p>
+      {/* ═══ INSTAGRAM FEED ═══ */}
+      {INSTA_POST_URLS.length > 0 && (
+        <section style={{ padding: 'clamp(48px, 8vw, 96px) 0', background: 'linear-gradient(180deg, #fffaf5 0%, #fff5f8 100%)' }}>
+          <div className="page-container">
+            <AnimatedSection>
+              <div style={{ textAlign: 'center', marginBottom: 'clamp(32px, 5vw, 56px)' }}>
+                <div className="section-label" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                  <Instagram size={12} color="#C44569" /> As Seen On Instagram
+                </div>
+                <h2 style={{ fontSize: 'clamp(1.6rem, 3.5vw, 2.75rem)', fontWeight: 900, color: '#1A0A05', letterSpacing: '-0.025em' }}>
+                  Follow the Love
+                </h2>
+                <p style={{ color: '#8B6655', fontSize: 'clamp(0.875rem, 2vw, 1rem)', maxWidth: '440px', margin: '14px auto 0', lineHeight: 1.7 }}>
+                  Real posts from our feed. Tag us{' '}
+                  <a
+                    href="https://instagram.com/softoi.store"
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    style={{ color: '#C44569', fontWeight: 700, textDecoration: 'none' }}
+                  >
+                    @softoi.store
+                  </a>
+                </p>
+              </div>
+            </AnimatedSection>
 
-      <Link to="/products" style={{ textDecoration: 'none' }}>
-        <button
-          style={{
-            background: 'linear-gradient(135deg, #C44569, #E8607B)',
-            color: '#fff', padding: 'clamp(11px, 2vw, 15px) clamp(22px, 3vw, 32px)',
-            borderRadius: '50px', fontWeight: 700,
-            fontSize: 'clamp(0.8rem, 1.8vw, 0.9375rem)',
-            border: 'none', cursor: 'pointer',
-            display: 'inline-flex', alignItems: 'center', gap: '8px',
-            boxShadow: '0 8px 28px rgba(196,69,105,0.5)',
-            transition: 'all 0.25s',
-          }}
-          onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 14px 36px rgba(196,69,105,0.6)' }}
-          onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 8px 28px rgba(196,69,105,0.5)' }}
-        >
-          <ShoppingBag size={16} /> Shop Handmade
-        </button>
-      </Link>
-    </div>
-  </div>
-</section>
+            <div className="marquee-outer">
+              <div
+                className="marquee-track"
+                style={{
+                  gap: '20px',
+                  alignItems: 'stretch',
+                  animationDuration: `${Math.max(20, INSTA_POST_URLS.length * 6)}s`,
+                }}
+              >
+                {[...INSTA_POST_URLS, ...INSTA_POST_URLS, ...INSTA_POST_URLS, ...INSTA_POST_URLS].map((url, i) => (
+                  <InstagramCard key={`${url}-${i}`} url={url} index={i % INSTA_POST_URLS.length} />
+                ))}
+              </div>
+            </div>
+
+            <AnimatedSection>
+              <div style={{ textAlign: 'center', marginTop: 'clamp(28px, 5vw, 44px)' }}>
+                <a
+                  href="https://instagram.com/softoi.store"
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  style={{ textDecoration: 'none' }}
+                  aria-label="Follow Softoi on Instagram"
+                >
+                  <button className="btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                    <Instagram size={15} /> Follow on Instagram
+                  </button>
+                </a>
+              </div>
+            </AnimatedSection>
+          </div>
+        </section>
+      )}
 
       {/* ═══ TESTIMONIALS ═══ */}
       <section style={{ padding: '96px 0', background: 'linear-gradient(180deg, #fffaf5 0%, #fff5f8 100%)' }}>
@@ -1124,6 +1248,7 @@ export default function Home() {
           </AnimatedSection>
         </div>
       </section>
+
     </div>
   )
 }
