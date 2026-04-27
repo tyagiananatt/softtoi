@@ -604,32 +604,29 @@ function ReviewCard({ review: r, index = 0 }) {
 // ─── Instagram Card ───────────────────────────────────────────────────────────
 // ─── Instagram Card ───────────────────────────────────────────────────────────
 function InstagramCard({ url, index }) {
-  const [postData, setPostData] = useState(null)
-  const [loading, setLoading] = useState(true)
-
   useEffect(() => {
-    fetch(
-      `https://noembed.com/embed?url=${encodeURIComponent(url)}`
+    if (window.instgrm) {
+      window.instgrm.Embeds.process()
+      return
+    }
+
+    const existing = document.getElementById(
+      'instagram-embed-script'
     )
-      .then((r) => r.json())
-      .then((data) => {
-        setPostData({
-          thumbnail: data.thumbnail_url,
-          author: data.author_name || 'softoi.store',
-          caption:
-            data.title ||
-            'Handmade magic in every stitch ✨',
-        })
-      })
-      .catch(() => {
-        setPostData({
-          thumbnail: '/insta-fallback.jpg',
-          author: 'softoi.store',
-          caption:
-            'Handmade magic in every stitch ✨',
-        })
-      })
-      .finally(() => setLoading(false))
+
+    if (!existing) {
+      const script = document.createElement('script')
+      script.id = 'instagram-embed-script'
+      script.src =
+        'https://www.instagram.com/embed.js'
+      script.async = true
+
+      script.onload = () => {
+        window.instgrm?.Embeds.process()
+      }
+
+      document.body.appendChild(script)
+    }
   }, [url])
 
   return (
@@ -640,89 +637,66 @@ function InstagramCard({ url, index }) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{
-        duration: 0.5,
-        delay: index * 0.08,
+        duration: .5,
+        delay: index * .08
       }}
       style={{
-        display: 'flex',
-        flexDirection: 'column',
-        width: 'min(280px,85vw)',
-        borderRadius: '24px',
-        overflow: 'hidden',
-        background: '#fff',
-        textDecoration: 'none',
-        border:
-          '1px solid rgba(196,69,105,.08)',
+        width: 'min(340px,90vw)',
+        background:'#fff',
+        borderRadius:'24px',
+        overflow:'hidden',
+        textDecoration:'none',
+        flexShrink:0,
         boxShadow:
           '0 8px 24px rgba(196,69,105,.12)',
-        flexShrink: 0,
-        transition:
-          'transform .25s ease, box-shadow .25s ease',
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform =
-          'translateY(-4px)'
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform =
-          'translateY(0)'
+        border:
+          '1px solid rgba(196,69,105,.08)'
       }}
     >
-      {/* top profile row */}
+
+      {/* profile header */}
       <div
         style={{
-          padding: '12px 14px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: '10px',
+          padding:'12px 16px',
+          display:'flex',
+          justifyContent:'space-between',
+          alignItems:'center'
         }}
       >
         <div
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px',
-            minWidth: 0,
+            display:'flex',
+            gap:'10px',
+            alignItems:'center'
           }}
         >
           <img
             src="/logo.jpeg"
             alt="Softoi"
-            loading="lazy"
             style={{
-              width: 36,
-              height: 36,
-              borderRadius: '50%',
-              objectFit: 'cover',
-              flexShrink: 0,
+              width:36,
+              height:36,
+              borderRadius:'50%',
+              objectFit:'cover'
             }}
           />
 
-          <div
-            style={{
-              minWidth: 0,
-            }}
-          >
+          <div>
             <div
               style={{
-                fontWeight: 800,
-                fontSize: '.8rem',
-                color: '#1A0A05',
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
+                fontWeight:800,
+                fontSize:'.8rem',
+                color:'#1A0A05'
               }}
             >
-              {postData?.author ||
-                'softoi.store'}
+              softoi.store
             </div>
 
             <div
               style={{
-                fontSize: '.68rem',
-                color: '#C44569',
-                fontWeight: 700,
+                fontSize:'.68rem',
+                color:'#C44569',
+                fontWeight:700
               }}
             >
               View Profile
@@ -736,69 +710,29 @@ function InstagramCard({ url, index }) {
         />
       </div>
 
-      {/* 1:1 post image */}
+
+      {/* URL auto-renders post */}
       <div
         style={{
-          aspectRatio: '1 / 1',
-          overflow: 'hidden',
-          background: '#fff5f8',
+          background:'#fff',
+          padding:'8px'
         }}
       >
-        {loading ? (
-          <div
-            style={{
-              height: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#C44569',
-              fontWeight: 700,
-              fontSize: '.8rem',
-            }}
-          >
-            Loading...
-          </div>
-        ) : (
-          <img
-            src={postData?.thumbnail}
-            alt="Instagram post"
-            loading="lazy"
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              display: 'block',
-            }}
-          />
-        )}
+        <blockquote
+          className="instagram-media"
+          data-instgrm-permalink={url}
+          data-instgrm-version="14"
+          style={{
+            margin:0,
+            maxWidth:'100%',
+            minWidth:'100%'
+          }}
+        />
       </div>
 
-      {/* caption */}
-      <div
-        style={{
-          padding: '14px 16px 18px',
-        }}
-      >
-        <p
-          style={{
-            margin: 0,
-            fontSize: '.82rem',
-            lineHeight: 1.6,
-            color: '#4A2E20',
-            display: '-webkit-box',
-            WebkitLineClamp: 3,
-            WebkitBoxOrient:
-              'vertical',
-            overflow: 'hidden',
-          }}
-        >
-          {postData?.caption}
-        </p>
-      </div>
     </motion.a>
   )
-}
-// ─── Home Page ────────────────────────────────────────────────────────────────
+}// ─── Home Page ────────────────────────────────────────────────────────────────
 export default function Home() {
   const [featured, setFeatured] = useState([])
   const [categories, setCategories] = useState([])
