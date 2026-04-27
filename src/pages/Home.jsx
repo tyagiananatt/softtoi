@@ -45,10 +45,10 @@ const TESTIMONIALS = [
 // ─── Add / remove URLs here — everything else adapts automatically ────────────
 const INSTA_POST_URLS = [
   'https://www.instagram.com/p/DXm13kbko2L/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==',
-  'https://www.instagram.com/p/DXm13kbko2L/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==',
-  'https://www.instagram.com/p/DXm13kbko2L/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==',
-  'https://www.instagram.com/p/DXm13kbko2L/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==',
-  'https://www.instagram.com/p/DXm13kbko2L/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==',
+  'https://www.instagram.com/p/DXmziThEl3e/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==',
+  'https://www.instagram.com/p/DXbD1G0kvbV/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==',
+  'https://www.instagram.com/reel/DXU41OHkuBJ/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==',
+  'https://www.instagram.com/reel/DWR5QOCErjO/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==',
   'https://www.instagram.com/p/DXm13kbko2L/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==',
 ]
 
