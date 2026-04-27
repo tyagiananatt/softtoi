@@ -43,14 +43,14 @@ const TESTIMONIALS = [
 ]
 
 // ─── Add / remove URLs here — everything else adapts automatically ────────────
-const INSTA_POST_URLS = [
+/*const INSTA_POST_URLS = [
   'https://www.instagram.com/p/DXm13kbko2L/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==',
   'https://www.instagram.com/p/DXmziThEl3e/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==',
   'https://www.instagram.com/p/DXbD1G0kvbV/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==',
   'https://www.instagram.com/reel/DXU41OHkuBJ/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==',
   'https://www.instagram.com/reel/DWR5QOCErjO/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==',
   'https://www.instagram.com/p/DXm13kbko2L/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==',
-]
+]*/
 
 // Particle data — generated once
 const PARTICLES = Array.from({ length: 18 }, (_, i) => ({
@@ -603,7 +603,7 @@ function ReviewCard({ review: r, index = 0 }) {
 
 // ─── Instagram Card ───────────────────────────────────────────────────────────
 // ─── Instagram Card ───────────────────────────────────────────────────────────
-function InstagramCard({ url, index }) {
+/*function InstagramCard({ url, index }) {
   useEffect(() => {
     if (window.instgrm) {
       window.instgrm.Embeds.process()
@@ -654,7 +654,7 @@ function InstagramCard({ url, index }) {
       }}
     >
 
-      {/* profile header */}
+      
       <div
         style={{
           padding:'12px 16px',
@@ -711,7 +711,7 @@ function InstagramCard({ url, index }) {
       </div>
 
 
-      {/* URL auto-renders post */}
+      
       <div
         style={{
           background:'#fff',
@@ -732,7 +732,8 @@ function InstagramCard({ url, index }) {
 
     </motion.a>
   )
-}// ─── Home Page ────────────────────────────────────────────────────────────────
+}*/
+// ─── Home Page ────────────────────────────────────────────────────────────────
 export default function Home() {
   const [featured, setFeatured] = useState([])
   const [categories, setCategories] = useState([])
@@ -1119,8 +1120,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ═══ INSTAGRAM FEED ═══ */}
-      {INSTA_POST_URLS.length > 0 && (
+    {/* ═══ INSTAGRAM FEED ═══ */}
+      {/*  {INSTA_POST_URLS.length > 0 && (
         <section style={{ padding: 'clamp(48px, 8vw, 96px) 0', background: 'linear-gradient(180deg, #fffaf5 0%, #fff5f8 100%)' }}>
           <div className="page-container">
             <AnimatedSection>
@@ -1181,7 +1182,7 @@ export default function Home() {
             </AnimatedSection>
           </div>
         </section>
-      )}
+      )}*/}
 
       {/* ═══ TESTIMONIALS ═══ */}
       <section style={{ padding: '96px 0', background: 'linear-gradient(180deg, #fffaf5 0%, #fff5f8 100%)' }}>
