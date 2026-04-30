@@ -38,7 +38,7 @@ export function CartProvider({ children }) {
   const itemCount = items.reduce((sum, i) => sum + i.quantity, 0)
   const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0)
   // LPU campus = free, outside LPU = ₹19 flat
-  const shippingCost = subtotal === 0 ? 0 : (isLPU ? 0 : 19)
+  const shippingCost = subtotal === 0 ? 0 : (isLPU ? 0 : 39)
   const total = subtotal + shippingCost
 
   return (

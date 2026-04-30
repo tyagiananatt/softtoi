@@ -194,7 +194,7 @@ export default function Checkout() {
                       >
                         <div style={{ fontSize: '1.1rem', marginBottom: '4px' }}>🚚</div>
                         <div style={{ fontWeight: 700, fontSize: '0.85rem', color: '#7A5C4E' }}>Outside LPU Campus</div>
-                        <div style={{ fontSize: '0.72rem', color: '#C44569', fontWeight: 600, marginTop: '2px' }}>₹19 Delivery Charge</div>
+                        <div style={{ fontSize: '0.72rem', color: '#C44569', fontWeight: 600, marginTop: '2px' }}>₹39 Delivery Charge</div>
                       </button>
                     </div>
 

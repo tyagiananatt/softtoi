@@ -91,7 +91,7 @@ export default function Cart() {
                 <div style={{ marginBottom: '20px', background: 'rgba(248,200,220,0.1)', borderRadius: '12px', padding: '12px' }}>
                   <div style={{ fontSize: '0.8rem', color: '#9E7B6C', display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <Truck size={14} color="#E8A0B8" />
-                    ₹19 delivery charge applies · <span style={{ color: '#16a34a', fontWeight: 600 }}>Free inside LPU campus</span>
+                    ₹39 delivery charge applies · <span style={{ color: '#16a34a', fontWeight: 600 }}>Free inside LPU campus</span>
                   </div>
                 </div>
               )}
