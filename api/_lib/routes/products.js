@@ -16,11 +16,11 @@ router.get('/', async (req, res) => {
     if (sort === 'price-asc') sortOption.price = 1;
     else if (sort === 'price-desc') sortOption.price = -1;
     else if (sort === 'rating') sortOption.rating = -1;
+    else if (sort === 'newest') sortOption.createdAt = -1;
     else sortOption.featured = -1;
 
-    // Exclude the large base64 `images` array from list responses to reduce memory usage.
-    // The full images array is returned only on the single-product endpoint below.
-    const products = await Product.find(query).sort(sortOption).select('-images -description -details').allowDiskUse(true).lean();
+    const limit = parseInt(req.query.limit) || 0;
+    const products = await Product.find(query).sort(sortOption).limit(limit).select('-images -description -details').allowDiskUse(true).lean();
     // For base64 images, replace with a lightweight URL endpoint; for URL images, keep as-is
     const base = `${req.protocol}://${req.get('host')}`;
     products.forEach(p => {
@@ -59,7 +59,14 @@ router.get('/:id', async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ message: 'Product not found' });
-    res.json(product);
+    // Fetch sibling variants if this product belongs to a variant group
+    let variants = [];
+    if (product.variantGroup) {
+      variants = await Product.find({ variantGroup: product.variantGroup })
+        .select('_id name variantLabel image price inStock')
+        .lean();
+    }
+    res.json({ ...product.toObject(), variants });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

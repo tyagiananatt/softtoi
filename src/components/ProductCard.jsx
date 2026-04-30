@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
 import { useToast } from '../context/ToastContext'
+import { formatCategory } from '../utils/api'
 
 function StarRating({ rating }) {
   return (
@@ -203,7 +204,7 @@ export default function ProductCard({ product, index = 0 }) {
               fontSize: '0.63rem', fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase',
               background: cat.bg, color: cat.color, padding: '3px 9px', borderRadius: '50px',
             }}>
-              {product.category.replace('-', ' ')}
+              {formatCategory(product.category)}
             </span>
             {!product.inStock && (
               <span style={{ fontSize: '0.63rem', fontWeight: 700, color: '#dc2626', background: '#FEF2F2', padding: '3px 9px', borderRadius: '50px' }}>

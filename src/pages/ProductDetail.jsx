@@ -9,7 +9,7 @@ import { useAuth } from '../context/AuthContext'
 import { useCart } from '../context/CartContext'
 import { useWishlist } from '../context/WishlistContext'
 import { useToast } from '../context/ToastContext'
-import api from '../utils/api'
+import api, { formatCategory } from '../utils/api'
 
 function StarRating({ rating, size = 14 }) {
   return (
@@ -152,7 +152,7 @@ export default function ProductDetail() {
           <Link to="/" style={{ color: '#9E7B6C', textDecoration: 'none' }}>Home</Link>
           <ChevronRight size={14} />
           <Link to={`/products?category=${product.category}`} style={{ color: '#9E7B6C', textDecoration: 'none', textTransform: 'capitalize' }}>
-            {product.category.replace('-', ' ')}
+            {formatCategory(product.category)}
           </Link>
           <ChevronRight size={14} />
           <span style={{ color: '#7A5C4E', fontWeight: 600 }}>{product.name}</span>
@@ -243,7 +243,7 @@ export default function ProductDetail() {
               )}
               <h1 style={{ fontSize: 'clamp(1.5rem, 3vw, 2.25rem)', fontWeight: 800, color: '#7A5C4E', marginBottom: '8px', lineHeight: 1.2 }}>{product.name}</h1>
               <div style={{ fontSize: '0.8125rem', color: '#E8A0B8', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '12px' }}>
-                {product.category.replace('-', ' ')}
+                {formatCategory(product.category)}
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
@@ -271,6 +271,41 @@ export default function ProductDetail() {
                     : <p key={i} style={{ margin: line === '' ? '8px 0' : '0 0 4px 0' }}>{line}</p>
                 )}
               </div>
+
+              {/* Variants */}
+              {product.variants?.length > 1 && (
+                <div style={{ marginBottom: '24px' }}>
+                  <div className="form-label">Available Variants</div>
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '10px' }}>
+                    {product.variants.map(v => {
+                      const isCurrent = v._id === product._id
+                      return (
+                        <Link key={v._id} to={`/products/${v._id}`} style={{ textDecoration: 'none' }}>
+                          <motion.div
+                            whileHover={{ scale: 1.06 }}
+                            whileTap={{ scale: 0.96 }}
+                            style={{
+                              width: 64, height: 64,
+                              borderRadius: '12px',
+                              overflow: 'hidden',
+                              border: `2.5px solid ${isCurrent ? '#C44569' : 'rgba(196,69,105,0.15)'}`,
+                              boxShadow: isCurrent ? '0 4px 14px rgba(196,69,105,0.25)' : '0 2px 6px rgba(122,92,78,0.08)',
+                              position: 'relative',
+                              flexShrink: 0,
+                              opacity: v.inStock ? 1 : 0.5,
+                            }}
+                          >
+                            <img src={v.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                            {isCurrent && (
+                              <div style={{ position: 'absolute', top: 3, right: 3, width: 16, height: 16, borderRadius: '50%', background: '#C44569', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '9px', color: '#fff', fontWeight: 900 }}>✓</div>
+                            )}
+                          </motion.div>
+                        </Link>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
 
               {/* Quantity */}
               <div style={{ marginBottom: '24px' }}>

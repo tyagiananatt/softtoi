@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react'
-import { Plus, Edit2, Trash2, Search, X, Image as Img, Link2, Star, Tag } from 'lucide-react'
+import { Plus, Edit2, Trash2, Search, X, Image as Img, Link2, Star, Tag, GitBranch } from 'lucide-react'
 import { AdminLayout } from './Dashboard'
 import { useToast } from '../../context/ToastContext'
-import api, { adminRequestConfig } from '../../utils/api'
+import api, { adminRequestConfig, formatCategory } from '../../utils/api'
 
-const EMPTY = { name: '', description: '', price: '', originalPrice: '', category: '', image: '', images: [], badge: '', inStock: true, featured: false }
+const EMPTY = { name: '', description: '', price: '', originalPrice: '', category: '', image: '', images: [], badge: '', inStock: true, featured: false, variantGroup: '', variantLabel: '' }
 
 export default function AdminProducts() {
   const [products, setProducts] = useState([])
@@ -49,12 +49,43 @@ export default function AdminProducts() {
     setForm({ ...EMPTY, category: categories[0]?.slug || '' })
     setImageUrlInput(''); setCustomCatName(''); setModal(true)
   }
+
+  const openAddVariant = async (p) => {
+    // Pre-fill form with parent product's details, same variantGroup, empty label/image
+    try {
+      const res = await api.get(`/products/${p._id}`)
+      const full = res.data
+      // Generate a variantGroup if parent doesn't have one yet
+      const groupId = full.variantGroup || `${full.slug}-variants`
+      // If parent has no variantGroup yet, update it first — use product name as label
+      if (!full.variantGroup) {
+        await api.put(`/products/${full._id}`, { variantGroup: groupId, variantLabel: full.variantLabel || full.name }, adminRequestConfig)
+      }
+      setEditing(null)
+      setForm({
+        name: full.name,
+        description: full.description,
+        price: full.price,
+        originalPrice: full.originalPrice || '',
+        category: full.category,
+        image: '',
+        images: [],
+        badge: full.badge || '',
+        inStock: true,
+        featured: false,
+        variantGroup: groupId,
+        variantLabel: '',
+      })
+      setImageUrlInput(''); setCustomCatName(''); setModal(true)
+      addToast(`Adding variant for "${full.name}" — set the label & photo`, 'info')
+    } catch { addToast('Failed to load product', 'error') }
+  }
   const openEdit = async (p) => {
     try {
       const res = await api.get(`/products/${p._id}`)
       const full = res.data
       setEditing(full._id)
-      setForm({ name: full.name, description: full.description, price: full.price, originalPrice: full.originalPrice || '', category: full.category, image: full.image, images: full.images || [], badge: full.badge || '', inStock: full.inStock, featured: full.featured })
+      setForm({ name: full.name, description: full.description, price: full.price, originalPrice: full.originalPrice || '', category: full.category, image: full.image, images: full.images || [], badge: full.badge || '', inStock: full.inStock, featured: full.featured, variantGroup: full.variantGroup || '', variantLabel: full.variantLabel || '' })
       setImageUrlInput(''); setCustomCatName(''); setModal(true)
     } catch { addToast('Failed to load product details', 'error') }
   }
@@ -185,11 +216,14 @@ export default function AdminProducts() {
                       <img src={p.imageUrl || p.image} alt={p.name} style={{ width: '44px', height: '44px', borderRadius: '10px', objectFit: 'cover', background: '#FFF6EC' }} />
                       <div>
                         <div style={{ fontWeight: 600, color: '#7A5C4E', fontSize: '0.875rem' }}>{p.name}</div>
-                        {p.badge && <span style={{ fontSize: '0.65rem', background: '#FDE8F0', color: '#E8A0B8', padding: '2px 6px', borderRadius: '50px', fontWeight: 700 }}>{p.badge}</span>}
+                        <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: '2px' }}>
+                          {p.badge && <span style={{ fontSize: '0.65rem', background: '#FDE8F0', color: '#E8A0B8', padding: '2px 6px', borderRadius: '50px', fontWeight: 700 }}>{p.badge}</span>}
+                          {p.variantGroup && <span style={{ fontSize: '0.6rem', background: 'rgba(196,69,105,0.1)', color: '#C44569', padding: '2px 7px', borderRadius: '50px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '3px' }}>🎨 {p.variantLabel || 'Variant'}</span>}
+                        </div>
                       </div>
                     </div>
                   </td>
-                  <td style={{ padding: '12px 16px' }}><span style={{ fontSize: '0.8rem', background: 'rgba(248,200,220,0.2)', color: '#9E7B6C', padding: '4px 10px', borderRadius: '50px', textTransform: 'capitalize', whiteSpace: 'nowrap' }}>{p.category.replace('-', ' ')}</span></td>
+                  <td style={{ padding: '12px 16px' }}><span style={{ fontSize: '0.8rem', background: 'rgba(248,200,220,0.2)', color: '#9E7B6C', padding: '4px 10px', borderRadius: '50px', textTransform: 'capitalize', whiteSpace: 'nowrap' }}>{formatCategory(p.category)}</span></td>
                   <td style={{ padding: '12px 16px', fontWeight: 700, color: '#7A5C4E', fontSize: '0.9rem' }}>₹{p.price.toLocaleString('en-IN')}</td>
                   <td style={{ padding: '12px 16px' }}>
                     <span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', background: p.inStock ? '#16a34a' : '#dc2626', marginRight: '6px' }} />
@@ -198,8 +232,9 @@ export default function AdminProducts() {
                   <td style={{ padding: '12px 16px', fontSize: '0.8rem', color: p.featured ? '#E8A0B8' : '#C4A696', fontWeight: 600 }}>{p.featured ? '★ Yes' : 'No'}</td>
                   <td style={{ padding: '12px 16px' }}>
                     <div style={{ display: 'flex', gap: '6px' }}>
-                      <button onClick={() => openEdit(p)} style={{ width: '34px', height: '34px', border: '1.5px solid #EED6C4', borderRadius: '8px', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9E7B6C' }}><Edit2 size={14} /></button>
-                      <button onClick={() => setDeleteId(p._id)} style={{ width: '34px', height: '34px', border: '1.5px solid #fca5a5', borderRadius: '8px', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#dc2626' }}><Trash2 size={14} /></button>
+                      <button onClick={() => openEdit(p)} title="Edit" style={{ width: '34px', height: '34px', border: '1.5px solid #EED6C4', borderRadius: '8px', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9E7B6C' }}><Edit2 size={14} /></button>
+                      <button onClick={() => openAddVariant(p)} title="Add Variant" style={{ width: '34px', height: '34px', border: '1.5px solid rgba(196,69,105,0.3)', borderRadius: '8px', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#C44569' }}><GitBranch size={14} /></button>
+                      <button onClick={() => setDeleteId(p._id)} title="Delete" style={{ width: '34px', height: '34px', border: '1.5px solid #fca5a5', borderRadius: '8px', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#dc2626' }}><Trash2 size={14} /></button>
                     </div>
                   </td>
                 </tr>
@@ -229,13 +264,15 @@ export default function AdminProducts() {
                 <div style={{ fontWeight: 700, color: '#7A5C4E', fontSize: '0.875rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</div>
                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '4px', flexWrap: 'wrap' }}>
                   <span style={{ fontWeight: 800, color: '#7A5C4E', fontSize: '0.9375rem' }}>₹{p.price.toLocaleString('en-IN')}</span>
-                  <span style={{ fontSize: '0.7rem', background: 'rgba(248,200,220,0.2)', color: '#9E7B6C', padding: '2px 8px', borderRadius: '50px', textTransform: 'capitalize' }}>{p.category.replace('-', ' ')}</span>
+                  <span style={{ fontSize: '0.7rem', background: 'rgba(248,200,220,0.2)', color: '#9E7B6C', padding: '2px 8px', borderRadius: '50px', textTransform: 'capitalize' }}>{formatCategory(p.category)}</span>
                   <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: p.inStock ? '#16a34a' : '#dc2626' }} />
                   {p.featured && <span style={{ fontSize: '0.65rem', color: '#E8A0B8', fontWeight: 700 }}>★ Featured</span>}
+                  {p.variantGroup && <span style={{ fontSize: '0.6rem', background: 'rgba(196,69,105,0.1)', color: '#C44569', padding: '1px 6px', borderRadius: '50px', fontWeight: 700 }}>🎨 {p.variantLabel || 'Variant'}</span>}
                 </div>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', flexShrink: 0 }}>
                 <button onClick={() => openEdit(p)} style={{ width: '34px', height: '34px', border: '1.5px solid #EED6C4', borderRadius: '8px', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#9E7B6C' }}><Edit2 size={14} /></button>
+                <button onClick={() => openAddVariant(p)} style={{ width: '34px', height: '34px', border: '1.5px solid rgba(196,69,105,0.3)', borderRadius: '8px', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#C44569' }}><GitBranch size={14} /></button>
                 <button onClick={() => setDeleteId(p._id)} style={{ width: '34px', height: '34px', border: '1.5px solid #fca5a5', borderRadius: '8px', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#dc2626' }}><Trash2 size={14} /></button>
               </div>
             </div>
@@ -250,10 +287,17 @@ export default function AdminProducts() {
         >
           <div className="admin-modal-content" style={{ background: '#fff', borderRadius: '20px', padding: '28px', width: '100%', maxWidth: '560px', maxHeight: '90vh', overflowY: 'auto' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-              <h2 style={{ fontWeight: 800, color: '#7A5C4E' }}>{editing ? 'Edit Product' : 'Add Product'}</h2>
+              <h2 style={{ fontWeight: 800, color: '#7A5C4E' }}>
+                {editing ? 'Edit Product' : form.variantGroup ? '+ Add Variant' : 'Add Product'}
+              </h2>
               <button onClick={() => setModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9E7B6C' }}><X size={20} /></button>
             </div>
             <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              {!editing && form.variantGroup && (
+                <div style={{ background: 'rgba(196,69,105,0.08)', border: '1px solid rgba(196,69,105,0.2)', borderRadius: '10px', padding: '10px 14px', fontSize: '0.8rem', color: '#C44569', fontWeight: 600 }}>
+                  🎨 Adding variant to group: <strong>{form.variantGroup}</strong> — set the label (e.g. "Red") and upload the variant photo
+                </div>
+              )}
               <F label="Name" v={form.name} onChange={v => set('name', v)} required />
               <div>
                 <label className="form-label">Description</label>
@@ -369,6 +413,22 @@ export default function AdminProducts() {
                 )}
               </div>
               <F label="Badge (optional)" v={form.badge} onChange={v => set('badge', v)} />
+              {/* Variant system */}
+              <div style={{ background: '#FFF6EC', borderRadius: '12px', padding: '14px', border: '1px solid rgba(238,214,196,0.5)' }}>
+                <div style={{ fontSize: '0.8rem', fontWeight: 700, color: '#7A5C4E', marginBottom: '10px' }}>🎨 Variant Linking (optional)</div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                  <div>
+                    <label className="form-label">Variant Group ID</label>
+                    <input value={form.variantGroup} onChange={e => set('variantGroup', e.target.value)} className="form-input" placeholder="e.g. rose-keychain-group" />
+                    <div style={{ fontSize: '0.65rem', color: '#C4A696', marginTop: '3px' }}>Same ID links products as variants</div>
+                  </div>
+                  <div>
+                    <label className="form-label">Variant Label</label>
+                    <input value={form.variantLabel} onChange={e => set('variantLabel', e.target.value)} className="form-input" placeholder="e.g. Red, Blue, Pink" />
+                    <div style={{ fontSize: '0.65rem', color: '#C4A696', marginTop: '3px' }}>Shown as pill on product page</div>
+                  </div>
+                </div>
+              </div>
               <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end', marginTop: '8px' }}>
                 <button type="button" onClick={() => setModal(false)} className="btn-secondary">Cancel</button>
                 <button type="submit" disabled={saving} className="btn-primary">{saving ? 'Saving...' : editing ? 'Update' : 'Create'}</button>

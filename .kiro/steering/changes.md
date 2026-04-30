@@ -168,3 +168,23 @@ const handleBuyNow = () => {
 
 All strip logos are in `public/strip_logos/`:
 - `handmade.png`, `gift.png`, `eco.png`, `fast.png`, `sustainable.png`, `image.png`
+
+---
+
+## 9. Product Variant System
+
+**What:** Products can be linked as variants (e.g. different colors) using a shared `variantGroup` ID.
+
+**Models updated:** `lib/models/Product.js` and `api/_lib/models/Product.js` — added:
+```js
+variantGroup: { type: String, default: null },
+variantLabel: { type: String, default: null },
+```
+
+**Backend:** `lib/routes/products.js` GET `/:id` now returns `variants` array with sibling products.
+
+**Admin:** `src/pages/admin/AdminProducts.jsx` — EMPTY constant and edit form include `variantGroup` and `variantLabel` fields. A "🎨 Variant Linking" section appears at the bottom of the product form.
+
+**Frontend:** `src/pages/ProductDetail.jsx` — shows variant pills above the quantity selector when `product.variants.length > 1`. Each pill shows the variant's thumbnail + label and navigates to that product on click.
+
+**Usage:** Set same `variantGroup` ID (e.g. `rose-keychain`) on all variant products. Set different `variantLabel` (e.g. `Red`, `Pink`) on each.

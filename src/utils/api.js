@@ -46,3 +46,14 @@ api.interceptors.response.use(
 )
 
 export default api
+
+// Strip trailing timestamp from category slug and format for display
+// e.g. "tshirt-1714000000000" → "Tshirt"
+// e.g. "soft-toys" → "Soft Toys"
+export function formatCategory(slug) {
+  if (!slug) return ''
+  // Remove trailing -digits (timestamp)
+  const clean = slug.replace(/-\d{10,}$/, '')
+  // Replace hyphens with spaces and title-case
+  return clean.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+}

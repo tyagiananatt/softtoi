@@ -4,6 +4,7 @@ import { ShoppingBag, Trash2, Plus, Minus, Truck, Tag } from 'lucide-react'
 import { useCart } from '../context/CartContext'
 import { useToast } from '../context/ToastContext'
 import AnimatedSection from '../components/AnimatedSection'
+import { formatCategory } from '../utils/api'
 
 export default function Cart() {
   const { items, removeFromCart, updateQuantity, clearCart, subtotal, shippingCost, total } = useCart()
@@ -58,7 +59,7 @@ export default function Cart() {
                     <Link to={`/products/${item._id}`} style={{ textDecoration: 'none' }}>
                       <div style={{ fontWeight: 700, color: '#7A5C4E', fontSize: '0.9375rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.name}</div>
                     </Link>
-                    <div style={{ fontSize: '0.75rem', color: '#E8A0B8', textTransform: 'uppercase', fontWeight: 600, marginBottom: '4px' }}>{item.category.replace('-', ' ')}</div>
+                    <div style={{ fontSize: '0.75rem', color: '#E8A0B8', textTransform: 'uppercase', fontWeight: 600, marginBottom: '4px' }}>{formatCategory(item.category)}</div>
                     <div style={{ fontWeight: 700, color: '#9E7B6C', fontSize: '0.875rem' }}>₹{item.price.toLocaleString('en-IN')} each</div>
                   </div>
                   <div className="cart-item-controls">
