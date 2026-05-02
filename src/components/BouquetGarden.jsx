@@ -202,8 +202,10 @@ function OrbitCircle({ products, currentIdx, posClass, animDirection }) {
   return (
     <div
       className={`bq-orbit-card ${posClassMap[posClass]}`}
+      onClick={() => { const p = products[currentIdx]; if (p?._id) window.location.href = `/products/${p._id}` }}
       style={{
         width: 130, height: 130,
+        cursor: 'pointer',
         ...posStyles[posClass],
       }}
     >
@@ -293,6 +295,7 @@ function CenterCard({ products }) {
       }}
       onMouseEnter={() => clearInterval(timerRef.current)}
       onMouseLeave={startTimer}
+      onClick={() => { if (p?._id) window.location.href = `/products/${p._id}` }}
     >
       {/* Flip container */}
       <div style={{
