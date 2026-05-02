@@ -6,6 +6,7 @@ import AnimatedSection from '../components/AnimatedSection'
 import ProductCard from '../components/ProductCard'
 import CategoryCard from '../components/CategoryCard'
 import LoadingQuote from '../components/LoadingQuote'
+import KeychainCarousel from '../components/KeychainCarousel'
 import api from '../utils/api'
 
 const FEATURES = [
@@ -738,6 +739,7 @@ export default function Home() {
   const [featured, setFeatured] = useState([])
   const [categories, setCategories] = useState([])
   const [newArrivals, setNewArrivals] = useState([])
+  const [keychains, setKeychains] = useState([])
   const [loading, setLoading] = useState(true)
   const [apiError, setApiError] = useState(null)
   const [recentReviews, setRecentReviews] = useState([])
@@ -748,10 +750,12 @@ export default function Home() {
       api.get('/products?featured=true'),
       api.get('/categories'),
       api.get('/products?sort=newest&limit=8'),
-    ]).then(([p, c, n]) => {
+      api.get('/products?category=keychains&limit=12'),
+    ]).then(([p, c, n, k]) => {
       setFeatured(p.data)
       setCategories(c.data)
       setNewArrivals(n.data)
+      setKeychains(k.data)
       setApiError(null)
     }).catch(err => setApiError(err.response?.data?.message || err.message || 'Failed to load data'))
       .finally(() => setLoading(false))
@@ -973,6 +977,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* ═══ KEYCHAIN CAROUSEL ═══ */}
+      {keychains.length > 0 && <KeychainCarousel products={keychains} />}
 
       {/* ═══ FEATURE STRIP ═══ */}
       <section style={{ background: '#fff', borderTop: '1px solid rgba(196,69,105,0.08)', borderBottom: '1px solid rgba(196,69,105,0.08)', padding: '16px 0' }}>
