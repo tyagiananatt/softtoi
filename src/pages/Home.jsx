@@ -975,7 +975,7 @@ export default function Home() {
       </section>
 
       {/* ═══ FEATURE STRIP ═══ */}
-      <section style={{ background: '#fff', borderTop: '1px solid rgba(196,69,105,0.08)', borderBottom: '1px solid rgba(196,69,105,0.08)', padding: '0' }}>
+      <section style={{ background: '#fff', borderTop: '1px solid rgba(196,69,105,0.08)', borderBottom: '1px solid rgba(196,69,105,0.08)', padding: '16px 0' }}>
         <div className="page-container">
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0' }}>
             {FEATURES.map((f, i) => (
@@ -999,50 +999,6 @@ export default function Home() {
               </AnimatedSection>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* ═══ CUSTOMER REVIEWS ═══ */}
-      <section style={{ padding: 'clamp(48px, 8vw, 96px) 0', background: 'linear-gradient(180deg, #fff 0%, #fff5f8 100%)' }}>
-        <div className="page-container">
-          <AnimatedSection>
-            <div style={{ textAlign: 'center', marginBottom: 'clamp(32px, 5vw, 56px)' }}>
-              <div className="section-label">Happy Customers</div>
-              <h2 style={{ fontSize: 'clamp(1.6rem, 3.5vw, 2.75rem)', fontWeight: 900, color: '#1A0A05', letterSpacing: '-0.025em' }}>
-                What People Are Saying
-              </h2>
-              <p style={{ color: '#8B6655', fontSize: 'clamp(0.875rem, 2vw, 1rem)', maxWidth: '440px', margin: '14px auto 0', lineHeight: 1.7 }}>
-                Real reviews from verified buyers across our collection.
-              </p>
-            </div>
-          </AnimatedSection>
-
-          {reviewsLoading ? (
-            <div style={{ display: 'flex', gap: '20px', overflow: 'hidden' }}>
-              {[...Array(3)].map((_, i) => (
-                <div key={i} className="skeleton" style={{ height: '380px', borderRadius: '24px', minWidth: '260px' }} />
-              ))}
-            </div>
-          ) : recentReviews.length === 0 ? null : (
-            <>
-              <div className="marquee-outer" style={{ paddingBottom: '8px' }}>
-                <div className="marquee-track" style={{ gap: '20px', alignItems: 'stretch', animationDuration: `${Math.max(20, recentReviews.length * 6)}s` }}>
-                  {[...recentReviews, ...recentReviews, ...recentReviews, ...recentReviews].map((r, i) => (
-                    <ReviewCard key={`${r._id}-${i}`} review={r} index={i % recentReviews.length} />
-                  ))}
-                </div>
-              </div>
-              <AnimatedSection>
-                <div style={{ textAlign: 'center', marginTop: '44px' }}>
-                  <Link to="/products" style={{ textDecoration: 'none' }}>
-                    <button className="btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
-                      Shop &amp; Leave a Review <ArrowRight size={16} />
-                    </button>
-                  </Link>
-                </div>
-              </AnimatedSection>
-            </>
-          )}
         </div>
       </section>
 
@@ -1120,6 +1076,50 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ═══ CUSTOMER REVIEWS ═══ */}
+      <section style={{ padding: 'clamp(48px, 8vw, 96px) 0', background: 'linear-gradient(180deg, #fff 0%, #fff5f8 100%)' }}>
+        <div className="page-container">
+          <AnimatedSection>
+            <div style={{ textAlign: 'center', marginBottom: 'clamp(32px, 5vw, 56px)' }}>
+              <div className="section-label">Happy Customers</div>
+              <h2 style={{ fontSize: 'clamp(1.6rem, 3.5vw, 2.75rem)', fontWeight: 900, color: '#1A0A05', letterSpacing: '-0.025em' }}>
+                What People Are Saying
+              </h2>
+              <p style={{ color: '#8B6655', fontSize: 'clamp(0.875rem, 2vw, 1rem)', maxWidth: '440px', margin: '14px auto 0', lineHeight: 1.7 }}>
+                Real reviews from verified buyers across our collection.
+              </p>
+            </div>
+          </AnimatedSection>
+
+          {reviewsLoading ? (
+            <div style={{ display: 'flex', gap: '20px', overflow: 'hidden' }}>
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="skeleton" style={{ height: '380px', borderRadius: '24px', minWidth: '260px' }} />
+              ))}
+            </div>
+          ) : recentReviews.length === 0 ? null : (
+            <>
+              <div className="marquee-outer" style={{ paddingBottom: '8px' }}>
+                <div className="marquee-track" style={{ gap: '20px', alignItems: 'stretch', animationDuration: `${Math.max(20, recentReviews.length * 6)}s` }}>
+                  {[...recentReviews, ...recentReviews, ...recentReviews, ...recentReviews].map((r, i) => (
+                    <ReviewCard key={`${r._id}-${i}`} review={r} index={i % recentReviews.length} />
+                  ))}
+                </div>
+              </div>
+              <AnimatedSection>
+                <div style={{ textAlign: 'center', marginTop: '44px' }}>
+                  <Link to="/products" style={{ textDecoration: 'none' }}>
+                    <button className="btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+                      Shop & Leave a Review <ArrowRight size={16} />
+                    </button>
+                  </Link>
+                </div>
+              </AnimatedSection>
+            </>
+          )}
+        </div>
+      </section>
+
     {/* ═══ INSTAGRAM FEED ═══ */}
       {/*  {INSTA_POST_URLS.length > 0 && (
         <section style={{ padding: 'clamp(48px, 8vw, 96px) 0', background: 'linear-gradient(180deg, #fffaf5 0%, #fff5f8 100%)' }}>
@@ -1185,7 +1185,7 @@ export default function Home() {
       )}*/}
 
       {/* ═══ TESTIMONIALS ═══ */}
-      <section style={{ padding: '96px 0', background: 'linear-gradient(180deg, #fffaf5 0%, #fff5f8 100%)' }}>
+      {/* <section style={{ padding: '96px 0', background: 'linear-gradient(180deg, #fffaf5 0%, #fff5f8 100%)' }}>
         <div className="page-container">
           <AnimatedSection>
             <div style={{ textAlign: 'center', marginBottom: '56px' }}>
@@ -1234,7 +1234,7 @@ export default function Home() {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* ═══ CTA BANNER ═══ */}
       <section style={{ padding: '96px 0', background: '#fff' }}>
