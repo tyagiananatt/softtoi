@@ -7,6 +7,7 @@ import ProductCard from '../components/ProductCard'
 import CategoryCard from '../components/CategoryCard'
 import LoadingQuote from '../components/LoadingQuote'
 import KeychainCarousel from '../components/KeychainCarousel'
+import BouquetGarden from '../components/BouquetGarden'
 import api from '../utils/api'
 
 const FEATURES = [
@@ -740,6 +741,7 @@ export default function Home() {
   const [categories, setCategories] = useState([])
   const [newArrivals, setNewArrivals] = useState([])
   const [keychains, setKeychains] = useState([])
+  const [flowers, setFlowers] = useState([])
   const [loading, setLoading] = useState(true)
   const [apiError, setApiError] = useState(null)
   const [recentReviews, setRecentReviews] = useState([])
@@ -751,11 +753,13 @@ export default function Home() {
       api.get('/categories'),
       api.get('/products?sort=newest&limit=8'),
       api.get('/products?category=keychains&limit=12'),
-    ]).then(([p, c, n, k]) => {
+      api.get('/products?category=flowers&limit=12'),
+    ]).then(([p, c, n, k, f]) => {
       setFeatured(p.data)
       setCategories(c.data)
       setNewArrivals(n.data)
       setKeychains(k.data)
+      setFlowers(f.data)
       setApiError(null)
     }).catch(err => setApiError(err.response?.data?.message || err.message || 'Failed to load data'))
       .finally(() => setLoading(false))
@@ -1008,6 +1012,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* ═══ BOUQUET GARDEN ═══ */}
+      {flowers.length > 0 && <BouquetGarden products={flowers} />}
 
       {/* ═══ VIDEO SHOWCASE ═══ */}
       <section style={{ padding: '0', background: '#1A0A05', position: 'relative', overflow: 'hidden' }}>
