@@ -1,6 +1,5 @@
 // Vercel serverless entry point
 const mongoose = require('mongoose');
-const dns = require('dns').promises;
 const serverless = require('serverless-http');
 const express = require('express');
 const cors = require('cors');
@@ -34,95 +33,26 @@ function buildHandler() {
   return handler;
 }
 
-// Resolve mongodb+srv:// to a direct mongodb:// URI by doing SRV + TXT DNS lookups.
-// This bypasses the built-in SRV DNS resolution which can time out on some serverless
-// platforms (Vercel), while still being fully dynamic (no hardcoded hostnames).
-async function resolveSrvUri(uri) {
-  if (!uri || !uri.startsWith('mongodb+srv://')) return uri;
-  try {
-    // Parse:  mongodb+srv://user:pass@cluster.mongodb.net/dbname?opts
-    const withoutScheme = uri.slice('mongodb+srv://'.length);
-    const atIdx = withoutScheme.indexOf('@');
-    const creds = withoutScheme.slice(0, atIdx);           // user:pass
-    const afterAt = withoutScheme.slice(atIdx + 1);        // cluster.mongodb.net/dbname?opts
-    const slashIdx = afterAt.indexOf('/');
-    const srvHost = afterAt.slice(0, slashIdx);             // cluster.mongodb.net
-    const dbAndParams = afterAt.slice(slashIdx);            // /dbname?opts
-
-    // Race DNS lookups against a 3-second timeout so cold starts don't hang
-    const timeout = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('DNS timeout')), 3000)
-    );
-    const result = await Promise.race([
-      Promise.all([
-        dns.resolveSrv(`_mongodb._tcp.${srvHost}`),
-        dns.resolveTxt(srvHost).catch(() => []),
-      ]),
-      timeout,
-    ]).catch(() => null);
-
-    if (!result || !result[0] || result[0].length === 0) {
-      console.warn('SRV resolution returned no records, falling back to original URI');
-      return uri;
-    }
-
-    const [srvRecords, txtRecords] = result;
-    const hosts = srvRecords.map((r) => `${r.name}:${r.port}`).join(',');
-    const txtOpts = (txtRecords[0] || []).join(''); // e.g. authSource=admin&replicaSet=...
-
-    // Collect all params from the original URI and TXT record, then deduplicate.
-    // Build a merged params map so no option ever appears twice.
-    const merged = new Map();
-
-    // Parse params already in the original URI (e.g. ?retryWrites=true&w=majority)
-    const qIdx = dbAndParams.indexOf('?');
-    const dbName = qIdx === -1 ? dbAndParams : dbAndParams.slice(0, qIdx);
-    const origParams = qIdx === -1 ? '' : dbAndParams.slice(qIdx + 1);
-    for (const pair of origParams.split('&').filter(Boolean)) {
-      const [k, v] = pair.split('=');
-      merged.set(k, v);
-    }
-    // Merge TXT record options (Atlas puts replicaSet + authSource here)
-    for (const pair of txtOpts.split('&').filter(Boolean)) {
-      const [k, v] = pair.split('=');
-      merged.set(k, v);
-    }
-    // Always need tls=true for Atlas direct connections
-    merged.set('tls', 'true');
-
-    const queryString = Array.from(merged.entries()).map(([k, v]) => `${k}=${v}`).join('&');
-    const directUri = `mongodb://${creds}@${hosts}${dbName}?${queryString}`;
-    console.log(`SRV resolved to ${srvRecords.length} host(s)`);
-    return directUri;
-  } catch (e) {
-    // If DNS resolution fails for any reason, fall back to the original SRV URI
-    console.warn('SRV resolution failed, using original URI:', e.message);
-    return uri;
-  }
-}
-
 // DB connection — cached via global so it survives warm reuse between requests.
 // readyState: 0=disconnected 1=connected 2=connecting 3=disconnecting
 async function connectDB() {
   // Already connected — reuse the existing connection
   if (mongoose.connection.readyState === 1) return;
 
-  // If the previous connection dropped (readyState 0) or we never connected,
-  // clear any stale cached promise so we reconnect cleanly.
+  // If the previous connection dropped, clear stale promise so we reconnect cleanly
   if (mongoose.connection.readyState === 0) {
     global._dbPromise = null;
   }
 
   if (!global._dbPromise) {
-    // Dynamically resolve SRV so DNS lookup happens with our known-good timeout,
-    // not buried inside Mongoose's connection internals.
-    const uri = await resolveSrvUri(process.env.MONGODB_URI);
+    // Let Mongoose + the MongoDB driver handle SRV resolution natively.
+    // Do NOT manually resolve SRV to IPs — Atlas rotates nodes and cached IPs go stale.
     global._dbPromise = mongoose
-      .connect(uri, {
+      .connect(process.env.MONGODB_URI, {
         bufferCommands: false,
-        serverSelectionTimeoutMS: 8000,
-        connectTimeoutMS: 8000,
-        socketTimeoutMS: 8000,
+        serverSelectionTimeoutMS: 30000,
+        connectTimeoutMS: 30000,
+        socketTimeoutMS: 45000,
         maxPoolSize: 5,
       })
       .catch((err) => {
@@ -144,7 +74,6 @@ module.exports = async (req, res) => {
     await connectDB();
   } catch (err) {
     console.error('DB connection failed:', err.message);
-    // Return the real error in non-production so it's debuggable
     return res.status(503).json({
       message: 'Database connection failed',
       detail: err.message,
