@@ -39,9 +39,13 @@ async function connectDB() {
   // Already connected — reuse the existing connection
   if (mongoose.connection.readyState === 1) return;
 
-  // If the previous connection dropped, clear stale promise so we reconnect cleanly
-  if (mongoose.connection.readyState === 0) {
+  // Clear stale promise for any non-connected state (disconnected, disconnecting, or stuck connecting)
+  if (mongoose.connection.readyState !== 1) {
     global._dbPromise = null;
+    // Close any existing connection cleanly before reconnecting
+    if (mongoose.connection.readyState !== 0) {
+      try { await mongoose.disconnect(); } catch (_) {}
+    }
   }
 
   if (!global._dbPromise) {
@@ -50,9 +54,9 @@ async function connectDB() {
     global._dbPromise = mongoose
       .connect(process.env.MONGODB_URI, {
         bufferCommands: false,
-        serverSelectionTimeoutMS: 30000,
-        connectTimeoutMS: 30000,
-        socketTimeoutMS: 45000,
+        serverSelectionTimeoutMS: 10000,
+        connectTimeoutMS: 10000,
+        socketTimeoutMS: 20000,
         maxPoolSize: 5,
       })
       .catch((err) => {
