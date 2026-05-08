@@ -3,7 +3,7 @@ import axios from 'axios'
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || '/api',
   headers: { 'Content-Type': 'application/json' },
-  timeout: 15000, // 15s — fail fast instead of hanging forever
+  timeout: 30000, // 30s — Render free tier can take ~30s to wake from sleep
 })
 
 export const adminRequestConfig = { headers: { 'X-Softtoi-Admin': 'true' } }
