@@ -25,5 +25,7 @@ productSchema.index({ price: -1 });
 productSchema.index({ rating: -1 });
 productSchema.index({ category: 1, featured: -1 });
 productSchema.index({ variantGroup: 1 });
+productSchema.index({ createdAt: -1 });
+productSchema.index({ name: 'text' }); // text index for search
 
 module.exports = mongoose.models.Product || mongoose.model('Product', productSchema);
