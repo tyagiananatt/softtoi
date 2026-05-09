@@ -93,14 +93,33 @@ export default function Profile() {
     setReviewForm({ rating: 5, comment: '', images: [] })
   }
 
-  const handleReviewImageUpload = (e) => {
-    Array.from(e.target.files).forEach(file => {
-      const reader = new FileReader()
-      reader.onload = ev => setReviewForm(f => ({ ...f, images: [...f.images, ev.target.result] }))
-      reader.readAsDataURL(file)
-    })
-    e.target.value = ''
-  }
+  const handleReviewImageUpload = async (e) => {
+    const files = Array.from(e.target.files);
+    e.target.value = '';
+    
+    for (const file of files) {
+      try {
+        const base64 = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (ev) => resolve(ev.target.result);
+          reader.readAsDataURL(file);
+        });
+
+        addToast('Uploading image...', 'info');
+        const response = await api.post('/upload', { 
+          image: base64, 
+          folder: 'softtoi/reviews' 
+        });
+        
+        const cloudinaryUrl = response.data.url;
+        setReviewForm(f => ({ ...f, images: [...f.images, cloudinaryUrl] }));
+        addToast('Image uploaded!', 'success');
+      } catch (error) {
+        console.error('Upload failed:', error);
+        addToast('Failed to upload image', 'error');
+      }
+    }
+  };
 
   const handleReviewSubmit = async (e) => {
     e.preventDefault()

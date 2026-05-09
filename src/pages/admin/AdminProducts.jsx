@@ -134,19 +134,41 @@ export default function AdminProducts() {
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
 
-  const handleImageUpload = (e) => {
-    Array.from(e.target.files).forEach(file => {
-      const reader = new FileReader()
-      reader.onload = ev => {
+  const handleImageUpload = async (e) => {
+    const files = Array.from(e.target.files);
+    e.target.value = ''; // reset input
+    
+    for (const file of files) {
+      try {
+        // Read file as base64
+        const base64 = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (ev) => resolve(ev.target.result);
+          reader.readAsDataURL(file);
+        });
+
+        // Upload to Cloudinary via API
+        addToast('Uploading image...', 'info');
+        const response = await api.post('/upload', { 
+          image: base64, 
+          folder: 'softtoi/products' 
+        });
+        
+        const cloudinaryUrl = response.data.url;
+        
+        // Add Cloudinary URL to form
         setForm(f => {
-          if (!f.image) return { ...f, image: ev.target.result }
-          return { ...f, images: [...(f.images || []), ev.target.result] }
-        })
+          if (!f.image) return { ...f, image: cloudinaryUrl };
+          return { ...f, images: [...(f.images || []), cloudinaryUrl] };
+        });
+        
+        addToast('Image uploaded successfully!', 'success');
+      } catch (error) {
+        console.error('Upload failed:', error);
+        addToast(error.response?.data?.message || 'Failed to upload image', 'error');
       }
-      reader.readAsDataURL(file)
-    })
-    e.target.value = ''
-  }
+    }
+  };
 
   const removeImage = (idx) => {
     setForm(f => {
