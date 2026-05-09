@@ -31,25 +31,31 @@ router.get('/verify', authMiddleware, (req, res) => {
 // GET dashboard stats
 router.get('/stats', authMiddleware, async (req, res) => {
   try {
-    const [orders, products] = await Promise.all([
+    const [orders, productCount] = await Promise.all([
       Order.find(),
-      Product.find(),
+      Product.countDocuments(),  // just count, don't load all products
     ]);
     const totalRevenue = orders.filter(o => o.status !== 'cancelled').reduce((sum, o) => sum + o.total, 0);
     const pendingOrders = orders.filter(o => o.status === 'pending').length;
     const recentOrders = await Order.find().sort({ createdAt: -1 }).limit(5).populate('items.product', 'name');
     const statusBreakdown = {};
     orders.forEach(o => { statusBreakdown[o.status] = (statusBreakdown[o.status] || 0) + 1; });
-    const categoryBreakdown = {};
-    products.forEach(p => { categoryBreakdown[p.category] = (categoryBreakdown[p.category] || 0) + 1; });
+    
+    // Get category breakdown without loading full products
+    const categoryBreakdown = await Product.aggregate([
+      { $group: { _id: '$category', count: { $sum: 1 } } }
+    ]);
+    const categoryBreakdownObj = {};
+    categoryBreakdown.forEach(c => { categoryBreakdownObj[c._id] = c.count; });
+    
     res.json({
       totalRevenue,
       totalOrders: orders.length,
-      totalProducts: products.length,
+      totalProducts: productCount,
       pendingOrders,
       recentOrders,
       statusBreakdown,
-      categoryBreakdown,
+      categoryBreakdown: categoryBreakdownObj,
     });
   } catch (err) {
     res.status(500).json({ message: err.message });
