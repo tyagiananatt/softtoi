@@ -58,16 +58,30 @@ router.get('/:id/image', async (req, res) => {
 // GET single product
 router.get('/:id', async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const product = await Product.findById(req.params.id)
+      .select('-image -images')
+      .maxTimeMS(10000)
+      .lean();
     if (!product) return res.status(404).json({ message: 'Product not found' });
-    // Fetch sibling variants if this product belongs to a variant group
+    
+    const base = `${req.protocol}://${req.get('host')}`;
+    const imageUrl = `${base}/api/products/${product._id}/image`;
+    product.imageUrl = imageUrl;
+    product.image = imageUrl;
+    product.images = [];
+    
     let variants = [];
     if (product.variantGroup) {
       variants = await Product.find({ variantGroup: product.variantGroup })
-        .select('_id name variantLabel image price inStock')
+        .select('_id name variantLabel price inStock')
         .lean();
+      variants.forEach(v => {
+        const vImageUrl = `${base}/api/products/${v._id}/image`;
+        v.imageUrl = vImageUrl;
+        v.image = vImageUrl;
+      });
     }
-    res.json({ ...product.toObject(), variants });
+    res.json({ ...product, variants });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

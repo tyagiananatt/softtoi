@@ -14,10 +14,10 @@ router.get('/product/:productId', async (req, res) => {
       .select('-images')  // exclude heavy base64 images
       .maxTimeMS(10000)
       .lean();
-    // Add image URLs pointing to the image endpoint
+    const base = `${req.protocol}://${req.get('host')}`;
     const data = reviews.map(r => ({
       ...r,
-      images: r._id ? [`/api/reviews/${r._id}/images`] : []  // placeholder - will serve first image
+      images: r._id ? [`${base}/api/reviews/${r._id}/images`] : []
     }));
     res.json(data);
   } catch (err) { res.status(500).json({ message: err.message }); }
@@ -33,10 +33,11 @@ router.get('/recent', async (req, res) => {
       .populate('product', 'name')
       .maxTimeMS(10000)
       .lean();
+    const base = `${req.protocol}://${req.get('host')}`;
     const data = reviews.map(r => ({
       ...r,
       productName: r.product?.name || '',
-      images: r._id ? [`/api/reviews/${r._id}/images`] : []
+      images: r._id ? [`${base}/api/reviews/${r._id}/images`] : []
     }));
     res.json(data);
   } catch (err) { res.status(500).json({ message: err.message }); }
@@ -82,10 +83,10 @@ router.get('/', authMiddleware, async (req, res) => {
       .populate('user', 'fullName email')
       .maxTimeMS(15000)
       .lean();
-    // Add image URLs
+    const base = `${req.protocol}://${req.get('host')}`;
     const data = reviews.map(r => ({
       ...r,
-      images: r._id ? [`/api/reviews/${r._id}/images`] : []
+      images: r._id ? [`${base}/api/reviews/${r._id}/images`] : []
     }));
     res.json(data);
   } catch (err) { res.status(500).json({ message: err.message }); }
