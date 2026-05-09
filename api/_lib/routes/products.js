@@ -23,18 +23,14 @@ router.get('/', async (req, res) => {
     const products = await Product.find(query)
       .sort(sortOption)
       .limit(limit)
-      .select('-images -description -details')
-      .maxTimeMS(8000)  // fail after 8s instead of hanging forever
+      .select('-images -description -details -image')  // exclude heavy base64 image field
+      .maxTimeMS(15000)  // 15s timeout for Atlas free tier
       .lean();
-    // For base64 images, replace with a lightweight URL endpoint; for URL images, keep as-is
+    
+    // Add imageUrl for frontend — always use the /image endpoint
     const base = `${req.protocol}://${req.get('host')}`;
     products.forEach(p => {
-      if (p.image && p.image.startsWith('data:')) {
-        p.imageUrl = `${base}/api/products/${p._id}/image`;
-        delete p.image;
-      } else {
-        p.imageUrl = p.image;
-      }
+      p.imageUrl = `${base}/api/products/${p._id}/image`;
     });
     res.json(products);
   } catch (err) {
